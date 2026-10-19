@@ -1,0 +1,112 @@
+import React, { useEffect, useRef, useState } from 'react';
+import { createRoot } from 'react-dom/client';
+import Phaser from 'phaser';
+import { GameScene, type SceneStatus } from './game/GameScene';
+import { playSound, setMusicPaused, setMusicVolume, startMusic, stopMusic } from './game/audio';
+import { getLevel, LEVELS, WORLD_ICONS, WORLD_NAMES } from './game/levels';
+import { STICKER_INFO, STICKERS, type StickerType } from './game/model';
+import { useProgress } from './state/progress';
+import './styles/main.css';
+
+type Screen = 'home' | 'map' | 'play' | 'character' | 'book' | 'settings';
+const COSMETICS = [
+  { id:'classic', name:'Everyday Outfit', icon:'👟', detail:'Ready for an adventure.' },
+  { id:'backpack', name:'Shlichus Backpack', icon:'🎒', detail:'Complete The Runaway Pushka.' }
+];
+const ACHIEVEMENTS = [
+  { id:'first-sticker', name:'First Sticker', icon:'🏷️', detail:'Make your first sticker transfer.' },
+  { id:'pushka-pro', name:'Pushka Pro', icon:'🌟', detail:'Help Rivky fill the pushka.' }
+];
+
+function Logo({ small = false }: { small?: boolean }) { return <div className={`logo ${small ? 'small' : ''}`}><span className="logo-star">✦</span>MITZVAH <strong>CHAOS</strong><span className="logo-star">✦</span></div>; }
+function Back({ onClick }: { onClick: () => void }) { return <button className="icon-button back" onClick={onClick} aria-label="Back">←</button>; }
+
+function Joystick({ onMove }: { onMove: (x:number,y:number) => void }) {
+  const [point,setPoint] = useState({x:0,y:0});
+  const move = (event: React.PointerEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = (event.clientX - (rect.left + rect.width/2)) / (rect.width/2);
+    const y = (event.clientY - (rect.top + rect.height/2)) / (rect.height/2);
+    const length = Math.max(1,Math.hypot(x,y));
+    const next = {x:x/length,y:y/length}; setPoint(next); onMove(next.x,next.y);
+  };
+  const stop = () => {setPoint({x:0,y:0});onMove(0,0);};
+  return <div className="joystick" role="group" aria-label="Movement joystick" onPointerDown={(event) => {event.currentTarget.setPointerCapture(event.pointerId);move(event);}} onPointerMove={(event) => {if(event.currentTarget.hasPointerCapture(event.pointerId))move(event);}} onPointerUp={stop} onPointerCancel={stop}>
+    <div className="joystick-ring"/><div className="joystick-knob" style={{transform:`translate(${point.x*32}px,${point.y*32}px)`}}>✦</div>
+  </div>;
+}
+
+function GameScreen({ number, onBack, onNext }: { number:number; onBack:()=>void; onNext:(number:number)=>void }) {
+  const level = getLevel(number);
+  const { progress, setSettings, recordTransfer, recordBounce, completeLevel } = useProgress();
+  const [status,setStatus] = useState<SceneStatus>({ selected:null, armed:null, transfers:0, treasure:false, gem:false, goals:0, totalGoals:level.goals.length, message:level.hint, canUndo:false, carried:0, deposited:0, required:level.mission?.coins.length ?? 0, nearStation:false });
+  const [paused,setPaused] = useState(false);
+  const [pauseSettings,setPauseSettings] = useState(false);
+  const [result,setResult] = useState<{stars:number;gem:boolean}|null>(null);
+  const achievementsSeen = useRef(progress.achievements.length);
+  const host = useRef<HTMLDivElement>(null);
+  const scene = useRef<GameScene|null>(null);
+  useEffect(() => {
+    if (!host.current) return;
+    const canvasHost = host.current;
+    const gameScene = new GameScene(level, {
+      onStatus: setStatus,
+      onTransfer: (sticker,sourceKind,stickers) => recordTransfer(sticker,sourceKind,stickers),
+      onBounce: () => recordBounce(),
+      onComplete: (stars,gem,tiny) => { completeLevel(number,stars,gem,tiny); setResult({stars,gem}); }
+    }, progress.settings, progress.selectedCosmetic, progress.selectedCharacter);
+    startMusic(level.world, progress.settings.musicVolume);
+    scene.current = gameScene;
+    const game = new Phaser.Game({
+      type: progress.settings.graphicsQuality === 'low' ? Phaser.CANVAS : Phaser.AUTO,
+      parent: canvasHost,
+      width:390,height:620,
+      backgroundColor:'#fff0c8',
+      scale:{ mode:Phaser.Scale.FIT, autoCenter:Phaser.Scale.CENTER_BOTH, width:390, height:620 },
+      physics:{ default:'arcade', arcade:{ debug:false, gravity:{x:0,y:0} } },
+      render:{ antialias:progress.settings.graphicsQuality !== 'low', pixelArt:false },
+      scene:[gameScene]
+    });
+    const visibility = () => { if(document.hidden){gameScene.setPaused(true);setMusicPaused(true);setPaused(true);} };
+    document.addEventListener('visibilitychange',visibility);
+    return () => { document.removeEventListener('visibilitychange',visibility); scene.current=null; stopMusic(); game.destroy(true); canvasHost.replaceChildren(); };
+    // A level's game is intentionally mounted once; settings can be changed from the menu.
+  },[number]);
+  useEffect(() => { scene.current?.updateSettings(progress.settings); setMusicVolume(progress.settings.musicVolume); },[progress.settings]);
+  useEffect(() => {
+    if (progress.achievements.length > achievementsSeen.current) playSound('achievement',progress.settings.effectsVolume);
+    achievementsSeen.current = progress.achievements.length;
+  },[progress.achievements.length,progress.settings.effectsVolume]);
+  const resume = () => {setPaused(false);setPauseSettings(false);setMusicPaused(false);scene.current?.setPaused(false);};
+  const restart = () => {setResult(null);setPaused(false);setPauseSettings(false);setMusicPaused(false);scene.current?.setPaused(false);scene.current?.restart();};
+  return <main className="game-screen">
+    <header className="game-top"><button className="icon-button" onClick={() => {setPaused(true);setMusicPaused(true);scene.current?.setPaused(true);}} aria-label="Pause">Ⅱ</button><div className="game-title"><small>{WORLD_NAMES[level.world-1]} · Level {number}</small><strong>{level.name}</strong></div><div className="game-progress"><span>🎁 {status.treasure?'✓':'0/1'}</span><span>💎 {status.gem?'✓':'0/1'}</span></div></header>
+    <section className={`stage-shell world-${level.world}`} aria-label={`${level.name} game area`}><div ref={host} className="game-canvas"/><div className="stage-hint">{status.message || level.hint}</div></section>
+    <div className="game-bottom">{level.mission && <div className="mission-strip"><span><b className="coin-symbol">●</b> Bag: {status.carried} · Pushka: {status.deposited}/{status.required}</span><button onClick={()=>scene.current?.deposit()} disabled={!status.carried || !status.nearStation}>DEPOSIT COINS</button></div>}<div className="tool-row"><button className="tool-button" onClick={() => scene.current?.undo()} disabled={!status.canUndo}>↶ <span>UNDO</span></button><button className="tool-button" onClick={restart}>↻ <span>RESTART</span></button><div className="goal-count">⚡ {status.goals}/{status.totalGoals} switches</div></div>
+      <div className="control-row">{progress.settings.controlMode==='joystick'?<Joystick onMove={(x,y)=>scene.current?.setJoystick(x,y)}/>:<div className="tap-tip">👆 Tap the ground<br/>to move</div>}
+      <div className="sticker-tray">{status.selected?<><span className="tray-title">{status.selected.kind.toUpperCase()} STICKERS</span><div className="tray-stickers">{status.selected.stickers.length?status.selected.stickers.map((sticker)=><button key={sticker} className={`sticker-pill ${status.armed===sticker?'armed':''}`} style={{'--sticker':STICKER_INFO[sticker].color} as React.CSSProperties} onClick={()=>scene.current?.selectSticker(sticker)}>{STICKER_INFO[sticker].icon} {sticker}</button>):<span className="tray-empty">Tap a stickered object</span>}</div></>:<><span className="tray-title">HOW TO PLAY</span><span className="tray-empty">Tap an object, choose a sticker, then tap a new home. Or drag a sticker!</span></>}</div></div>
+    </div>
+    {paused && <div className="modal-backdrop"><div className="modal-card">{pauseSettings ? <><h2>Settings</h2><div className="pause-settings"><label>🎵 Music volume<input aria-label="Music volume" type="range" min="0" max="1" step="0.05" value={progress.settings.musicVolume} onChange={(event)=>setSettings({musicVolume:Number(event.target.value)})}/></label><label>🔊 Sound effects<input aria-label="Sound effects volume" type="range" min="0" max="1" step="0.05" value={progress.settings.effectsVolume} onChange={(event)=>setSettings({effectsVolume:Number(event.target.value)})}/></label><label className="pause-toggle">✨ Reduced motion<input type="checkbox" checked={progress.settings.reducedMotion} onChange={(event)=>setSettings({reducedMotion:event.target.checked})}/></label><label className="pause-toggle">🪶 Low graphics<input type="checkbox" checked={progress.settings.graphicsQuality==='low'} onChange={(event)=>setSettings({graphicsQuality:event.target.checked?'low':'standard'})}/></label><p>Graphics quality changes when you reopen a level.</p><div className="segmented"><button className={progress.settings.controlMode==='joystick'?'active':''} onClick={()=>setSettings({controlMode:'joystick'})}>Joystick</button><button className={progress.settings.controlMode==='tap'?'active':''} onClick={()=>setSettings({controlMode:'tap'})}>Tap to move</button></div></div><button className="secondary-button" onClick={()=>setPauseSettings(false)}>BACK TO PAUSE</button></> : <><div className="modal-icon">⏸️</div><h2>Taking a breather?</h2><p>Your sticker puzzle is right where you left it.</p><button className="primary-button" onClick={resume}>RESUME</button><button className="secondary-button" onClick={restart}>RESTART LEVEL</button><button className="secondary-button" onClick={()=>setPauseSettings(true)}>SETTINGS</button><button className="text-button" onClick={onBack}>WORLD MAP</button></>}</div></div>}
+    {result && <div className="modal-backdrop"><div className={`modal-card victory ${number===20?'finale':''}`}><div className="modal-icon">{number===20?'🌍':'🎉'}</div><h2>{number===20?'Grand celebration!':'Mitzvah accomplished!'}</h2><div className="big-stars">{'⭐'.repeat(result.stars)}{'☆'.repeat(3-result.stars)}</div><p>{result.gem?'You found the secret gem too!':'You helped Rivky. Try again for the secret gem!'}</p><button className="primary-button" onClick={()=>number<LEVELS.length?onNext(number+1):onBack()}>{number<LEVELS.length?'NEXT LEVEL →':'WORLD MAP'}</button><button className="secondary-button" onClick={restart}>PLAY AGAIN</button></div></div>}
+  </main>;
+}
+
+function App() {
+  const { ready, progress, load, setSettings, selectCosmetic, selectCharacter, reset } = useProgress();
+  const [screen,setScreen] = useState<Screen>('home');
+  const [level,setLevel] = useState(1);
+  useEffect(()=>{void load();},[load]);
+  const openLevel = (number:number) => {setLevel(number);setScreen('play');};
+  if(!ready) return <main className="boot"><img src="/icons/icon-192.png" alt="Mitzvah Chaos adventurer"/><h1>Mitzvah Chaos</h1><p>Getting the adventure ready...</p></main>;
+  const nextAvailable = Math.min(LEVELS.length,Math.max(1,...progress.completedLevels.map((value)=>value+1)));
+  if(screen==='play') return <GameScreen key={level} number={level} onBack={()=>setScreen('map')} onNext={openLevel}/>;
+  return <div className="app-shell">
+    {screen==='home' && <main className="home-screen"><div className="home-cloud one"/><div className="home-cloud two"/><div className="home-sparkles">✦ ⋆ ✧ ✦ ⋆</div><div className="home-content"><Logo/><div className="mascot-wrap"><div className="mascot-halo"/><img className="mascot" src="/icons/icon-512.png" alt="Mitzvah Chaos adventurer smiling"/><span className="floating-sticker s1">⚡ FAST</span><span className="floating-sticker s2">✦ BIG</span><span className="floating-sticker s3">☁ FLOAT</span></div><p className="tagline">ONE LITTLE MITZVAH CAN CHANGE THE WHOLE WORLD!</p><button className="primary-button play-button" onClick={()=>setScreen('map')}>▶ {progress.completedLevels.length?'KEEP PLAYING':'PLAY'} <span>✦</span></button><div className="home-nav"><button onClick={()=>setScreen('character')}><span>🎭</span> MY HERO</button><button onClick={()=>setScreen('book')}><span>📖</span> STICKER BOOK</button><button onClick={()=>setScreen('settings')}><span>⚙️</span> SETTINGS</button></div></div><div className="home-footer">A new adventure begins in Crown Heights · 8 magical stickers</div></main>}
+    {screen==='map' && <main className="page map-page"><div className="page-heading"><Back onClick={()=>setScreen('home')}/><div><span className="eyebrow">THE ADVENTURE</span><h1>Pick a level!</h1></div><span className="page-decoration">🗺️</span></div><div className="map-progress"><span>⭐ {Object.values(progress.levelStars).reduce((a,b)=>a+b,0)} / {LEVELS.length * 3} stars</span><span>💎 {progress.collectedGems.length} / {LEVELS.length} gems</span></div><div className="world-list">{WORLD_NAMES.map((name,index)=><section className={`world-card world-card-${index+1}`} key={name}><div className="world-card-heading"><span className="world-emoji">{WORLD_ICONS[index]}</span><div><small>WORLD {index+1}</small><h2>{name}</h2></div></div><div className="level-grid">{LEVELS.filter((item)=>item.world===index+1).map((item)=><button key={item.number} className={`level-button ${item.number<=nextAvailable?'available':'locked'} ${progress.completedLevels.includes(item.number)?'finished':''}`} disabled={item.number>nextAvailable} onClick={()=>openLevel(item.number)} aria-label={`Level ${item.number}: ${item.name}${item.number>nextAvailable?', locked':''}`}><strong>{item.number>nextAvailable?'🔒':item.number}</strong><span>{progress.levelStars[item.number]?'⭐'.repeat(progress.levelStars[item.number]):item.number===nextAvailable?'NEW':'·'}</span></button>)}</div>{!LEVELS.some((item)=>item.world===index+1) && <p className="coming-soon">New missions are being built.</p>}</section>)}</div></main>}
+    {screen==='character' && <main className="page collection-page"><div className="page-heading"><Back onClick={()=>setScreen('home')}/><div><span className="eyebrow">CHOOSE YOUR ADVENTURER</span><h1>My Hero</h1></div><span className="page-decoration">🎭</span></div><p className="page-intro">Both heroes can solve every puzzle. Pick the one you like!</p><div className="character-choice"><button className={progress.selectedCharacter==='boy'?'selected':''} onClick={()=>selectCharacter('boy')}><img src="/icons/icon.svg" alt="Boy adventurer"/><strong>Boy adventurer</strong></button><button className={progress.selectedCharacter==='girl'?'selected':''} onClick={()=>selectCharacter('girl')}><img src="/icons/girl.svg" alt="Girl adventurer"/><strong>Girl adventurer</strong></button></div><h2 className="section-title">Outfits</h2><div className="card-grid">{COSMETICS.map((item)=><button key={item.id} className={`collection-card ${progress.selectedCosmetic===item.id?'selected':''}`} disabled={!progress.unlockedCosmetics.includes(item.id)} onClick={()=>selectCosmetic(item.id)}><span className="card-icon">{progress.unlockedCosmetics.includes(item.id)?item.icon:'🔒'}</span><strong>{item.name}</strong><small>{progress.unlockedCosmetics.includes(item.id)?progress.selectedCosmetic===item.id?'Wearing now': 'Tap to wear':item.detail}</small></button>)}</div></main>}
+    {screen==='book' && <main className="page collection-page"><div className="page-heading"><Back onClick={()=>setScreen('home')}/><div><span className="eyebrow">THE COLLECTION</span><h1>Sticker Book</h1></div><span className="page-decoration">📖</span></div><p className="page-intro">Peel, swap, combine. Every sticker changes how an object behaves!</p><div className="book-list">{STICKERS.map((sticker:StickerType)=><article key={sticker} className={`book-entry ${progress.stickerDiscoveries.includes(sticker)?'found':''}`}><div className="book-icon" style={{background:STICKER_INFO[sticker].color}}>{STICKER_INFO[sticker].icon}</div><div><h2>{sticker} {progress.stickerDiscoveries.includes(sticker)?'✓':'?'}</h2><p>{STICKER_INFO[sticker].description}</p><small>{STICKER_INFO[sticker].example}</small></div></article>)}</div><h2 className="section-title">🏆 Achievements</h2><div className="achievement-list">{ACHIEVEMENTS.map((item)=><div key={item.id} className={`achievement ${progress.achievements.includes(item.id)?'earned':''}`}><span>{progress.achievements.includes(item.id)?item.icon:'🔒'}</span><div><strong>{item.name}</strong><small>{item.detail}</small></div></div>)}</div></main>}
+    {screen==='settings' && <main className="page settings-page"><div className="page-heading"><Back onClick={()=>setScreen('home')}/><div><span className="eyebrow">MAKE IT YOURS</span><h1>Settings</h1></div><span className="page-decoration">⚙️</span></div><section className="settings-card"><label><span>🎵 Music volume</span><input type="range" min="0" max="1" step="0.05" value={progress.settings.musicVolume} onChange={(event)=>setSettings({musicVolume:Number(event.target.value)})}/></label><label><span>🔊 Sound effects</span><input type="range" min="0" max="1" step="0.05" value={progress.settings.effectsVolume} onChange={(event)=>setSettings({effectsVolume:Number(event.target.value)})}/></label><label className="toggle-row"><span>✨ Reduced motion</span><input type="checkbox" checked={progress.settings.reducedMotion} onChange={(event)=>setSettings({reducedMotion:event.target.checked})}/></label><div className="setting-group"><strong>Movement controls</strong><div className="segmented"><button className={progress.settings.controlMode==='joystick'?'active':''} onClick={()=>setSettings({controlMode:'joystick'})}>Joystick</button><button className={progress.settings.controlMode==='tap'?'active':''} onClick={()=>setSettings({controlMode:'tap'})}>Tap to move</button></div></div><label className="toggle-row"><span>🪶 Low graphics</span><input type="checkbox" checked={progress.settings.graphicsQuality==='low'} onChange={(event)=>setSettings({graphicsQuality:event.target.checked?'low':'standard'})}/></label></section><section className="instruction-card"><h2>How to play</h2><p>1. Tap a stickered object or drag its sticker.</p><p>2. Tap a new object to transfer the magic.</p><p>3. Gather the coins, deposit them in the pushka, and reach the door!</p><p>Move with the joystick, tap the ground, or use arrow keys.</p></section><button className="danger-button" onClick={()=>{if(window.confirm('Reset all levels, stars, and collectibles? This cannot be undone.')){reset();setScreen('home');}}}>Reset progress</button></main>}
+  </div>;
+}
+
+createRoot(document.getElementById('root')!).render(<React.StrictMode><App /></React.StrictMode>);

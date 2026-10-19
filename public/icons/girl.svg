@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Mitzvah Chaos girl adventurer">
+  <defs><linearGradient id="sky" x2="0" y2="1"><stop stop-color="#9bd9ee"/><stop offset="1" stop-color="#ffe8b0"/></linearGradient></defs>
+  <rect width="512" height="512" rx="104" fill="url(#sky)"/>
+  <path d="M0 382h512v130H0z" fill="#7ac990"/>
+  <path d="M26 178h96v206H26zM402 162h87v222h-87z" fill="#d9a0a8" opacity=".75"/>
+  <path d="M42 208h26v34H42zm48 0h23v34H90zm332-17h27v37h-27zm35 0h24v37h-24z" fill="#fff3d8"/>
+  <ellipse cx="260" cy="456" rx="156" ry="29" fill="#4f8e6b" opacity=".35"/>
+  <path d="M310 280q58-13 91 58v99h-81z" fill="#eda36b" stroke="#533b62" stroke-width="11"/>
+  <path d="M164 294q92-45 182 0l50 145q-132 44-282 0z" fill="#ed829c" stroke="#533b62" stroke-width="13" stroke-linejoin="round"/>
+  <path d="M155 321q-31 40-31 84m232-84q25 37 28 83" fill="none" stroke="#c98e65" stroke-width="33" stroke-linecap="round"/>
+  <path d="M206 432l-9 36m112-36 8 36" stroke="#31446b" stroke-width="30" stroke-linecap="round"/>
+  <path d="M150 474h74m74 0h73" stroke="#563c67" stroke-width="19" stroke-linecap="round"/>
+  <path d="M161 191q-8-113 96-128 98 6 96 128l-4 94q-98 57-183-2z" fill="#503d44" stroke="#533b62" stroke-width="10"/>
+  <ellipse cx="256" cy="205" rx="88" ry="108" fill="#dca578" stroke="#533b62" stroke-width="11"/>
+  <path d="M171 150q25-76 84-82 68 7 84 82-25-20-42-50-53 52-126 50z" fill="#503d44"/>
+  <path d="M190 112q68-36 132 0" fill="none" stroke="#f8cc66" stroke-width="17" stroke-linecap="round"/>
+  <path d="M205 218q11-18 26 0m50 0q11-18 26 0" fill="none" stroke="#302945" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="208" cy="251" r="9" fill="#ed8e80" opacity=".65"/><circle cx="304" cy="251" r="9" fill="#ed8e80" opacity=".65"/>
+  <path d="M233 267q24 22 49 0" fill="none" stroke="#833c58" stroke-width="9" stroke-linecap="round"/>
+  <g transform="translate(41 307)"><rect x="0" y="35" width="80" height="99" rx="20" fill="#f7cb6b" stroke="#563c67" stroke-width="10"/><path d="M18 35q22-25 42 0" fill="none" stroke="#563c67" stroke-width="8"/><path d="M20 65h40" stroke="#bd7c48" stroke-width="8" stroke-linecap="round"/><circle cx="40" cy="99" r="11" fill="#fff2bd" stroke="#bd7c48" stroke-width="5"/></g>
+  <path d="M403 77l9 20 20 9-20 9-9 20-9-20-20-9 20-9z" fill="#fff9d6"/>
+</svg>
