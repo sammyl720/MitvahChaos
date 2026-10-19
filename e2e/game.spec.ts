@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { PROGRESS_KEY } from '../src/state/progress';
+import { DEFAULT_PROGRESS, PROGRESS_KEY } from '../src/state/progress';
 
 async function tapWorld(page: import('@playwright/test').Page, x: number, y: number) {
   const canvas = page.locator('canvas');
@@ -46,4 +46,29 @@ test('transfers MAGNETIC and completes the pushka mission', async ({page}) => {
   await expect(page.getByText('🎁 ✓')).toBeVisible({timeout:12000});
   await tapWorld(page, 195, 70);
   await expect(page.getByRole('heading', {name:'Mitzvah accomplished!'})).toBeVisible({timeout:12000});
+});
+
+test('unlocks Challahzilla and completes the tablecloth delivery', async ({page}) => {
+  await page.addInitScript(({key, progress}) => {
+    localStorage.setItem(key, JSON.stringify(progress));
+  }, {key:PROGRESS_KEY, progress:{...DEFAULT_PROGRESS, completedLevels:[1], settings:{...DEFAULT_PROGRESS.settings, controlMode:'tap'}}});
+  await page.goto('/');
+  await page.getByRole('button', {name:/PLAY/}).first().click();
+  await page.getByRole('button', {name:/Level 2: Challahzilla!/}).click();
+  await expect(page.locator('canvas')).toBeVisible();
+  await tapWorld(page, 86, 246);
+  await page.getByRole('button', {name:/BIG/}).click();
+  await tapWorld(page, 294, 246);
+  await expect(page.getByText('1/1 switches')).toBeVisible();
+  await tapWorld(page, 66, 415);
+  await expect(page.locator('.mission-strip')).toContainText('Bag: 1', {timeout:12000});
+  await tapWorld(page, 260, 494);
+  await expect(page.getByRole('button', {name:'DELIVER ITEM'})).toBeEnabled({timeout:12000});
+  await page.getByRole('button', {name:'DELIVER ITEM'}).click();
+  await expect(page.locator('.mission-strip')).toContainText('Delivered: 1/1');
+  await tapWorld(page, 67, 542);
+  await expect(page.getByText('🎁 ✓')).toBeVisible({timeout:12000});
+  await tapWorld(page, 195, 70);
+  await expect(page.getByRole('heading', {name:'Mitzvah accomplished!'})).toBeVisible({timeout:12000});
+  await expect(page.getByRole('button', {name:'WORLD MAP'})).toBeVisible();
 });

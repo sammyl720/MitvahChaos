@@ -4,7 +4,7 @@ export const StickerSchema = z.enum(['BIG', 'FAST', 'BOUNCY', 'HEAVY', 'TINY', '
 export type StickerType = z.infer<typeof StickerSchema>;
 export const STICKERS: StickerType[] = StickerSchema.options;
 
-export const ENTITY_KINDS = ['bandit', 'chicken', 'apple', 'snail', 'rock', 'boulder', 'ball', 'turtle', 'robot', 'knight', 'key', 'frog', 'crate'] as const;
+export const ENTITY_KINDS = ['bandit', 'chicken', 'apple', 'snail', 'rock', 'boulder', 'ball', 'turtle', 'robot', 'knight', 'key', 'frog', 'crate', 'challah'] as const;
 export type EntityKind = typeof ENTITY_KINDS[number];
 export type Behavior = 'idle' | 'wander' | 'patrol' | 'chase' | 'flee' | 'activate' | 'stunned';
 
@@ -85,12 +85,22 @@ export const LevelSchema = z.object({
   exit: z.object({ x: z.number(), y: z.number() }),
   par: z.number().int().positive(),
   solution: z.array(z.object({ source: z.string(), target: z.string(), sticker: StickerSchema })).min(1),
-  mission: z.object({
-    kind: z.literal('tzedakah'),
-    coins: z.array(z.object({ x: z.number(), y: z.number() })).min(1),
-    station: z.object({ x: z.number(), y: z.number() }),
-    npc: z.object({ x: z.number(), y: z.number(), name: z.string(), greeting: z.string(), thanks: z.string() })
-  }).optional()
+  mission: z.discriminatedUnion('kind', [
+    z.object({
+      kind: z.literal('tzedakah'),
+      coins: z.array(z.object({ x: z.number(), y: z.number() })).min(1),
+      station: z.object({ x: z.number(), y: z.number() }),
+      npc: z.object({ x: z.number(), y: z.number(), name: z.string(), greeting: z.string(), thanks: z.string() })
+    }),
+    z.object({
+      kind: z.literal('delivery'),
+      items: z.array(z.object({ x: z.number(), y: z.number() })).min(1),
+      itemName: z.string(),
+      stationLabel: z.string(),
+      station: z.object({ x: z.number(), y: z.number() }),
+      npc: z.object({ x: z.number(), y: z.number(), name: z.string(), greeting: z.string(), thanks: z.string() })
+    })
+  ]).optional()
 });
 export type Level = z.infer<typeof LevelSchema>;
 
@@ -107,7 +117,8 @@ export const BASE_STATS: Record<EntityKind, Stats> = {
   knight: { radius: 28, mass: 2.8, speed: 42, drag: 500, restitution: 0.13, pushForce: 120, magneticRadius: 0, canFloat: false },
   key: { radius: 16, mass: 0.25, speed: 24, drag: 500, restitution: 0.05, pushForce: 15, magneticRadius: 0, canFloat: false },
   frog: { radius: 20, mass: 1, speed: 56, drag: 370, restitution: 0.35, pushForce: 55, magneticRadius: 0, canFloat: false },
-  crate: { radius: 23, mass: 1.8, speed: 32, drag: 470, restitution: 0.05, pushForce: 95, magneticRadius: 0, canFloat: false }
+  crate: { radius: 23, mass: 1.8, speed: 32, drag: 470, restitution: 0.05, pushForce: 95, magneticRadius: 0, canFloat: false },
+  challah: { radius: 24, mass: 1.3, speed: 38, drag: 450, restitution: 0.15, pushForce: 65, magneticRadius: 0, canFloat: false }
 };
 
 export const STICKER_INFO: Record<StickerType, { icon: string; color: string; description: string; example: string }> = {

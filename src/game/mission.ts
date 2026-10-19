@@ -6,8 +6,13 @@ export interface MissionState {
   deposited: number;
 }
 
+export function missionItems(level: Level): { x: number; y: number }[] {
+  if (!level.mission) return [];
+  return level.mission.kind === 'tzedakah' ? level.mission.coins : level.mission.items;
+}
+
 export function startMission(level: Level): MissionState {
-  return { collected: level.mission?.coins.map(() => false) ?? [], carried: 0, deposited: 0 };
+  return { collected: missionItems(level).map(() => false), carried: 0, deposited: 0 };
 }
 
 export function collectCoin(state: MissionState, index: number): MissionState {
@@ -23,5 +28,5 @@ export function depositCoins(state: MissionState): MissionState {
 }
 
 export function missionComplete(level: Level, state: MissionState): boolean {
-  return !level.mission || state.deposited >= level.mission.coins.length;
+  return !level.mission || state.deposited >= missionItems(level).length;
 }

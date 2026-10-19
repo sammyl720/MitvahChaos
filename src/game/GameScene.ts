@@ -7,7 +7,7 @@ import type { Fixture } from './model';
 import { findTapRoute, type Point } from './navigation';
 import { platformPosition } from './platform';
 import { StickerEngine } from './stickerEngine';
-import { collectCoin, depositCoins, missionComplete, startMission, type MissionState } from './mission';
+import { collectCoin, depositCoins, missionComplete, missionItems, startMission, type MissionState } from './mission';
 
 export interface SceneStatus {
   selected: EntityState | null;
@@ -260,8 +260,14 @@ export class GameScene extends Phaser.Scene {
   }
   private addMission(): void {
     if (!this.level.mission) return;
-    this.coinSprites = this.level.mission.coins.map(({ x, y }) => {
-      const sprite = this.add.container(x, y, [
+    const delivery = this.level.mission.kind === 'delivery';
+    this.coinSprites = missionItems(this.level).map(({ x, y }) => {
+      const sprite = this.add.container(x, y, delivery ? [
+        this.add.rectangle(0, 0, 31, 24, 0xf7efdb).setStrokeStyle(2, 0x8b5760),
+        this.add.rectangle(0, -7, 28, 4, 0x77bfd0),
+        this.add.rectangle(0, 3, 28, 3, 0x77bfd0),
+        this.add.circle(0, -1, 4, 0xffcc68)
+      ] : [
         this.add.circle(0, 0, 15, 0xe69a3d).setStrokeStyle(2, 0x8b5760),
         this.add.circle(0, -2, 12, 0xffd36e).setStrokeStyle(2, 0xffeead),
         this.add.text(0, -2, '1', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '15px', fontStyle: 'bold', color: '#90566a' }).setOrigin(.5)
@@ -270,7 +276,13 @@ export class GameScene extends Phaser.Scene {
       return { x, y, sprite };
     });
     const station = this.level.mission.station;
-    const stationSprite = this.add.container(station.x, station.y, [
+    const stationSprite = this.add.container(station.x, station.y, delivery ? [
+      this.add.rectangle(0, 10, 58, 24, 0xb68165).setStrokeStyle(3, 0x654b69),
+      this.add.rectangle(-21, 30, 5, 27, 0x654b69),
+      this.add.rectangle(21, 30, 5, 27, 0x654b69),
+      this.add.rectangle(0, -3, 56, 9, 0xf7efdb).setStrokeStyle(2, 0x77bfd0),
+      this.add.circle(0, -10, 8, 0xffd274).setStrokeStyle(2, 0xffffff)
+    ] : [
       this.add.rectangle(0, 5, 47, 47, 0x6cb7c7).setStrokeStyle(4, 0x594a79),
       this.add.rectangle(0, -22, 52, 13, 0xffca64).setStrokeStyle(3, 0x594a79),
       this.add.rectangle(0, -22, 22, 3, 0x594a79),
@@ -278,7 +290,7 @@ export class GameScene extends Phaser.Scene {
       this.add.text(0, 7, '1', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '14px', fontStyle: 'bold', color: '#885874' }).setOrigin(.5)
     ]).setDepth(13).setSize(54, 61).setInteractive({ useHandCursor: true });
     stationSprite.on('pointerdown', () => this.deposit());
-    this.add.text(station.x, station.y + 36, 'PUSHKA', { fontSize: '11px', color: '#5a397e', backgroundColor: '#fff7de', padding: { x: 5, y: 3 } }).setOrigin(.5).setDepth(14);
+    this.add.text(station.x, station.y + 36, this.level.mission.kind === 'delivery' ? this.level.mission.stationLabel : 'PUSHKA', { fontSize: '11px', color: '#5a397e', backgroundColor: '#fff7de', padding: { x: 5, y: 3 } }).setOrigin(.5).setDepth(14);
     const npc = this.level.mission.npc;
     const friend = this.add.container(npc.x, npc.y, [
       this.add.ellipse(0, 15, 37, 34, 0xe77f9a).setStrokeStyle(2, 0x634469),
@@ -291,16 +303,17 @@ export class GameScene extends Phaser.Scene {
     this.add.text(npc.x, npc.y + 27, npc.name, { fontSize: '10px', color: '#50366e', backgroundColor: '#fff7de', padding: { x: 4, y: 2 } }).setOrigin(.5).setDepth(13);
   }
   deposit(): void {
-    const station = this.level.mission?.station;
+    const mission = this.level.mission;
+    const station = mission?.station;
     const player = this.engine.get('player');
     if (!station || !player || this.paused || this.completed) return;
-    if (Math.hypot(player.x - station.x, player.y - station.y) > 64) { this.say('Come closer to the pushka.'); return; }
-    if (!this.mission.carried) { this.say('Find the runaway coins first!'); return; }
+    if (Math.hypot(player.x - station.x, player.y - station.y) > 64) { this.say(mission?.kind === 'delivery' ? 'Come closer to the table.' : 'Come closer to the pushka.'); return; }
+    if (!this.mission.carried) { this.say(mission?.kind === 'delivery' ? `Find the ${mission.itemName} first!` : 'Find the runaway coins first!'); return; }
     const count = this.mission.carried;
     this.mission = depositCoins(this.mission);
     this.burst(station.x, station.y, '#ffd66e');
     playSound('treasure', this.settings.effectsVolume);
-    this.say(missionComplete(this.level, this.mission) ? this.level.mission!.npc.thanks : `${count} coin${count === 1 ? '' : 's'} in the pushka! Find the rest.`);
+    this.say(missionComplete(this.level, this.mission) ? mission!.npc.thanks : mission?.kind === 'delivery' ? `${count} item${count === 1 ? '' : 's'} delivered! Find the rest.` : `${count} coin${count === 1 ? '' : 's'} in the pushka! Find the rest.`);
   }
   private addExit(): void {
     const { x, y } = this.level.exit;
@@ -594,7 +607,7 @@ export class GameScene extends Phaser.Scene {
   private emitStatus(): void {
     const player = this.engine.get('player');
     const station = this.level.mission?.station;
-    this.callbacks.onStatus({ selected: this.selectedId ? this.engine.get(this.selectedId) ?? null : null, armed: this.armed, transfers: this.transfers, treasure: this.treasure, gem: this.gem, goals: this.goalActive.filter(Boolean).length, totalGoals: this.goalActive.length, message: this.message, canUndo: this.engine.undoCount > 0, carried: this.mission.carried, deposited: this.mission.deposited, required: this.level.mission?.coins.length ?? 0, nearStation: Boolean(station && player && Math.hypot(player.x - station.x, player.y - station.y) <= 64) });
+    this.callbacks.onStatus({ selected: this.selectedId ? this.engine.get(this.selectedId) ?? null : null, armed: this.armed, transfers: this.transfers, treasure: this.treasure, gem: this.gem, goals: this.goalActive.filter(Boolean).length, totalGoals: this.goalActive.length, message: this.message, canUndo: this.engine.undoCount > 0, carried: this.mission.carried, deposited: this.mission.deposited, required: missionItems(this.level).length, nearStation: Boolean(station && player && Math.hypot(player.x - station.x, player.y - station.y) <= 64) });
   }
   private onCollision(a: Phaser.Physics.Arcade.Image, b: Phaser.Physics.Arcade.Image): void {
     const ids = [a, b].map((sprite) => [...this.pieces].find(([, piece]) => piece.sprite === sprite)?.[0]);
@@ -685,7 +698,7 @@ export class GameScene extends Phaser.Scene {
     this.completionTimer?.remove(); this.completionTimer = undefined;
     this.engine.resetLevel(); this.treasure = false; this.gem = false; this.transfers = 0; this.completed = false; this.armed = null; this.selectedId = null;
     this.mission = startMission(this.level);
-    this.coinSprites.forEach((coin, index) => { coin.x = this.level.mission!.coins[index].x; coin.y = this.level.mission!.coins[index].y; coin.sprite.setPosition(coin.x, coin.y).setVisible(true); });
+    this.coinSprites.forEach((coin, index) => { coin.x = missionItems(this.level)[index].x; coin.y = missionItems(this.level)[index].y; coin.sprite.setPosition(coin.x, coin.y).setVisible(true); });
     this.goalHistory = []; this.lastTransferTarget = null;
     this.tapRoute = [];
     this.stunnedUntil.clear();
@@ -782,8 +795,9 @@ export class GameScene extends Phaser.Scene {
 
   private updateMission(delta: number): void {
     const player = this.engine.get('player');
-    if (!player || !this.level.mission || !player.stickers.includes('MAGNETIC')) return;
-    const radius = effectiveStats(player).magneticRadius;
+    const mission = this.level.mission;
+    if (!player || !mission || (mission.kind === 'tzedakah' && !player.stickers.includes('MAGNETIC'))) return;
+    const radius = mission.kind === 'tzedakah' ? effectiveStats(player).magneticRadius : 0;
     this.coinSprites.forEach((coin, index) => {
       if (this.mission.collected[index]) return;
       const dx = player.x - coin.x, dy = player.y - coin.y;
@@ -798,7 +812,7 @@ export class GameScene extends Phaser.Scene {
         this.mission = collectCoin(this.mission, index);
         coin.sprite.setVisible(false);
         playSound('gem', this.settings.effectsVolume);
-        this.say(`${this.mission.carried} coin${this.mission.carried === 1 ? '' : 's'} in your bag. Find the pushka!`);
+        this.say(mission.kind === 'delivery' ? `${mission.itemName} in your bag. Bring it to ${mission.npc.name}!` : `${this.mission.carried} coin${this.mission.carried === 1 ? '' : 's'} in your bag. Find the pushka!`);
       }
     });
   }

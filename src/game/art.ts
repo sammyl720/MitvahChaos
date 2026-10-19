@@ -21,7 +21,7 @@ function eyes(ctx: CanvasRenderingContext2D, y = 55, spacing = 25): void {
 function draw(ctx: CanvasRenderingContext2D, kind: EntityKind, character: 'boy' | 'girl' = 'boy'): void {
   ctx.clearRect(0, 0, 128, 128);
   ellipse(ctx, 64, 109, 39, 9, 'rgba(42,27,86,.17)', 'transparent', 0);
-  const palettes: Record<EntityKind, string> = { bandit:'#8657dc', chicken:'#fff7e1', apple:'#f75d66', snail:'#f2b86f', rock:'#9097ad', boulder:'#7e8a9c', ball:'#fc9cce', turtle:'#61cbb3', robot:'#70bce6', knight:'#a3aed6', key:'#ffcf56', frog:'#78d18b', crate:'#dfae71' };
+  const palettes: Record<EntityKind, string> = { bandit:'#8657dc', chicken:'#fff7e1', apple:'#f75d66', snail:'#f2b86f', rock:'#9097ad', boulder:'#7e8a9c', ball:'#fc9cce', turtle:'#61cbb3', robot:'#70bce6', knight:'#a3aed6', key:'#ffcf56', frog:'#78d18b', crate:'#dfae71', challah:'#e9a84f' };
   const fill = palettes[kind];
   if (kind === 'bandit') {
     rounded(ctx, 87, 52, 29, 51, 9, '#ee9b62', '#714d61', 4); // backpack
@@ -75,6 +75,11 @@ function draw(ctx: CanvasRenderingContext2D, kind: EntityKind, character: 'boy' 
   } else if (kind === 'crate') {
     rounded(ctx, 19, 26, 90, 80, 10, fill, '#9c6a45', 6);
     ctx.beginPath();ctx.moveTo(30,39);ctx.lineTo(97,96);ctx.moveTo(98,39);ctx.lineTo(30,96);ctx.strokeStyle='#f4ce91';ctx.lineWidth=7;ctx.stroke();eyes(ctx,61,22);
+  } else if (kind === 'challah') {
+    ellipse(ctx, 64, 72, 50, 34, '#a95f3d', '#70475b', 5);
+    for (const [x,y] of [[37,68],[64,58],[91,68]] as const) ellipse(ctx, x, y, 22, 30, fill, '#bd7d45', 3);
+    for (const [x,y] of [[39,46],[63,39],[87,46]] as const) ellipse(ctx, x, y, 10, 5, '#fff0b6', 'transparent', 0);
+    eyes(ctx, 65, 20);
   } else if (kind === 'key') {
     ellipse(ctx, 48, 50, 25, 25, fill, '#ae8543',6);ellipse(ctx, 48, 50, 11, 11, '#fff1ba','transparent',0);
     rounded(ctx, 62, 48, 44, 16, 5, fill, '#ae8543',4);rounded(ctx, 91, 58, 11, 18, 2, fill, '#ae8543',3);
