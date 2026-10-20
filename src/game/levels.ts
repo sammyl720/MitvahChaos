@@ -246,6 +246,39 @@ export const LEVELS: Level[] = [LevelSchema.parse({
     fragileZone: { x: 195, y: 363, w: 74, h: 43 },
     npc: { x: 350, y: 263, name: 'BASYA', greeting: 'The kitchen is blocked and the soup supplies could spill. Can you clear a safe path?', thanks: 'The supplies made it safely! Now everyone can share warm soup.' }
   }
+}), LevelSchema.parse({
+  number: 8,
+  name: 'The Tiny Shtetl',
+  world: 2,
+  hint: 'Borrow TINY to squeeze through the little passage. Stand on the inside switch, then give the model mechanism MAGNETIC!',
+  entities: [
+    { id: 'player', kind: 'bandit', label: 'YOU', x: 195, y: 510, stickers: [], behavior: 'idle' },
+    { id: 'tiny-snail', kind: 'snail', label: 'TINY SNAIL', x: 73, y: 492, stickers: ['TINY'], behavior: 'idle' },
+    { id: 'magnet-bot', kind: 'robot', label: 'MAGNET BOT', x: 315, y: 492, stickers: ['MAGNETIC'], behavior: 'idle' },
+    { id: 'model-switch', kind: 'crate', label: 'MODEL SWITCH', x: 195, y: 232, stickers: [], behavior: 'idle' }
+  ],
+  goals: [
+    { id: 'tiny-passage', x: 195, y: 320, radius: 22, targetId: 'player', requires: ['TINY'], label: 'TINY PASSAGE' },
+    { id: 'model-magnet', x: 195, y: 232, radius: 38, targetId: 'model-switch', requires: ['MAGNETIC'], minMagneticRadius: 100, label: 'MODEL MECHANISM' }
+  ],
+  goalOrder: 'sequential',
+  fixtures: [
+    { kind: 'wall', x: 100, y: 362, w: 160, h: 18 },
+    { kind: 'wall', x: 290, y: 362, w: 160, h: 18 },
+    { kind: 'gate', x: 195, y: 132, w: 348, h: 16, opensAfter: 2 }
+  ],
+  treasure: { x: 66, y: 547 },
+  gem: { x: 328, y: 301 },
+  exit: { x: 195, y: 70 },
+  par: 2,
+  solution: [
+    { source: 'tiny-snail', target: 'player', sticker: 'TINY' },
+    { source: 'magnet-bot', target: 'model-switch', sticker: 'MAGNETIC' }
+  ],
+  mission: {
+    kind: 'neighbors',
+    people: [{ x: 315, y: 215, name: 'TOVA', greeting: 'Our little village model has stopped moving. Can you reach its tiny switch?', thanks: 'The model moves again! The children will love seeing our village.' , needsGoal: 1 }]
+  }
 })];
 
 export function getLevel(number: number): Level {

@@ -27,7 +27,8 @@ const ACHIEVEMENTS = [
   { id:'ahavas-hero', name:'Ahavas Yisroel Hero', icon:'❤️', detail:'Help both neighbors on Kingston Avenue.' },
   { id:'chabad-adventurer', name:'Chabad Adventurer', icon:'🏙️', detail:'Complete the Crown Heights world.' },
   { id:'wagon-wrangler', name:'Wagon Wrangler', icon:'🛞', detail:'Catch the runaway wagon and help Golda.' },
-  { id:'soup-saver', name:'Soup Saver', icon:'🥣', detail:'Carry every supply safely to Basya’s soup pot.' }
+  { id:'soup-saver', name:'Soup Saver', icon:'🥣', detail:'Carry every supply safely to Basya’s soup pot.' },
+  { id:'little-village-helper', name:'Little Village Helper', icon:'🏘️', detail:'Reach the tiny switch and help Tova.' }
 ];
 
 function Logo({ small = false }: { small?: boolean }) { return <div className={`logo ${small ? 'small' : ''}`}><span className="logo-star">✦</span>MITZVAH <strong>CHAOS</strong><span className="logo-star">✦</span></div>; }

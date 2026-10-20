@@ -8,7 +8,7 @@ import { findTapRoute } from '../src/game/navigation';
 describe('The Runaway Pushka', () => {
   const level = LEVELS[0];
   it('has a valid original layout and a solvable sticker transfer', () => {
-    expect(LEVELS).toHaveLength(7);
+    expect(LEVELS).toHaveLength(8);
     expect(LevelSchema.safeParse(level).success).toBe(true);
     const engine = new StickerEngine(level.entities);
     for (const step of level.solution) expect(engine.transfer(step.source, step.target, step.sticker).ok).toBe(true);
@@ -31,6 +31,30 @@ describe('The Runaway Pushka', () => {
     expect(findTapRoute(start, level.exit, 18, level.fixtures, 0, [], false)).toBeNull();
     expect(findTapRoute(start, level.exit, 18, level.fixtures, 1, [], false)).not.toBeNull();
     for (const coin of missionItems(level)) expect(findTapRoute(start, coin, 18, level.fixtures, 1, [], false)).not.toBeNull();
+  });
+});
+
+describe('The Tiny Shtetl', () => {
+  const level = LEVELS[7];
+  it('needs a genuinely smaller player to pass through the miniature opening', () => {
+    expect(LevelSchema.safeParse(level).success).toBe(true);
+    const engine = new StickerEngine(level.entities);
+    const player = engine.get('player')!;
+    expect(findTapRoute(player, level.goals[0], effectiveStats(player).radius, level.fixtures, 0, [], false)).toBeNull();
+    expect(engine.transfer('tiny-snail', 'player', 'TINY').ok).toBe(true);
+    const tinyPlayer = engine.get('player')!;
+    expect(findTapRoute(tinyPlayer, level.goals[0], effectiveStats(tinyPlayer).radius, level.fixtures, 0, [], false)).not.toBeNull();
+    expect(engine.transfer('magnet-bot', 'model-switch', 'MAGNETIC').ok).toBe(true);
+    expect(effectiveStats(engine.get('model-switch')!).magneticRadius).toBeGreaterThanOrEqual(level.goals[1].minMagneticRadius!);
+  });
+  it('keeps Tova and the exit behind the miniature passage and last switch', () => {
+    const start = level.entities[0];
+    const npc = level.mission?.kind === 'neighbors' ? level.mission.people[0] : null;
+    expect(npc).not.toBeNull();
+    expect(findTapRoute(start, npc!, 18, level.fixtures, 2, [], false)).toBeNull();
+    expect(findTapRoute(start, npc!, 9.9, level.fixtures, 2, [], false)).not.toBeNull();
+    expect(findTapRoute(start, level.exit, 9.9, level.fixtures, 1, [], false)).toBeNull();
+    expect(findTapRoute(start, level.exit, 9.9, level.fixtures, 2, [], false)).not.toBeNull();
   });
 });
 

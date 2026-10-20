@@ -220,6 +220,17 @@ export class GameScene extends Phaser.Scene {
         g.lineBetween(x, y - 13, x, y + 13);
       }
       if (this.level.number === 6) this.add.text(195, 177, 'VILLAGE KITCHEN', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '12px', color: '#654f61', backgroundColor: '#fff5d9', padding: { x: 7, y: 4 } }).setOrigin(.5).setDepth(1);
+      if (this.level.number === 7) this.add.text(195, 177, 'SOUP KITCHEN', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '12px', color: '#654f61', backgroundColor: '#fff5d9', padding: { x: 7, y: 4 } }).setOrigin(.5).setDepth(1);
+      if (this.level.number === 8) {
+        g.fillStyle(0xf5e9d2, .9).fillRoundedRect(118, 188, 153, 95, 9);
+        g.lineStyle(3, 0x9e7b76).strokeRoundedRect(118, 188, 153, 95, 9);
+        for (const [x, roof] of [[132, 0xbe8180], [179, 0x8b7a9c], [226, 0xc89b68]] as const) {
+          g.fillStyle(0xd8af84).fillRoundedRect(x, 226, 31, 37, 3);
+          g.fillStyle(roof).fillTriangle(x - 3, 226, x + 15, 207, x + 34, 226);
+          g.fillStyle(0xffedba).fillRoundedRect(x + 11, 234, 9, 12, 2);
+        }
+        this.add.text(195, 178, 'LITTLE VILLAGE MODEL', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '11px', color: '#654f61', backgroundColor: '#fff5d9', padding: { x: 7, y: 4 } }).setOrigin(.5).setDepth(1);
+      }
     } else if (this.level.world === 3) {
       for (const x of [19, 348]) {
         g.fillStyle(0x788ab0, .65).fillRoundedRect(x, 160, 25, 374, 5);
