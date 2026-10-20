@@ -74,6 +74,7 @@ export function unlockedAchievements(progress: GameProgress): string[] {
   add(progress.completedLevels.includes(3), 'shlichus-superstar');
   add(progress.completedLevels.includes(4), 'ahavas-hero');
   add(progress.completedLevels.includes(5), 'chabad-adventurer');
+  add(progress.completedLevels.includes(6), 'wagon-wrangler');
   add(progress.chickenTransforms >= 10, 'chicken-whisperer');
   add(progress.bounceCollisions >= 25, 'bounce-master');
   add(progress.combinations.length >= 5, 'mad-scientist');
@@ -89,6 +90,7 @@ export function unlockedCosmetics(progress: GameProgress): string[] {
   add(progress.completedLevels.includes(2), 'shabbos');
   add(progress.completedLevels.includes(3), 'courier');
   add(progress.completedLevels.includes(4), 'kindness-pin');
+  add(progress.completedLevels.includes(6), 'village-scarf');
   add(progress.completedLevels.some((number) => number >= 10), 'robot');
   add(progress.completedLevels.some((number) => number >= 15), 'knight');
   add(progress.completedLevels.includes(20), 'golden');

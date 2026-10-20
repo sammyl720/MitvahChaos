@@ -199,21 +199,27 @@ export class GameScene extends Phaser.Scene {
         }
       }
     } else if (this.level.world === 2) {
-      g.fillStyle(0x6b86a9, .35).fillRoundedRect(20, 471, 350, 76, 12);
-      for (let x = 34; x < 354; x += 47) g.fillStyle(0xffe993, .85).fillRoundedRect(x, 507, 24, 5, 2);
-      for (const [x, y, color] of [[25, 178, 0xff82b5], [321, 190, 0x86eeea]] as const) {
-        g.fillStyle(0x526b9f).fillRoundedRect(x, y, 44, 62, 6);
-        g.lineStyle(3, color).strokeRoundedRect(x + 4, y + 6, 36, 22, 4);
-        g.fillStyle(color).fillRoundedRect(x + 9, y + 12, 25, 7, 3);
-        g.fillStyle(0xbfe9f4).fillRoundedRect(x + 9, y + 37, 25, 17, 3);
+      // Warm timber cottages and a cobbled lane make the village distinct from Crown Heights.
+      for (const [x, width, roof] of [[17, 72, 0x9b6871], [302, 72, 0x7d7292]] as const) {
+        g.fillStyle(0xe8caa3).fillRoundedRect(x, 180, width, 250, 5);
+        g.fillStyle(roof).fillTriangle(x - 8, 183, x + width / 2, 139, x + width + 8, 183);
+        g.fillStyle(0xcfae84).fillRoundedRect(x + 8, 196, width - 16, 224, 3);
+        for (const y of [207, 273, 339]) {
+          g.fillStyle(0xffefd1).fillRoundedRect(x + 15, y, 16, 25, 3).fillRoundedRect(x + 42, y, 16, 25, 3);
+          g.lineStyle(2, 0x815f6c).strokeRoundedRect(x + 15, y, 16, 25, 3).strokeRoundedRect(x + 42, y, 16, 25, 3);
+        }
+        g.fillStyle(0x8e6f6b).fillRoundedRect(x + 28, 385, 18, 45, 3);
       }
-      for (const [x, y] of [[35, 337], [345, 338], [338, 444]] as const) {
-        g.fillStyle(0xff906c).fillTriangle(x - 11, y + 15, x, y - 15, x + 11, y + 15);
-        g.fillStyle(0xffefcc).fillRoundedRect(x - 7, y + 2, 14, 5, 2);
-        g.fillStyle(0x596787).fillRoundedRect(x - 13, y + 14, 26, 5, 2);
+      g.fillStyle(0xb5a9a1, .47).fillRoundedRect(22, 467, 346, 83, 12);
+      for (let y = 478; y < 545; y += 18) for (let x = 33 + (Math.floor(y / 18) % 2) * 17; x < 363; x += 42) {
+        g.fillStyle(0xf8ecdc, .62).fillRoundedRect(x, y, 26, 8, 4);
       }
-      this.addGear(37, 413, 17, 0x678bbd);
-      this.addGear(350, 273, 16, 0x6686b9);
+      for (const [x, y] of [[45, 447], [340, 447]] as const) {
+        g.lineStyle(5, 0x8b665d).strokeCircle(x, y, 15);
+        g.lineBetween(x - 13, y, x + 13, y);
+        g.lineBetween(x, y - 13, x, y + 13);
+      }
+      if (this.level.number === 6) this.add.text(195, 177, 'VILLAGE KITCHEN', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '12px', color: '#654f61', backgroundColor: '#fff5d9', padding: { x: 7, y: 4 } }).setOrigin(.5).setDepth(1);
     } else if (this.level.world === 3) {
       for (const x of [19, 348]) {
         g.fillStyle(0x788ab0, .65).fillRoundedRect(x, 160, 25, 374, 5);
@@ -282,12 +288,17 @@ export class GameScene extends Phaser.Scene {
     if (this.level.mission.kind === 'neighbors') { this.addNeighborMission(); return; }
     const delivery = this.level.mission.kind === 'delivery';
     const tablecloth = this.level.mission.kind === 'delivery' && ['tablecloth', 'napkins'].includes(this.level.mission.itemName);
+    const flourSacks = this.level.mission.kind === 'delivery' && this.level.mission.itemName === 'flour sacks';
     this.coinSprites = missionItems(this.level).map(({ x, y }) => {
       const sprite = this.add.container(x, y, tablecloth ? [
         this.add.rectangle(0, 0, 31, 24, 0xf7efdb).setStrokeStyle(2, 0x8b5760),
         this.add.rectangle(0, -7, 28, 4, 0x77bfd0),
         this.add.rectangle(0, 3, 28, 3, 0x77bfd0),
         this.add.circle(0, -1, 4, 0xffcc68)
+      ] : flourSacks ? [
+        this.add.ellipse(0, 2, 29, 28, 0xe8d5a4).setStrokeStyle(2, 0x907252),
+        this.add.rectangle(0, -10, 18, 4, 0xb28457),
+        this.add.text(0, 3, 'F', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '13px', fontStyle: 'bold', color: '#936e49' }).setOrigin(.5)
       ] : delivery ? [
         this.add.rectangle(0, 0, 28, 25, 0xe8a76a).setStrokeStyle(2, 0x8b5760),
         this.add.rectangle(0, -2, 28, 4, 0xffd17f),
@@ -302,7 +313,12 @@ export class GameScene extends Phaser.Scene {
       return { x, y, sprite };
     });
     const station = this.level.mission.station;
-    const stationSprite = this.add.container(station.x, station.y, tablecloth ? [
+    const stationSprite = this.add.container(station.x, station.y, flourSacks ? [
+      this.add.rectangle(0, 6, 56, 47, 0xa97055).setStrokeStyle(3, 0x654b69),
+      this.add.rectangle(0, -22, 61, 10, 0xf0cf94).setStrokeStyle(3, 0x654b69),
+      this.add.ellipse(0, -17, 21, 9, 0xfff0d0).setStrokeStyle(2, 0x987a66),
+      this.add.rectangle(0, 4, 34, 17, 0xf2deac).setStrokeStyle(2, 0x987a66)
+    ] : tablecloth ? [
       this.add.rectangle(0, 10, 58, 24, 0xb68165).setStrokeStyle(3, 0x654b69),
       this.add.rectangle(-21, 30, 5, 27, 0x654b69),
       this.add.rectangle(21, 30, 5, 27, 0x654b69),
@@ -325,7 +341,7 @@ export class GameScene extends Phaser.Scene {
     this.add.text(station.x, station.y + 36, this.level.mission.kind === 'delivery' ? this.level.mission.stationLabel : 'PUSHKA', { fontSize: '11px', color: '#5a397e', backgroundColor: '#fff7de', padding: { x: 5, y: 3 } }).setOrigin(.5).setDepth(14);
     const npc = this.level.mission.npc;
     const friend = this.add.container(npc.x, npc.y, [
-      this.add.ellipse(0, 15, 37, 34, npc.name === 'DOVI' ? 0x6cadd5 : 0xe77f9a).setStrokeStyle(2, 0x634469),
+      this.add.ellipse(0, 15, 37, 34, npc.name === 'DOVI' ? 0x6cadd5 : npc.name === 'GOLDA' ? 0xb38bd4 : 0xe77f9a).setStrokeStyle(2, 0x634469),
       this.add.circle(0, -5, 18, 0x553944),
       this.add.circle(0, -3, 14, 0xeec397),
       this.add.circle(-5, -6, 2, 0x47344a), this.add.circle(5, -6, 2, 0x47344a),
@@ -460,14 +476,14 @@ export class GameScene extends Phaser.Scene {
     const texture = entity.id === 'player' && this.character === 'girl' ? 'character-bandit-girl' : this.level.number === 20 && entity.id === this.level.bossId ? 'boss-robot' : `character-${entity.kind}`;
     const sprite = this.physics.add.image(entity.x, entity.y, texture).setDepth(5);
     if (entity.id === 'player') {
-      const tints: Record<string, number> = { rainbow: 0xffc4ee, robot: 0xb5eaff, knight: 0xd4d9ff, golden: 0xffd765, chicken: 0xffeed1, 'tiny-crown': 0xebc7ff, shabbos: 0xfff4e2, courier: 0xd8f6ff, 'kindness-pin': 0xffd7e2 };
+      const tints: Record<string, number> = { rainbow: 0xffc4ee, robot: 0xb5eaff, knight: 0xd4d9ff, golden: 0xffd765, chicken: 0xffeed1, 'tiny-crown': 0xebc7ff, shabbos: 0xfff4e2, courier: 0xd8f6ff, 'kindness-pin': 0xffd7e2, 'village-scarf': 0xffdfce };
       if (tints[this.cosmetic]) sprite.setTint(tints[this.cosmetic]);
     }
     sprite.setInteractive({ useHandCursor: true });
     sprite.on('pointerdown', () => this.onEntityTap(entity.id));
     const name = this.add.text(entity.x, entity.y + stats.radius + 13, entity.label ?? entity.kind.toUpperCase(), { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '10px', fontStyle: 'bold', color: '#453465', backgroundColor: '#fff9e6', padding: { x: 5, y: 2 } }).setOrigin(.5).setDepth(10);
     if (entity.id === 'player' && this.cosmetic !== 'classic') {
-      const icons: Record<string,string> = { rainbow:'🌈', robot:'🤖', knight:'🛡️', golden:'👑', chicken:'🐔', 'tiny-crown':'✨', backpack:'🎒', shabbos:'✦', courier:'🧢', 'kindness-pin':'♥' };
+      const icons: Record<string,string> = { rainbow:'🌈', robot:'🤖', knight:'🛡️', golden:'👑', chicken:'🐔', 'tiny-crown':'✨', backpack:'🎒', shabbos:'✦', courier:'🧢', 'kindness-pin':'♥', 'village-scarf':'🧣' };
       this.costumeMark = this.add.text(entity.x,entity.y - stats.radius - 15,icons[this.cosmetic] ?? '',{fontSize:'23px'}).setOrigin(.5).setDepth(11);
     }
     const piece = { sprite, name, badges: [] as Phaser.GameObjects.Text[], shadow };

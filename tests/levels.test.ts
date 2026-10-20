@@ -8,7 +8,7 @@ import { findTapRoute } from '../src/game/navigation';
 describe('The Runaway Pushka', () => {
   const level = LEVELS[0];
   it('has a valid original layout and a solvable sticker transfer', () => {
-    expect(LEVELS).toHaveLength(5);
+    expect(LEVELS).toHaveLength(6);
     expect(LevelSchema.safeParse(level).success).toBe(true);
     const engine = new StickerEngine(level.entities);
     for (const step of level.solution) expect(engine.transfer(step.source, step.target, step.sticker).ok).toBe(true);
@@ -146,5 +146,36 @@ describe('The Great Challah Avalanche', () => {
     }
     expect(findTapRoute(start, level.exit, 18, level.fixtures, 2, [], false)).toBeNull();
     expect(findTapRoute(start, level.exit, 18, level.fixtures, 3, [], false)).not.toBeNull();
+  });
+});
+
+describe('The Runaway Wagon', () => {
+  const level = LEVELS[5];
+  it('uses HEAVY and SLIPPERY together on an original wagon', () => {
+    expect(LevelSchema.safeParse(level).success).toBe(true);
+    const engine = new StickerEngine(level.entities);
+    const initial = effectiveStats(engine.get('wagon')!);
+    for (const step of level.solution) expect(engine.transfer(step.source, step.target, step.sticker).ok).toBe(true);
+    const modified = effectiveStats(engine.get('wagon')!);
+    expect(modified.mass).toBeGreaterThan(initial.mass * 3);
+    expect(modified.drag).toBeLessThan(initial.drag / 5);
+    expect(level.goals[1].requires).toEqual(['HEAVY', 'SLIPPERY']);
+    let mission = startMission(level);
+    mission = collectCoin(mission, 0);
+    mission = collectCoin(mission, 1);
+    expect(missionComplete(level, mission)).toBe(false);
+    mission = depositCoins(mission);
+    expect(missionComplete(level, mission)).toBe(true);
+  });
+  it('routes to the kitchen after the first gate and to the exit after the catch switch', () => {
+    const start = level.entities[0];
+    const station = level.mission?.kind === 'delivery' ? level.mission.station : null;
+    expect(station).not.toBeNull();
+    expect(findTapRoute(start, station!, 18, level.fixtures, 0, [], false)).toBeNull();
+    for (const destination of [...missionItems(level), station!]) {
+      expect(findTapRoute(start, destination, 18, level.fixtures, 1, [], false)).not.toBeNull();
+    }
+    expect(findTapRoute(start, level.exit, 18, level.fixtures, 1, [], false)).toBeNull();
+    expect(findTapRoute(start, level.exit, 18, level.fixtures, 2, [], false)).not.toBeNull();
   });
 });

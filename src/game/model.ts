@@ -4,7 +4,7 @@ export const StickerSchema = z.enum(['BIG', 'FAST', 'BOUNCY', 'HEAVY', 'TINY', '
 export type StickerType = z.infer<typeof StickerSchema>;
 export const STICKERS: StickerType[] = StickerSchema.options;
 
-export const ENTITY_KINDS = ['bandit', 'chicken', 'apple', 'snail', 'rock', 'boulder', 'ball', 'turtle', 'robot', 'knight', 'key', 'frog', 'crate', 'challah'] as const;
+export const ENTITY_KINDS = ['bandit', 'chicken', 'apple', 'snail', 'rock', 'boulder', 'ball', 'turtle', 'robot', 'knight', 'key', 'frog', 'crate', 'challah', 'wagon'] as const;
 export type EntityKind = typeof ENTITY_KINDS[number];
 export type Behavior = 'idle' | 'wander' | 'patrol' | 'chase' | 'flee' | 'activate' | 'stunned';
 
@@ -122,7 +122,8 @@ export const BASE_STATS: Record<EntityKind, Stats> = {
   key: { radius: 16, mass: 0.25, speed: 24, drag: 500, restitution: 0.05, pushForce: 15, magneticRadius: 0, canFloat: false },
   frog: { radius: 20, mass: 1, speed: 56, drag: 370, restitution: 0.35, pushForce: 55, magneticRadius: 0, canFloat: false },
   crate: { radius: 23, mass: 1.8, speed: 32, drag: 470, restitution: 0.05, pushForce: 95, magneticRadius: 0, canFloat: false },
-  challah: { radius: 24, mass: 1.3, speed: 38, drag: 450, restitution: 0.15, pushForce: 65, magneticRadius: 0, canFloat: false }
+  challah: { radius: 24, mass: 1.3, speed: 38, drag: 450, restitution: 0.15, pushForce: 65, magneticRadius: 0, canFloat: false },
+  wagon: { radius: 28, mass: 2.4, speed: 34, drag: 300, restitution: 0.08, pushForce: 110, magneticRadius: 0, canFloat: false }
 };
 
 export const STICKER_INFO: Record<StickerType, { icon: string; color: string; description: string; example: string }> = {

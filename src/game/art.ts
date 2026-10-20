@@ -21,7 +21,7 @@ function eyes(ctx: CanvasRenderingContext2D, y = 55, spacing = 25): void {
 function draw(ctx: CanvasRenderingContext2D, kind: EntityKind, character: 'boy' | 'girl' = 'boy'): void {
   ctx.clearRect(0, 0, 128, 128);
   ellipse(ctx, 64, 109, 39, 9, 'rgba(42,27,86,.17)', 'transparent', 0);
-  const palettes: Record<EntityKind, string> = { bandit:'#8657dc', chicken:'#fff7e1', apple:'#f75d66', snail:'#f2b86f', rock:'#9097ad', boulder:'#7e8a9c', ball:'#fc9cce', turtle:'#61cbb3', robot:'#70bce6', knight:'#a3aed6', key:'#ffcf56', frog:'#78d18b', crate:'#dfae71', challah:'#e9a84f' };
+  const palettes: Record<EntityKind, string> = { bandit:'#8657dc', chicken:'#fff7e1', apple:'#f75d66', snail:'#f2b86f', rock:'#9097ad', boulder:'#7e8a9c', ball:'#fc9cce', turtle:'#61cbb3', robot:'#70bce6', knight:'#a3aed6', key:'#ffcf56', frog:'#78d18b', crate:'#dfae71', challah:'#e9a84f', wagon:'#c68755' };
   const fill = palettes[kind];
   if (kind === 'bandit') {
     rounded(ctx, 87, 52, 29, 51, 9, '#ee9b62', '#714d61', 4); // backpack
@@ -80,6 +80,16 @@ function draw(ctx: CanvasRenderingContext2D, kind: EntityKind, character: 'boy' 
     for (const [x,y] of [[37,68],[64,58],[91,68]] as const) ellipse(ctx, x, y, 22, 30, fill, '#bd7d45', 3);
     for (const [x,y] of [[39,46],[63,39],[87,46]] as const) ellipse(ctx, x, y, 10, 5, '#fff0b6', 'transparent', 0);
     eyes(ctx, 65, 20);
+  } else if (kind === 'wagon') {
+    rounded(ctx, 16, 36, 96, 51, 9, fill, '#704c57', 5);
+    for (const x of [27, 47, 67, 87]) rounded(ctx, x, 40, 14, 38, 3, '#e5b37c', '#a36f55', 2);
+    ellipse(ctx, 37, 91, 16, 16, '#574b5e', '#392f48', 4);
+    ellipse(ctx, 91, 91, 16, 16, '#574b5e', '#392f48', 4);
+    ellipse(ctx, 37, 91, 5, 5, '#f6cf82', 'transparent', 0);
+    ellipse(ctx, 91, 91, 5, 5, '#f6cf82', 'transparent', 0);
+    ellipse(ctx, 47, 60, 3, 5, '#392f48', 'transparent', 0);
+    ellipse(ctx, 81, 60, 3, 5, '#392f48', 'transparent', 0);
+    ctx.beginPath();ctx.arc(64, 62, 10, .2, Math.PI-.2);ctx.strokeStyle='#704c57';ctx.lineWidth=3;ctx.stroke();
   } else if (kind === 'key') {
     ellipse(ctx, 48, 50, 25, 25, fill, '#ae8543',6);ellipse(ctx, 48, 50, 11, 11, '#fff1ba','transparent',0);
     rounded(ctx, 62, 48, 44, 16, 5, fill, '#ae8543',4);rounded(ctx, 91, 58, 11, 18, 2, fill, '#ae8543',3);

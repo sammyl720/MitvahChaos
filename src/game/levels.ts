@@ -169,6 +169,44 @@ export const LEVELS: Level[] = [LevelSchema.parse({
     station: { x: 310, y: 229 },
     npc: { x: 350, y: 183, name: 'DOVI', greeting: 'The loaves are rolling! Can you help me set the community table?', thanks: 'The loaves are safe, and the table is ready. What a team!' }
   }
+}), LevelSchema.parse({
+  number: 6,
+  name: 'The Runaway Wagon',
+  world: 2,
+  hint: 'Make the wagon HEAVY, then SLIPPERY. Watch it glide into the catch switch before bringing flour to the kitchen!',
+  entities: [
+    { id: 'player', kind: 'bandit', label: 'YOU', x: 195, y: 511, stickers: [], behavior: 'idle' },
+    { id: 'wagon', kind: 'wagon', label: 'WAGON', x: 122, y: 302, stickers: [], behavior: 'idle' },
+    { id: 'weight-rock', kind: 'boulder', label: 'WEIGHT ROCK', x: 315, y: 495, stickers: ['HEAVY'], behavior: 'idle' },
+    { id: 'slick-snail', kind: 'snail', label: 'SLICK SNAIL', x: 76, y: 495, stickers: ['SLIPPERY'], behavior: 'idle' }
+  ],
+  goals: [
+    { id: 'weigh-wagon', x: 122, y: 302, radius: 38, targetId: 'wagon', requires: ['HEAVY'], minMass: 7, label: 'WEIGH WAGON' },
+    { id: 'catch-wagon', x: 296, y: 302, radius: 30, targetId: 'wagon', requires: ['HEAVY', 'SLIPPERY'], minSpeed: 100, label: 'CATCH SWITCH' }
+  ],
+  goalOrder: 'sequential',
+  fixtures: [
+    { kind: 'wall', x: 195, y: 262, w: 200, h: 12 },
+    { kind: 'wall', x: 195, y: 342, w: 200, h: 12 },
+    { kind: 'gate', x: 195, y: 405, w: 348, h: 16, opensAfter: 1 },
+    { kind: 'gate', x: 195, y: 136, w: 348, h: 16, opensAfter: 2 }
+  ],
+  treasure: { x: 66, y: 547 },
+  gem: { x: 327, y: 251 },
+  exit: { x: 195, y: 70 },
+  par: 2,
+  solution: [
+    { source: 'weight-rock', target: 'wagon', sticker: 'HEAVY' },
+    { source: 'slick-snail', target: 'wagon', sticker: 'SLIPPERY' }
+  ],
+  mission: {
+    kind: 'delivery',
+    items: [{ x: 65, y: 206 }, { x: 260, y: 205 }],
+    itemName: 'flour sacks',
+    stationLabel: 'KITCHEN',
+    station: { x: 312, y: 207 },
+    npc: { x: 351, y: 249, name: 'GOLDA', greeting: 'The wagon brought flour. Can you carry the sacks into our kitchen?', thanks: 'The flour is in! Now the village can bake together.' }
+  }
 })];
 
 export function getLevel(number: number): Level {

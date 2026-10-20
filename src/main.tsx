@@ -16,7 +16,8 @@ const COSMETICS = [
   { id:'shabbos', name:'Shabbos Outfit', icon:'🕯️', detail:'Complete Challahzilla!' },
   { id:'courier', name:'Courier Cap', icon:'🧢', detail:'Complete The Speedy Shliach.' },
   { id:'kindness-pin', name:'Kindness Pin', icon:'❤️', detail:'Help both neighbors on Kingston Avenue.' },
-  { id:'rainbow', name:'Rainbow Outfit', icon:'🌈', detail:'Complete the Crown Heights world.' }
+  { id:'rainbow', name:'Rainbow Outfit', icon:'🌈', detail:'Complete the Crown Heights world.' },
+  { id:'village-scarf', name:'Village Scarf', icon:'🧣', detail:'Help Golda in The Runaway Wagon.' }
 ];
 const ACHIEVEMENTS = [
   { id:'first-sticker', name:'First Sticker', icon:'🏷️', detail:'Make your first sticker transfer.' },
@@ -24,7 +25,8 @@ const ACHIEVEMENTS = [
   { id:'challah-helper', name:'Challah Helper', icon:'🍞', detail:'Help Miriam prepare the Shabbos table.' },
   { id:'shlichus-superstar', name:'Shlichus Superstar', icon:'📦', detail:'Deliver Yanky’s package.' },
   { id:'ahavas-hero', name:'Ahavas Yisroel Hero', icon:'❤️', detail:'Help both neighbors on Kingston Avenue.' },
-  { id:'chabad-adventurer', name:'Chabad Adventurer', icon:'🏙️', detail:'Complete the Crown Heights world.' }
+  { id:'chabad-adventurer', name:'Chabad Adventurer', icon:'🏙️', detail:'Complete the Crown Heights world.' },
+  { id:'wagon-wrangler', name:'Wagon Wrangler', icon:'🛞', detail:'Catch the runaway wagon and help Golda.' }
 ];
 
 function Logo({ small = false }: { small?: boolean }) { return <div className={`logo ${small ? 'small' : ''}`}><span className="logo-star">✦</span>MITZVAH <strong>CHAOS</strong><span className="logo-star">✦</span></div>; }

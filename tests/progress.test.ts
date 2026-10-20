@@ -17,8 +17,10 @@ describe('local progress', () => {
     expect(unlockedAchievements(progress)).toContain('pushka-pro');
     expect(unlockedAchievements(progress)).toContain('ahavas-hero');
     expect(unlockedAchievements(progress)).toContain('chabad-adventurer');
+    expect(unlockedAchievements(progress)).toContain('wagon-wrangler');
     expect(unlockedCosmetics(progress)).toContain('backpack');
     expect(unlockedCosmetics(progress)).toContain('kindness-pin');
+    expect(unlockedCosmetics(progress)).toContain('village-scarf');
     expect(unlockedCosmetics(progress)).toContain('tiny-crown');
   });
 });
