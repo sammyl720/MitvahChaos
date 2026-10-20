@@ -59,6 +59,36 @@ export const LEVELS: Level[] = [LevelSchema.parse({
     station: { x: 307, y: 494 },
     npc: { x: 351, y: 428, name: 'MIRIAM', greeting: 'The Shabbos table needs its cloth. Can you bring it?', thanks: 'Thank you! Now the table is ready.' }
   }
+}), LevelSchema.parse({
+  number: 3,
+  name: 'The Speedy Shliach',
+  world: 1,
+  hint: 'Borrow FAST from the delivery bot, weave through the street maze, and bring the package to Yanky!',
+  entities: [
+    { id: 'player', kind: 'bandit', label: 'YOU', x: 195, y: 500, stickers: [], behavior: 'idle' },
+    { id: 'courier-bot', kind: 'robot', label: 'DELIVERY BOT', x: 82, y: 500, stickers: ['FAST'], behavior: 'idle' },
+    { id: 'mail-crate', kind: 'crate', label: 'MAIL CRATE', x: 300, y: 348, stickers: [], behavior: 'idle' }
+  ],
+  goals: [{ id: 'fast-lane', x: 195, y: 500, radius: 38, targetId: 'player', requires: ['FAST'], label: 'FAST LANE' }],
+  fixtures: [
+    { kind: 'wall', x: 125, y: 375, w: 180, h: 14 },
+    { kind: 'wall', x: 270, y: 285, w: 180, h: 14 },
+    { kind: 'wall', x: 130, y: 205, w: 160, h: 14 },
+    { kind: 'gate', x: 195, y: 126, w: 348, h: 16, opensAfter: 1 }
+  ],
+  treasure: { x: 322, y: 541 },
+  gem: { x: 61, y: 267 },
+  exit: { x: 195, y: 70 },
+  par: 1,
+  solution: [{ source: 'courier-bot', target: 'player', sticker: 'FAST' }],
+  mission: {
+    kind: 'delivery',
+    items: [{ x: 319, y: 437 }],
+    itemName: 'package',
+    stationLabel: 'DROP OFF',
+    station: { x: 314, y: 178 },
+    npc: { x: 352, y: 240, name: 'YANKY', greeting: 'Nu, can you bring this package through the maze?', thanks: 'That was quick! The family has what they need.' }
+  }
 })];
 
 export function getLevel(number: number): Level {

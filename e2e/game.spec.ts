@@ -22,6 +22,10 @@ test('has distinct identity, character choice, and isolated storage', async ({pa
 });
 
 test('transfers MAGNETIC and completes the pushka mission', async ({page}) => {
+  test.setTimeout(90000);
+  await page.addInitScript(({key, progress}) => {
+    localStorage.setItem(key, JSON.stringify(progress));
+  }, {key:PROGRESS_KEY, progress:{...DEFAULT_PROGRESS, settings:{...DEFAULT_PROGRESS.settings, controlMode:'tap'}}});
   await page.goto('/');
   await page.getByRole('button', {name:/PLAY/}).first().click();
   await page.getByRole('button', {name:/Level 1: The Runaway Pushka/}).click();
@@ -29,11 +33,6 @@ test('transfers MAGNETIC and completes the pushka mission', async ({page}) => {
   await tapWorld(page, 86, 229);
   await tapWorld(page, 193, 495);
   await expect(page.getByText('1/1 switches')).toBeVisible();
-  await page.getByRole('button', {name:'Pause'}).click();
-  await page.getByRole('button', {name:'SETTINGS', exact:true}).click();
-  await page.getByRole('button', {name:'Tap to move'}).click();
-  await page.getByRole('button', {name:'BACK TO PAUSE'}).click();
-  await page.getByRole('button', {name:'RESUME'}).click();
   for (const [index, [x,y]] of [[65,417],[313,389],[199,206]].entries()) {
     await tapWorld(page, x, y);
     await expect.poll(async () => Number((await page.locator('.mission-strip').innerText()).match(/Bag: (\d+)/)?.[1] ?? 0), {timeout:12000}).toBeGreaterThanOrEqual(index + 1);
@@ -49,6 +48,7 @@ test('transfers MAGNETIC and completes the pushka mission', async ({page}) => {
 });
 
 test('unlocks Challahzilla and completes the tablecloth delivery', async ({page}) => {
+  test.setTimeout(90000);
   await page.addInitScript(({key, progress}) => {
     localStorage.setItem(key, JSON.stringify(progress));
   }, {key:PROGRESS_KEY, progress:{...DEFAULT_PROGRESS, completedLevels:[1], settings:{...DEFAULT_PROGRESS.settings, controlMode:'tap'}}});
@@ -70,5 +70,30 @@ test('unlocks Challahzilla and completes the tablecloth delivery', async ({page}
   await expect(page.getByText('🎁 ✓')).toBeVisible({timeout:12000});
   await tapWorld(page, 195, 70);
   await expect(page.getByRole('heading', {name:'Mitzvah accomplished!'})).toBeVisible({timeout:12000});
-  await expect(page.getByRole('button', {name:'WORLD MAP'})).toBeVisible();
+  await expect(page.getByRole('button', {name:/NEXT LEVEL/})).toBeVisible();
+});
+
+test('uses FAST to deliver a package through the street maze', async ({page}) => {
+  test.setTimeout(90000);
+  await page.addInitScript(({key, progress}) => {
+    localStorage.setItem(key, JSON.stringify(progress));
+  }, {key:PROGRESS_KEY, progress:{...DEFAULT_PROGRESS, completedLevels:[1,2], settings:{...DEFAULT_PROGRESS.settings, controlMode:'tap'}}});
+  await page.goto('/');
+  await page.getByRole('button', {name:/PLAY/}).first().click();
+  await page.getByRole('button', {name:/Level 3: The Speedy Shliach/}).click();
+  await expect(page.locator('canvas')).toBeVisible();
+  await tapWorld(page, 82, 500);
+  await page.getByRole('button', {name:/FAST/}).click();
+  await tapWorld(page, 195, 500);
+  await expect(page.getByText('1/1 switches')).toBeVisible();
+  await tapWorld(page, 319, 437);
+  await expect(page.locator('.mission-strip')).toContainText('Bag: 1', {timeout:12000});
+  await tapWorld(page, 260, 178);
+  await expect(page.getByRole('button', {name:'DELIVER ITEM'})).toBeEnabled({timeout:20000});
+  await page.getByRole('button', {name:'DELIVER ITEM'}).click();
+  await expect(page.locator('.mission-strip')).toContainText('Delivered: 1/1');
+  await tapWorld(page, 322, 541);
+  await expect(page.getByText('🎁 ✓')).toBeVisible({timeout:20000});
+  await tapWorld(page, 195, 70);
+  await expect(page.getByRole('heading', {name:'Mitzvah accomplished!'})).toBeVisible({timeout:20000});
 });

@@ -8,7 +8,7 @@ import { findTapRoute } from '../src/game/navigation';
 describe('The Runaway Pushka', () => {
   const level = LEVELS[0];
   it('has a valid original layout and a solvable sticker transfer', () => {
-    expect(LEVELS).toHaveLength(2);
+    expect(LEVELS).toHaveLength(3);
     expect(LevelSchema.safeParse(level).success).toBe(true);
     const engine = new StickerEngine(level.entities);
     for (const step of level.solution) expect(engine.transfer(step.source, step.target, step.sticker).ok).toBe(true);
@@ -50,6 +50,30 @@ describe('Challahzilla!', () => {
     expect(missionComplete(level, mission)).toBe(true);
   });
   it('lets the player reach the tablecloth, family, treasure, and opened exit', () => {
+    const start = level.entities[0];
+    expect(findTapRoute(start, level.exit, 18, level.fixtures, 0, [], false)).toBeNull();
+    for (const destination of [...missionItems(level), level.mission!.station, level.treasure, level.exit]) {
+      expect(findTapRoute(start, destination, 18, level.fixtures, 1, [], false)).not.toBeNull();
+    }
+  });
+});
+
+describe('The Speedy Shliach', () => {
+  const level = LEVELS[2];
+  it('requires FAST and a separate package drop-off', () => {
+    expect(LevelSchema.safeParse(level).success).toBe(true);
+    const engine = new StickerEngine(level.entities);
+    for (const step of level.solution) expect(engine.transfer(step.source, step.target, step.sticker).ok).toBe(true);
+    expect(engine.get('player')?.stickers).toContain('FAST');
+    expect(effectiveStats(engine.get('player')!).speed).toBeGreaterThan(effectiveStats(level.entities[0]).speed);
+    let mission = startMission(level);
+    expect(missionComplete(level, mission)).toBe(false);
+    mission = collectCoin(mission, 0);
+    expect(missionComplete(level, mission)).toBe(false);
+    mission = depositCoins(mission);
+    expect(missionComplete(level, mission)).toBe(true);
+  });
+  it('routes through the maze when the FAST switch opens the exit', () => {
     const start = level.entities[0];
     expect(findTapRoute(start, level.exit, 18, level.fixtures, 0, [], false)).toBeNull();
     for (const destination of [...missionItems(level), level.mission!.station, level.treasure, level.exit]) {

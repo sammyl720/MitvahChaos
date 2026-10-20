@@ -4,7 +4,7 @@
 
 ## Playable now
 
-Two original Crown Heights missions are playable. In **The Runaway Pushka**, transfer MAGNETIC from the bot to your hero, collect three runaway coins, and place them in Rivky's pushka. In **Challahzilla!**, move BIG from a giant challah to the bridge crate, then carry a tablecloth to Miriam's Shabbos table. Both missions include a present, an exit, and a distinct mitzvah task. Choose a boy or girl adventurer. The eight-property sticker engine, undo, restart, touch controls, tap movement, local progress, sound settings, and offline PWA foundation are retained. Three future worlds appear as previews; their levels are not yet playable.
+Three original Crown Heights missions are playable. In **The Runaway Pushka**, transfer MAGNETIC from the bot to your hero, collect three runaway coins, and place them in Rivky's pushka. In **Challahzilla!**, move BIG from a giant challah to the bridge crate, then carry a tablecloth to Miriam's Shabbos table. In **The Speedy Shliach**, borrow FAST from a delivery bot and carry a package through a street maze to Yanky. Every mission includes a present, an exit, and a distinct mitzvah task. Choose a boy or girl adventurer. The eight-property sticker engine, undo, restart, touch controls, tap movement, local progress, sound settings, and offline PWA foundation are retained. Three future worlds appear as previews; their levels are not yet playable.
 
 This is an early playable milestone, not the full 20-level game described in [SPEC.md](SPEC.md). [PLAN.md](PLAN.md) tracks the remaining implementation and verification work.
 
@@ -36,4 +36,4 @@ The underlying engine, controls, and infrastructure come from [StickerChaos](htt
 
 ## Current limitations
 
-Only levels 1–2 have new layouts, mitzvah interactions, and documented solutions. Remaining worlds, richer NPC behavior, broader mission actions, Chassidic-inspired audio, more cosmetic rewards, and device testing are future work. Browser emulation does not replace testing on an actual iPhone or iPod touch before public release. Religious wording and ritual detail should receive community review before release.
+Only levels 1–3 have new layouts, mitzvah interactions, and documented solutions. Remaining worlds, richer NPC behavior, broader mission actions, Chassidic-inspired audio, more cosmetic rewards, and device testing are future work. Browser emulation does not replace testing on an actual iPhone or iPod touch before public release. Religious wording and ritual detail should receive community review before release.

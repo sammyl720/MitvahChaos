@@ -8,12 +8,13 @@
 - Added original boy and girl adventurer drawings and a saved character choice with identical gameplay.
 - Replaced the opening puzzle with **The Runaway Pushka**, a Crown Heights layout with a MAGNETIC sticker puzzle, collectible coin inventory, pushka deposit, Rivky interaction, exit gate, and documented solution.
 - Added **Challahzilla!**, with a BIG transfer, an original challah character, a tablecloth pickup and delivery, Miriam interaction, a distinct layout, and a documented solution.
+- Added **The Speedy Shliach**, with a FAST transfer, a zigzag street maze, a package delivery and drop-off, Yanky interaction, and a documented solution.
 - Generalized mission inventory and station handling for both tzedakah deposits and supply deliveries; completing level 2 unlocks an outfit and achievement.
 - Made unreleased worlds visible as previews rather than showing the original StickerChaos levels under new names.
 
 ## Next milestones
 
-1. **Crown Heights:** Build and playtest levels 3–5 with original layouts, NPC interactions, staged objectives, hints, and solution checks.
+1. **Crown Heights:** Build and playtest levels 4–5 with original layouts, NPC interactions, staged objectives, hints, and solution checks.
 2. **Reusable action system:** Extend item delivery into cooperation, preparation sequences, story event triggers, and NPC assistance. Keep inventory independent from stickers.
 3. **Worlds 2–4:** Implement fifteen original solvable levels, distinct scenery, and progression. Validate each documented solution and its physical route.
 4. **Art, audio, and rewards:** Expand original environment and character animation, create suitably licensed or original Chassidic-inspired music and effects, achievements, and cosmetic unlocks.
@@ -21,7 +22,7 @@
 
 ## Known issues and limits
 
-- Only levels 1–2 are playable. The original engine includes code for unreleased features and worlds that will be adapted during later milestones.
+- Only levels 1–3 are playable. The original engine includes code for unreleased features and worlds that will be adapted during later milestones.
 - Mission inventory supports coin collection and one item delivery. More varied interactions remain to be built.
 - Current music comes from the inherited procedural audio system and needs a new music direction.
 - Community review of dialogue and cultural detail is pending.
