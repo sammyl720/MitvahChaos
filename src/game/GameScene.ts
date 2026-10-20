@@ -183,7 +183,7 @@ export class GameScene extends Phaser.Scene {
       }
       g.fillStyle(0xf8f1dc).fillRoundedRect(12, 542, 366, 40, 8);
       for (let x = 43; x < 370; x += 53) g.fillStyle(0xe4d3ba).fillRoundedRect(x, 560, 27, 5, 2);
-      this.add.text(195, 165, 'KINGSTON AVE', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '13px', color: '#5e4669', backgroundColor: '#fff5d8', padding: { x: 8, y: 4 } }).setOrigin(.5).setDepth(1);
+      this.add.text(195, 165, this.level.number === 5 ? 'BAKERY LANE' : 'KINGSTON AVE', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '13px', color: '#5e4669', backgroundColor: '#fff5d8', padding: { x: 8, y: 4 } }).setOrigin(.5).setDepth(1);
       if (this.level.number === 3) {
         g.lineStyle(3, 0xffd279, .75);
         for (const [x, y] of [[235, 403], [151, 314], [234, 234]] as const) {
@@ -191,6 +191,12 @@ export class GameScene extends Phaser.Scene {
           g.fillStyle(0xffd279, .8).fillTriangle(x + 29, y, x + 20, y - 6, x + 20, y + 6);
         }
         this.add.text(196, 171, 'SHLIACH ROUTE', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '11px', color: '#5e4669', backgroundColor: '#fff5d8', padding: { x: 6, y: 3 } }).setOrigin(.5).setDepth(1);
+      }
+      if (this.level.number === 5) {
+        for (const [x, y] of [[47, 276], [160, 371], [228, 332], [344, 410], [119, 434]] as const) {
+          g.fillStyle(0xffffff, .52).fillCircle(x, y, 12);
+          g.fillStyle(0xffffff, .37).fillCircle(x + 15, y + 6, 6);
+        }
       }
     } else if (this.level.world === 2) {
       g.fillStyle(0x6b86a9, .35).fillRoundedRect(20, 471, 350, 76, 12);
@@ -275,7 +281,7 @@ export class GameScene extends Phaser.Scene {
     if (!this.level.mission) return;
     if (this.level.mission.kind === 'neighbors') { this.addNeighborMission(); return; }
     const delivery = this.level.mission.kind === 'delivery';
-    const tablecloth = this.level.mission.kind === 'delivery' && this.level.mission.itemName === 'tablecloth';
+    const tablecloth = this.level.mission.kind === 'delivery' && ['tablecloth', 'napkins'].includes(this.level.mission.itemName);
     this.coinSprites = missionItems(this.level).map(({ x, y }) => {
       const sprite = this.add.container(x, y, tablecloth ? [
         this.add.rectangle(0, 0, 31, 24, 0xf7efdb).setStrokeStyle(2, 0x8b5760),
@@ -319,7 +325,7 @@ export class GameScene extends Phaser.Scene {
     this.add.text(station.x, station.y + 36, this.level.mission.kind === 'delivery' ? this.level.mission.stationLabel : 'PUSHKA', { fontSize: '11px', color: '#5a397e', backgroundColor: '#fff7de', padding: { x: 5, y: 3 } }).setOrigin(.5).setDepth(14);
     const npc = this.level.mission.npc;
     const friend = this.add.container(npc.x, npc.y, [
-      this.add.ellipse(0, 15, 37, 34, 0xe77f9a).setStrokeStyle(2, 0x634469),
+      this.add.ellipse(0, 15, 37, 34, npc.name === 'DOVI' ? 0x6cadd5 : 0xe77f9a).setStrokeStyle(2, 0x634469),
       this.add.circle(0, -5, 18, 0x553944),
       this.add.circle(0, -3, 14, 0xeec397),
       this.add.circle(-5, -6, 2, 0x47344a), this.add.circle(5, -6, 2, 0x47344a),
@@ -639,6 +645,14 @@ export class GameScene extends Phaser.Scene {
       this.bossProps.push(this.add.text(boss.x, boss.y - 72, 'TRAPPED!', { fontSize: '15px', color: '#fff', backgroundColor: '#586ac4', padding: { x: 5, y: 3 } }).setOrigin(.5).setDepth(11));
       playSound('boss', this.settings.effectsVolume);
     }
+    if (this.level.number === 5) {
+      const labels = ['', 'SMALLER LOAF!', 'BOUNCE LANE!', 'AVALANCHE TAMED!'];
+      this.bossProps.push(this.add.text(195, 47, labels[stage], { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '13px', fontStyle: 'bold', color: '#fff9df', backgroundColor: '#935d72', padding: { x: 7, y: 4 } }).setOrigin(.5).setDepth(20));
+      if (stage === 3) {
+        this.bossProps.push(this.add.circle(boss.x, boss.y, 42, 0xffdc88, .22).setStrokeStyle(3, 0xffffff, .7).setDepth(4));
+        playSound('boss', this.settings.effectsVolume);
+      }
+    }
     if (this.level.number === 15) {
       this.bossProps.push(this.add.text(boss.x, boss.y - 74, '⚔️?!', { fontSize: '24px' }).setOrigin(.5).setDepth(12));
     }
@@ -813,7 +827,7 @@ export class GameScene extends Phaser.Scene {
         else {
           const attrs = effectiveStats(entity);
           const destination = this.level.goals.find((goal) => goal.targetId === entity.id && goal.requires.every((sticker) => entity.stickers.includes(sticker)));
-          const stunned = this.time.now < (this.stunnedUntil.get(entity.id) ?? 0) || (this.level.number === 10 && entity.id === this.level.bossId && this.goalActive[0]);
+          const stunned = this.time.now < (this.stunnedUntil.get(entity.id) ?? 0) || (this.level.number === 10 && entity.id === this.level.bossId && this.goalActive[0]) || (this.level.number === 5 && entity.kind === 'challah' && this.goalActive[2]);
           if (!stunned && entity.behavior === 'activate' && destination) {
             const dx = destination.x - piece.sprite.x, dy = destination.y - piece.sprite.y, distance = Math.hypot(dx,dy);
             piece.sprite.setAcceleration(0,0);

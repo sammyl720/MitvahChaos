@@ -8,7 +8,7 @@ import { findTapRoute } from '../src/game/navigation';
 describe('The Runaway Pushka', () => {
   const level = LEVELS[0];
   it('has a valid original layout and a solvable sticker transfer', () => {
-    expect(LEVELS).toHaveLength(4);
+    expect(LEVELS).toHaveLength(5);
     expect(LevelSchema.safeParse(level).success).toBe(true);
     const engine = new StickerEngine(level.entities);
     for (const step of level.solution) expect(engine.transfer(step.source, step.target, step.sticker).ok).toBe(true);
@@ -113,5 +113,38 @@ describe('Kingston Avenue Mix-Up', () => {
     expect(findTapRoute(start, people[1], 18, level.fixtures, 1, [], false)).toBeNull();
     expect(findTapRoute(start, people[1], 18, level.fixtures, 2, [], false)).not.toBeNull();
     expect(findTapRoute(start, level.exit, 18, level.fixtures, 2, [], false)).not.toBeNull();
+  });
+});
+
+describe('The Great Challah Avalanche', () => {
+  const level = LEVELS[4];
+  it('has three ordered sticker solutions and a separate two item preparation task', () => {
+    expect(LevelSchema.safeParse(level).success).toBe(true);
+    expect(level.bossId).toBe('challah-boss');
+    const engine = new StickerEngine(level.entities);
+    const giantRadius = effectiveStats(engine.get('challah-boss')!).radius;
+    for (const step of level.solution) expect(engine.transfer(step.source, step.target, step.sticker).ok).toBe(true);
+    expect(effectiveStats(engine.get('challah-boss')!).radius).toBeLessThan(giantRadius);
+    expect(engine.get('challah-boss')?.stickers).toContain('BOUNCY');
+    expect(engine.get('brake-crate')?.stickers).toContain('HEAVY');
+    let mission = startMission(level);
+    expect(missionComplete(level, mission)).toBe(false);
+    mission = collectCoin(mission, 0);
+    mission = depositCoins(mission);
+    expect(missionComplete(level, mission)).toBe(false);
+    mission = collectCoin(mission, 1);
+    mission = depositCoins(mission);
+    expect(missionComplete(level, mission)).toBe(true);
+  });
+  it('opens the bakery and exit gates in sequence', () => {
+    const start = level.entities[0];
+    const station = level.mission?.kind === 'delivery' ? level.mission.station : null;
+    expect(station).not.toBeNull();
+    expect(findTapRoute(start, station!, 18, level.fixtures, 1, [], false)).toBeNull();
+    for (const destination of [...missionItems(level), station!]) {
+      expect(findTapRoute(start, destination, 18, level.fixtures, 2, [], false)).not.toBeNull();
+    }
+    expect(findTapRoute(start, level.exit, 18, level.fixtures, 2, [], false)).toBeNull();
+    expect(findTapRoute(start, level.exit, 18, level.fixtures, 3, [], false)).not.toBeNull();
   });
 });

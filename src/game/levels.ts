@@ -126,6 +126,49 @@ export const LEVELS: Level[] = [LevelSchema.parse({
       { x: 330, y: 139, name: 'MOSHE', greeting: 'That supply cart keeps sliding. It needs some weight!', thanks: 'The cart is steady. Now we can bring everything inside!', needsGoal: 1 }
     ]
   }
+}), LevelSchema.parse({
+  number: 5,
+  name: 'The Great Challah Avalanche',
+  world: 1,
+  hint: 'Shrink the giant loaf, make it bounce into the catch lane, and steady the brake crate. Then help Dovi gather napkins!',
+  entities: [
+    { id: 'player', kind: 'bandit', label: 'YOU', x: 195, y: 514, stickers: [], behavior: 'idle' },
+    { id: 'challah-boss', kind: 'challah', label: 'GIANT LOAF', x: 78, y: 312, stickers: ['BIG'], behavior: 'idle' },
+    { id: 'catch-cart', kind: 'crate', label: 'CATCH CART', x: 300, y: 312, stickers: [], behavior: 'idle' },
+    { id: 'spring-chick', kind: 'chicken', label: 'SPRING CHICK', x: 74, y: 478, stickers: ['BOUNCY'], behavior: 'idle' },
+    { id: 'brake-rock', kind: 'boulder', label: 'BRAKE ROCK', x: 315, y: 478, stickers: ['HEAVY'], behavior: 'idle' },
+    { id: 'brake-crate', kind: 'crate', label: 'BRAKE CRATE', x: 195, y: 240, stickers: [], behavior: 'idle' },
+    { id: 'rolling-loaf', kind: 'challah', label: 'ROLLING LOAF', x: 325, y: 358, stickers: ['FAST'], behavior: 'patrol' }
+  ],
+  goals: [
+    { id: 'catch-giant', x: 300, y: 312, radius: 38, targetId: 'catch-cart', requires: ['BIG'], label: 'CATCH LOAF' },
+    { id: 'bounce-loaf', x: 78, y: 312, radius: 48, targetId: 'challah-boss', requires: ['BOUNCY'], label: 'BOUNCE LANE' },
+    { id: 'steady-brake', x: 195, y: 240, radius: 38, targetId: 'brake-crate', requires: ['HEAVY'], label: 'BRAKE' }
+  ],
+  goalOrder: 'sequential',
+  bossId: 'challah-boss',
+  fixtures: [
+    { kind: 'wall', x: 195, y: 322, w: 12, h: 98 },
+    { kind: 'gate', x: 195, y: 405, w: 348, h: 16, opensAfter: 2 },
+    { kind: 'gate', x: 195, y: 135, w: 348, h: 16, opensAfter: 3 }
+  ],
+  treasure: { x: 66, y: 548 },
+  gem: { x: 337, y: 285 },
+  exit: { x: 195, y: 70 },
+  par: 3,
+  solution: [
+    { source: 'challah-boss', target: 'catch-cart', sticker: 'BIG' },
+    { source: 'spring-chick', target: 'challah-boss', sticker: 'BOUNCY' },
+    { source: 'brake-rock', target: 'brake-crate', sticker: 'HEAVY' }
+  ],
+  mission: {
+    kind: 'delivery',
+    items: [{ x: 65, y: 221 }, { x: 257, y: 218 }],
+    itemName: 'napkins',
+    stationLabel: 'BAKER',
+    station: { x: 310, y: 229 },
+    npc: { x: 350, y: 183, name: 'DOVI', greeting: 'The loaves are rolling! Can you help me set the community table?', thanks: 'The loaves are safe, and the table is ready. What a team!' }
+  }
 })];
 
 export function getLevel(number: number): Level {
