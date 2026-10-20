@@ -7,7 +7,7 @@ import type { Fixture } from './model';
 import { findTapRoute, type Point } from './navigation';
 import { platformPosition } from './platform';
 import { StickerEngine } from './stickerEngine';
-import { collectCoin, depositCoins, helpNeighbor, missionComplete, missionGoalCount, missionItems, startMission, type MissionState } from './mission';
+import { collectCoin, depositCoins, helpNeighbor, missionComplete, missionGoalCount, missionItems, spillSupplies, startMission, type MissionState } from './mission';
 
 export interface SceneStatus {
   selected: EntityState | null;
@@ -289,8 +289,17 @@ export class GameScene extends Phaser.Scene {
     const delivery = this.level.mission.kind === 'delivery';
     const tablecloth = this.level.mission.kind === 'delivery' && ['tablecloth', 'napkins'].includes(this.level.mission.itemName);
     const flourSacks = this.level.mission.kind === 'delivery' && this.level.mission.itemName === 'flour sacks';
-    this.coinSprites = missionItems(this.level).map(({ x, y }) => {
-      const sprite = this.add.container(x, y, tablecloth ? [
+    const soupSupplies = this.level.mission.kind === 'delivery' && this.level.mission.itemName === 'soup supplies';
+    if (this.level.mission.kind === 'delivery' && this.level.mission.fragileZone) {
+      const zone = this.level.mission.fragileZone;
+      this.add.ellipse(zone.x, zone.y, zone.w, zone.h, 0xe8a45e, .85).setStrokeStyle(3, 0xffe5a8).setDepth(2);
+      this.add.text(zone.x, zone.y, 'SPILL', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '11px', fontStyle: 'bold', color: '#6f413b' }).setOrigin(.5).setDepth(3);
+    }
+    this.coinSprites = missionItems(this.level).map(({ x, y }, index) => {
+      const sprite = this.add.container(x, y, soupSupplies ? [
+        this.add.circle(0, 0, 16, index ? 0xe2aa63 : 0xe98063).setStrokeStyle(2, 0x855b59),
+        this.add.text(0, 0, index ? '🥕' : '🥔', { fontSize: '20px' }).setOrigin(.5)
+      ] : tablecloth ? [
         this.add.rectangle(0, 0, 31, 24, 0xf7efdb).setStrokeStyle(2, 0x8b5760),
         this.add.rectangle(0, -7, 28, 4, 0x77bfd0),
         this.add.rectangle(0, 3, 28, 3, 0x77bfd0),
@@ -313,7 +322,13 @@ export class GameScene extends Phaser.Scene {
       return { x, y, sprite };
     });
     const station = this.level.mission.station;
-    const stationSprite = this.add.container(station.x, station.y, flourSacks ? [
+    const stationSprite = this.add.container(station.x, station.y, soupSupplies ? [
+      this.add.ellipse(0, 14, 60, 23, 0x625569).setStrokeStyle(3, 0x443e59),
+      this.add.rectangle(0, 0, 55, 33, 0xa66c62).setStrokeStyle(3, 0x625569),
+      this.add.ellipse(0, -17, 56, 17, 0xe5a456).setStrokeStyle(3, 0xffd589),
+      this.add.arc(-12, -35, 8, 210, 80, false, 0x000000, 0).setStrokeStyle(2, 0xc5c5c5),
+      this.add.arc(10, -39, 8, 210, 80, false, 0x000000, 0).setStrokeStyle(2, 0xc5c5c5)
+    ] : flourSacks ? [
       this.add.rectangle(0, 6, 56, 47, 0xa97055).setStrokeStyle(3, 0x654b69),
       this.add.rectangle(0, -22, 61, 10, 0xf0cf94).setStrokeStyle(3, 0x654b69),
       this.add.ellipse(0, -17, 21, 9, 0xfff0d0).setStrokeStyle(2, 0x987a66),
@@ -395,6 +410,7 @@ export class GameScene extends Phaser.Scene {
     if (!station || !player || this.paused || this.completed) return;
     if (Math.hypot(player.x - station.x, player.y - station.y) > 64) { this.say(mission?.kind === 'delivery' ? `Come closer to the ${mission.stationLabel.toLowerCase()}.` : 'Come closer to the pushka.'); return; }
     if (!this.mission.carried) { this.say(mission?.kind === 'delivery' ? `Find the ${mission.itemName} first!` : 'Find the runaway coins first!'); return; }
+    if (mission?.kind === 'delivery' && mission.fragileZone && this.mission.carried < missionGoalCount(this.level)) { this.say('Bring all the soup supplies together, and keep them clear of the spill!'); return; }
     const count = this.mission.carried;
     this.mission = depositCoins(this.mission);
     this.burst(station.x, station.y, '#ffd66e');
@@ -894,6 +910,15 @@ export class GameScene extends Phaser.Scene {
     const player = this.engine.get('player');
     const mission = this.level.mission;
     if (!player || !mission || mission.kind === 'neighbors' || (mission.kind === 'tzedakah' && !player.stickers.includes('MAGNETIC'))) return;
+    if (mission.kind === 'delivery' && mission.fragileZone && this.mission.carried) {
+      const zone = mission.fragileZone;
+      if (Math.abs(player.x - zone.x) < zone.w / 2 + 10 && Math.abs(player.y - zone.y) < zone.h / 2 + 10) {
+        this.mission = spillSupplies(this.mission);
+        this.coinSprites.forEach((coin, index) => { coin.x = mission.items[index].x; coin.y = mission.items[index].y; coin.sprite.setPosition(coin.x, coin.y).setVisible(true); });
+        this.burst(player.x, player.y, '#e8a45e');
+        this.say('Oops, the supplies spilled! Pick them up again and go around the puddle.');
+      }
+    }
     const radius = mission.kind === 'tzedakah' ? effectiveStats(player).magneticRadius : 0;
     this.coinSprites.forEach((coin, index) => {
       if (this.mission.collected[index]) return;

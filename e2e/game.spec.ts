@@ -194,3 +194,38 @@ test('slides the heavy wagon into the catch switch and delivers flour', async ({
   await tapWorld(page, 195, 70);
   await expect(page.getByRole('heading', {name:'Mitzvah accomplished!'})).toBeVisible({timeout:20000});
 });
+
+test('clears the kitchen and carries soup supplies around the spill', async ({page}) => {
+  test.setTimeout(90000);
+  await page.addInitScript(({key, progress}) => {
+    localStorage.setItem(key, JSON.stringify(progress));
+  }, {key:PROGRESS_KEY, progress:{...DEFAULT_PROGRESS, completedLevels:[1,2,3,4,5,6], settings:{...DEFAULT_PROGRESS.settings, controlMode:'tap'}}});
+  await page.goto('/');
+  await page.getByRole('button', {name:/PLAY/}).first().click();
+  await page.getByRole('button', {name:/Level 7: Chicken Soup Catastrophe/}).click();
+  await expect(page.locator('canvas')).toBeVisible();
+  await tapWorld(page, 73, 496);
+  await page.getByRole('button', {name:/TINY/}).click();
+  await tapWorld(page, 118, 308);
+  await expect(page.getByText('1/2 switches')).toBeVisible();
+  await tapWorld(page, 312, 483);
+  await page.getByRole('button', {name:/HEAVY/}).click();
+  await tapWorld(page, 278, 309);
+  await expect(page.getByText('2/2 switches')).toBeVisible();
+  await tapWorld(page, 68, 464);
+  await expect(page.locator('.mission-strip')).toContainText('Bag: 1', {timeout:20000});
+  await tapWorld(page, 162, 380);
+  await expect(page.locator('.mission-strip')).toContainText('Bag: 0', {timeout:20000});
+  await tapWorld(page, 68, 464);
+  await expect(page.locator('.mission-strip')).toContainText('Bag: 1', {timeout:20000});
+  await tapWorld(page, 316, 425);
+  await expect(page.locator('.mission-strip')).toContainText('Bag: 2', {timeout:20000});
+  await tapWorld(page, 314, 260);
+  await expect(page.getByRole('button', {name:'DELIVER ITEM'})).toBeEnabled({timeout:20000});
+  await page.getByRole('button', {name:'DELIVER ITEM'}).click();
+  await expect(page.locator('.mission-strip')).toContainText('Delivered: 2/2');
+  await tapWorld(page, 66, 546);
+  await expect(page.getByText('🎁 ✓')).toBeVisible({timeout:20000});
+  await tapWorld(page, 195, 70);
+  await expect(page.getByRole('heading', {name:'Mitzvah accomplished!'})).toBeVisible({timeout:20000});
+});

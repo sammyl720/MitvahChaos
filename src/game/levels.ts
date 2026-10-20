@@ -207,6 +207,45 @@ export const LEVELS: Level[] = [LevelSchema.parse({
     station: { x: 312, y: 207 },
     npc: { x: 351, y: 249, name: 'GOLDA', greeting: 'The wagon brought flour. Can you carry the sacks into our kitchen?', thanks: 'The flour is in! Now the village can bake together.' }
   }
+}), LevelSchema.parse({
+  number: 7,
+  name: 'Chicken Soup Catastrophe',
+  world: 2,
+  hint: 'Shrink the crate blocking the kitchen, steady the soup shelf, then carry both supplies around the spill to the pot!',
+  entities: [
+    { id: 'player', kind: 'bandit', label: 'YOU', x: 194, y: 517, stickers: [], behavior: 'idle' },
+    { id: 'tiny-chick', kind: 'chicken', label: 'TINY CHICK', x: 73, y: 496, stickers: ['TINY'], behavior: 'idle' },
+    { id: 'kitchen-crate', kind: 'crate', label: 'BLOCKING CRATE', x: 118, y: 308, stickers: [], behavior: 'idle' },
+    { id: 'stone-press', kind: 'boulder', label: 'STONE PRESS', x: 312, y: 483, stickers: ['HEAVY'], behavior: 'idle' },
+    { id: 'soup-shelf', kind: 'crate', label: 'SOUP SHELF', x: 278, y: 309, stickers: [], behavior: 'idle' }
+  ],
+  goals: [
+    { id: 'clear-kitchen', x: 118, y: 308, radius: 38, targetId: 'kitchen-crate', requires: ['TINY'], label: 'CLEAR KITCHEN' },
+    { id: 'steady-shelf', x: 278, y: 309, radius: 38, targetId: 'soup-shelf', requires: ['HEAVY'], minMass: 5, label: 'STEADY SHELF' }
+  ],
+  goalOrder: 'sequential',
+  fixtures: [
+    { kind: 'wall', x: 197, y: 314, w: 14, h: 96 },
+    { kind: 'gate', x: 195, y: 401, w: 348, h: 16, opensAfter: 1 },
+    { kind: 'gate', x: 195, y: 137, w: 348, h: 16, opensAfter: 2 }
+  ],
+  treasure: { x: 66, y: 546 },
+  gem: { x: 327, y: 263 },
+  exit: { x: 195, y: 70 },
+  par: 2,
+  solution: [
+    { source: 'tiny-chick', target: 'kitchen-crate', sticker: 'TINY' },
+    { source: 'stone-press', target: 'soup-shelf', sticker: 'HEAVY' }
+  ],
+  mission: {
+    kind: 'delivery',
+    items: [{ x: 68, y: 464 }, { x: 316, y: 425 }],
+    itemName: 'soup supplies',
+    stationLabel: 'SOUP POT',
+    station: { x: 314, y: 213 },
+    fragileZone: { x: 195, y: 363, w: 74, h: 43 },
+    npc: { x: 350, y: 263, name: 'BASYA', greeting: 'The kitchen is blocked and the soup supplies could spill. Can you clear a safe path?', thanks: 'The supplies made it safely! Now everyone can share warm soup.' }
+  }
 })];
 
 export function getLevel(number: number): Level {
