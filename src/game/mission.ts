@@ -8,11 +8,16 @@ export interface MissionState {
 
 export function missionItems(level: Level): { x: number; y: number }[] {
   if (!level.mission) return [];
-  return level.mission.kind === 'tzedakah' ? level.mission.coins : level.mission.items;
+  if (level.mission.kind === 'tzedakah') return level.mission.coins;
+  return level.mission.kind === 'delivery' ? level.mission.items : [];
+}
+
+export function missionGoalCount(level: Level): number {
+  return level.mission?.kind === 'neighbors' ? level.mission.people.length : missionItems(level).length;
 }
 
 export function startMission(level: Level): MissionState {
-  return { collected: missionItems(level).map(() => false), carried: 0, deposited: 0 };
+  return { collected: Array(missionGoalCount(level)).fill(false), carried: 0, deposited: 0 };
 }
 
 export function collectCoin(state: MissionState, index: number): MissionState {
@@ -27,6 +32,13 @@ export function depositCoins(state: MissionState): MissionState {
   return { ...state, deposited: state.deposited + state.carried, carried: 0 };
 }
 
+export function helpNeighbor(state: MissionState, index: number): MissionState {
+  if (index < 0 || index >= state.collected.length || state.collected[index]) return state;
+  const collected = [...state.collected];
+  collected[index] = true;
+  return { ...state, collected, deposited: state.deposited + 1 };
+}
+
 export function missionComplete(level: Level, state: MissionState): boolean {
-  return !level.mission || state.deposited >= missionItems(level).length;
+  return !level.mission || state.deposited >= missionGoalCount(level);
 }

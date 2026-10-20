@@ -2,13 +2,13 @@ import { describe, expect, it } from 'vitest';
 import { LEVELS } from '../src/game/levels';
 import { LevelSchema } from '../src/game/model';
 import { StickerEngine, effectiveStats } from '../src/game/stickerEngine';
-import { collectCoin, depositCoins, missionComplete, missionItems, startMission } from '../src/game/mission';
+import { collectCoin, depositCoins, helpNeighbor, missionComplete, missionGoalCount, missionItems, startMission } from '../src/game/mission';
 import { findTapRoute } from '../src/game/navigation';
 
 describe('The Runaway Pushka', () => {
   const level = LEVELS[0];
   it('has a valid original layout and a solvable sticker transfer', () => {
-    expect(LEVELS).toHaveLength(3);
+    expect(LEVELS).toHaveLength(4);
     expect(LevelSchema.safeParse(level).success).toBe(true);
     const engine = new StickerEngine(level.entities);
     for (const step of level.solution) expect(engine.transfer(step.source, step.target, step.sticker).ok).toBe(true);
@@ -52,7 +52,9 @@ describe('Challahzilla!', () => {
   it('lets the player reach the tablecloth, family, treasure, and opened exit', () => {
     const start = level.entities[0];
     expect(findTapRoute(start, level.exit, 18, level.fixtures, 0, [], false)).toBeNull();
-    for (const destination of [...missionItems(level), level.mission!.station, level.treasure, level.exit]) {
+    const station = level.mission?.kind === 'delivery' ? level.mission.station : null;
+    expect(station).not.toBeNull();
+    for (const destination of [...missionItems(level), station!, level.treasure, level.exit]) {
       expect(findTapRoute(start, destination, 18, level.fixtures, 1, [], false)).not.toBeNull();
     }
   });
@@ -76,8 +78,40 @@ describe('The Speedy Shliach', () => {
   it('routes through the maze when the FAST switch opens the exit', () => {
     const start = level.entities[0];
     expect(findTapRoute(start, level.exit, 18, level.fixtures, 0, [], false)).toBeNull();
-    for (const destination of [...missionItems(level), level.mission!.station, level.treasure, level.exit]) {
+    const station = level.mission?.kind === 'delivery' ? level.mission.station : null;
+    expect(station).not.toBeNull();
+    for (const destination of [...missionItems(level), station!, level.treasure, level.exit]) {
       expect(findTapRoute(start, destination, 18, level.fixtures, 1, [], false)).not.toBeNull();
     }
+  });
+});
+
+describe('Kingston Avenue Mix-Up', () => {
+  const level = LEVELS[3];
+  it('requires two physical sticker changes and two separate neighbor interactions', () => {
+    expect(LevelSchema.safeParse(level).success).toBe(true);
+    const engine = new StickerEngine(level.entities);
+    const barrierBefore = effectiveStats(engine.get('street-barrier')!).radius;
+    const cartBefore = effectiveStats(engine.get('supply-cart')!).mass;
+    for (const step of level.solution) expect(engine.transfer(step.source, step.target, step.sticker).ok).toBe(true);
+    expect(effectiveStats(engine.get('street-barrier')!).radius).toBeLessThan(barrierBefore);
+    expect(effectiveStats(engine.get('supply-cart')!).mass).toBeGreaterThan(cartBefore);
+    expect(missionGoalCount(level)).toBe(2);
+    let mission = startMission(level);
+    mission = helpNeighbor(mission, 0);
+    expect(missionComplete(level, mission)).toBe(false);
+    expect(helpNeighbor(mission, 0)).toBe(mission);
+    mission = helpNeighbor(mission, 1);
+    expect(missionComplete(level, mission)).toBe(true);
+  });
+  it('opens the two street gates in stages', () => {
+    const start = level.entities[0];
+    const people = level.mission?.kind === 'neighbors' ? level.mission.people : [];
+    expect(people).toHaveLength(2);
+    expect(findTapRoute(start, people[0], 18, level.fixtures, 0, [], false)).toBeNull();
+    expect(findTapRoute(start, people[0], 18, level.fixtures, 1, [], false)).not.toBeNull();
+    expect(findTapRoute(start, people[1], 18, level.fixtures, 1, [], false)).toBeNull();
+    expect(findTapRoute(start, people[1], 18, level.fixtures, 2, [], false)).not.toBeNull();
+    expect(findTapRoute(start, level.exit, 18, level.fixtures, 2, [], false)).not.toBeNull();
   });
 });

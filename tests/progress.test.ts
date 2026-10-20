@@ -15,7 +15,9 @@ describe('local progress', () => {
   it('unlocks achievements and cosmetics from play, never from payment', () => {
     const progress = {...structuredClone(DEFAULT_PROGRESS), transfers:1, chickenTransforms:10, bounceCollisions:25, combinations:['a','b','c','d','e'], completedLevels:Array.from({length:20},(_,index)=>index+1),collectedGems:Array.from({length:20},(_,index)=>index+1),tinyWins:3};
     expect(unlockedAchievements(progress)).toContain('pushka-pro');
+    expect(unlockedAchievements(progress)).toContain('ahavas-hero');
     expect(unlockedCosmetics(progress)).toContain('backpack');
+    expect(unlockedCosmetics(progress)).toContain('kindness-pin');
     expect(unlockedCosmetics(progress)).toContain('tiny-crown');
   });
 });

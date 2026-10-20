@@ -4,7 +4,7 @@ import Phaser from 'phaser';
 import { GameScene, type SceneStatus } from './game/GameScene';
 import { playSound, setMusicPaused, setMusicVolume, startMusic, stopMusic } from './game/audio';
 import { getLevel, LEVELS, WORLD_ICONS, WORLD_NAMES } from './game/levels';
-import { missionItems } from './game/mission';
+import { missionGoalCount } from './game/mission';
 import { STICKER_INFO, STICKERS, type StickerType } from './game/model';
 import { useProgress } from './state/progress';
 import './styles/main.css';
@@ -14,13 +14,15 @@ const COSMETICS = [
   { id:'classic', name:'Everyday Outfit', icon:'👟', detail:'Ready for an adventure.' },
   { id:'backpack', name:'Shlichus Backpack', icon:'🎒', detail:'Complete The Runaway Pushka.' },
   { id:'shabbos', name:'Shabbos Outfit', icon:'🕯️', detail:'Complete Challahzilla!' },
-  { id:'courier', name:'Courier Cap', icon:'🧢', detail:'Complete The Speedy Shliach.' }
+  { id:'courier', name:'Courier Cap', icon:'🧢', detail:'Complete The Speedy Shliach.' },
+  { id:'kindness-pin', name:'Kindness Pin', icon:'❤️', detail:'Help both neighbors on Kingston Avenue.' }
 ];
 const ACHIEVEMENTS = [
   { id:'first-sticker', name:'First Sticker', icon:'🏷️', detail:'Make your first sticker transfer.' },
   { id:'pushka-pro', name:'Pushka Pro', icon:'🌟', detail:'Help Rivky fill the pushka.' },
   { id:'challah-helper', name:'Challah Helper', icon:'🍞', detail:'Help Miriam prepare the Shabbos table.' },
-  { id:'shlichus-superstar', name:'Shlichus Superstar', icon:'📦', detail:'Deliver Yanky’s package.' }
+  { id:'shlichus-superstar', name:'Shlichus Superstar', icon:'📦', detail:'Deliver Yanky’s package.' },
+  { id:'ahavas-hero', name:'Ahavas Yisroel Hero', icon:'❤️', detail:'Help both neighbors on Kingston Avenue.' }
 ];
 
 function Logo({ small = false }: { small?: boolean }) { return <div className={`logo ${small ? 'small' : ''}`}><span className="logo-star">✦</span>MITZVAH <strong>CHAOS</strong><span className="logo-star">✦</span></div>; }
@@ -44,7 +46,7 @@ function Joystick({ onMove }: { onMove: (x:number,y:number) => void }) {
 function GameScreen({ number, onBack, onNext }: { number:number; onBack:()=>void; onNext:(number:number)=>void }) {
   const level = getLevel(number);
   const { progress, setSettings, recordTransfer, recordBounce, completeLevel } = useProgress();
-  const [status,setStatus] = useState<SceneStatus>({ selected:null, armed:null, transfers:0, treasure:false, gem:false, goals:0, totalGoals:level.goals.length, message:level.hint, canUndo:false, carried:0, deposited:0, required:missionItems(level).length, nearStation:false });
+  const [status,setStatus] = useState<SceneStatus>({ selected:null, armed:null, transfers:0, treasure:false, gem:false, goals:0, totalGoals:level.goals.length, message:level.hint, canUndo:false, carried:0, deposited:0, required:missionGoalCount(level), nearStation:false });
   const [paused,setPaused] = useState(false);
   const [pauseSettings,setPauseSettings] = useState(false);
   const [result,setResult] = useState<{stars:number;gem:boolean}|null>(null);
@@ -87,12 +89,12 @@ function GameScreen({ number, onBack, onNext }: { number:number; onBack:()=>void
   return <main className="game-screen">
     <header className="game-top"><button className="icon-button" onClick={() => {setPaused(true);setMusicPaused(true);scene.current?.setPaused(true);}} aria-label="Pause">Ⅱ</button><div className="game-title"><small>{WORLD_NAMES[level.world-1]} · Level {number}</small><strong>{level.name}</strong></div><div className="game-progress"><span>🎁 {status.treasure?'✓':'0/1'}</span><span>💎 {status.gem?'✓':'0/1'}</span></div></header>
     <section className={`stage-shell world-${level.world}`} aria-label={`${level.name} game area`}><div ref={host} className="game-canvas"/><div className="stage-hint">{status.message || level.hint}</div></section>
-    <div className="game-bottom">{level.mission && <div className="mission-strip"><span><b className="coin-symbol">●</b> Bag: {status.carried} · {level.mission.kind === 'delivery' ? 'Delivered' : 'Pushka'}: {status.deposited}/{status.required}</span><button onClick={()=>scene.current?.deposit()} disabled={!status.carried || !status.nearStation}>{level.mission.kind === 'delivery' ? 'DELIVER ITEM' : 'DEPOSIT COINS'}</button></div>}<div className="tool-row"><button className="tool-button" onClick={() => scene.current?.undo()} disabled={!status.canUndo}>↶ <span>UNDO</span></button><button className="tool-button" onClick={restart}>↻ <span>RESTART</span></button><div className="goal-count">⚡ {status.goals}/{status.totalGoals} switches</div></div>
+    <div className="game-bottom">{level.mission && <div className="mission-strip"><span><b className="coin-symbol">●</b> {level.mission.kind === 'neighbors' ? `Neighbors helped: ${status.deposited}/${status.required}` : `Bag: ${status.carried} · ${level.mission.kind === 'delivery' ? 'Delivered' : 'Pushka'}: ${status.deposited}/${status.required}`}</span><button onClick={()=>scene.current?.deposit()} disabled={!status.nearStation || (level.mission.kind !== 'neighbors' && !status.carried)}>{level.mission.kind === 'neighbors' ? 'HELP NEIGHBOR' : level.mission.kind === 'delivery' ? 'DELIVER ITEM' : 'DEPOSIT COINS'}</button></div>}<div className="tool-row"><button className="tool-button" onClick={() => scene.current?.undo()} disabled={!status.canUndo}>↶ <span>UNDO</span></button><button className="tool-button" onClick={restart}>↻ <span>RESTART</span></button><div className="goal-count">⚡ {status.goals}/{status.totalGoals} switches</div></div>
       <div className="control-row">{progress.settings.controlMode==='joystick'?<Joystick onMove={(x,y)=>scene.current?.setJoystick(x,y)}/>:<div className="tap-tip">👆 Tap the ground<br/>to move</div>}
       <div className="sticker-tray">{status.selected?<><span className="tray-title">{status.selected.kind.toUpperCase()} STICKERS</span><div className="tray-stickers">{status.selected.stickers.length?status.selected.stickers.map((sticker)=><button key={sticker} className={`sticker-pill ${status.armed===sticker?'armed':''}`} style={{'--sticker':STICKER_INFO[sticker].color} as React.CSSProperties} onClick={()=>scene.current?.selectSticker(sticker)}>{STICKER_INFO[sticker].icon} {sticker}</button>):<span className="tray-empty">Tap a stickered object</span>}</div></>:<><span className="tray-title">HOW TO PLAY</span><span className="tray-empty">Tap an object, choose a sticker, then tap a new home. Or drag a sticker!</span></>}</div></div>
     </div>
     {paused && <div className="modal-backdrop"><div className="modal-card">{pauseSettings ? <><h2>Settings</h2><div className="pause-settings"><label>🎵 Music volume<input aria-label="Music volume" type="range" min="0" max="1" step="0.05" value={progress.settings.musicVolume} onChange={(event)=>setSettings({musicVolume:Number(event.target.value)})}/></label><label>🔊 Sound effects<input aria-label="Sound effects volume" type="range" min="0" max="1" step="0.05" value={progress.settings.effectsVolume} onChange={(event)=>setSettings({effectsVolume:Number(event.target.value)})}/></label><label className="pause-toggle">✨ Reduced motion<input type="checkbox" checked={progress.settings.reducedMotion} onChange={(event)=>setSettings({reducedMotion:event.target.checked})}/></label><label className="pause-toggle">🪶 Low graphics<input type="checkbox" checked={progress.settings.graphicsQuality==='low'} onChange={(event)=>setSettings({graphicsQuality:event.target.checked?'low':'standard'})}/></label><p>Graphics quality changes when you reopen a level.</p><div className="segmented"><button className={progress.settings.controlMode==='joystick'?'active':''} onClick={()=>setSettings({controlMode:'joystick'})}>Joystick</button><button className={progress.settings.controlMode==='tap'?'active':''} onClick={()=>setSettings({controlMode:'tap'})}>Tap to move</button></div></div><button className="secondary-button" onClick={()=>setPauseSettings(false)}>BACK TO PAUSE</button></> : <><div className="modal-icon">⏸️</div><h2>Taking a breather?</h2><p>Your sticker puzzle is right where you left it.</p><button className="primary-button" onClick={resume}>RESUME</button><button className="secondary-button" onClick={restart}>RESTART LEVEL</button><button className="secondary-button" onClick={()=>setPauseSettings(true)}>SETTINGS</button><button className="text-button" onClick={onBack}>WORLD MAP</button></>}</div></div>}
-    {result && <div className="modal-backdrop"><div className={`modal-card victory ${number===20?'finale':''}`}><div className="modal-icon">{number===20?'🌍':'🎉'}</div><h2>{number===20?'Grand celebration!':'Mitzvah accomplished!'}</h2><div className="big-stars">{'⭐'.repeat(result.stars)}{'☆'.repeat(3-result.stars)}</div><p>{result.gem?'You found the secret gem too!':`You helped ${level.mission?.npc.name === 'MIRIAM' ? 'Miriam' : level.mission?.npc.name === 'YANKY' ? 'Yanky' : 'Rivky'}. Try again for the secret gem!`}</p><button className="primary-button" onClick={()=>number<LEVELS.length?onNext(number+1):onBack()}>{number<LEVELS.length?'NEXT LEVEL →':'WORLD MAP'}</button><button className="secondary-button" onClick={restart}>PLAY AGAIN</button></div></div>}
+    {result && <div className="modal-backdrop"><div className={`modal-card victory ${number===20?'finale':''}`}><div className="modal-icon">{number===20?'🌍':'🎉'}</div><h2>{number===20?'Grand celebration!':'Mitzvah accomplished!'}</h2><div className="big-stars">{'⭐'.repeat(result.stars)}{'☆'.repeat(3-result.stars)}</div><p>{result.gem?'You found the secret gem too!':level.mission?.kind === 'neighbors' ? 'You helped both neighbors. Try again for the secret gem!' : `You helped ${level.mission?.npc.name === 'MIRIAM' ? 'Miriam' : level.mission?.npc.name === 'YANKY' ? 'Yanky' : 'Rivky'}. Try again for the secret gem!`}</p><button className="primary-button" onClick={()=>number<LEVELS.length?onNext(number+1):onBack()}>{number<LEVELS.length?'NEXT LEVEL →':'WORLD MAP'}</button><button className="secondary-button" onClick={restart}>PLAY AGAIN</button></div></div>}
   </main>;
 }
 

@@ -89,6 +89,43 @@ export const LEVELS: Level[] = [LevelSchema.parse({
     station: { x: 314, y: 178 },
     npc: { x: 352, y: 240, name: 'YANKY', greeting: 'Nu, can you bring this package through the maze?', thanks: 'That was quick! The family has what they need.' }
   }
+}), LevelSchema.parse({
+  number: 4,
+  name: 'Kingston Avenue Mix-Up',
+  world: 1,
+  hint: 'Make the barrier TINY, give the supply cart HEAVY, then check on both neighbors!',
+  entities: [
+    { id: 'player', kind: 'bandit', label: 'YOU', x: 193, y: 510, stickers: [], behavior: 'idle' },
+    { id: 'little-bot', kind: 'robot', label: 'LITTLE BOT', x: 75, y: 487, stickers: ['TINY'], behavior: 'idle' },
+    { id: 'street-barrier', kind: 'crate', label: 'BARRIER', x: 126, y: 288, stickers: [], behavior: 'idle' },
+    { id: 'weighty-rock', kind: 'boulder', label: 'WEIGHTY ROCK', x: 317, y: 486, stickers: ['HEAVY'], behavior: 'idle' },
+    { id: 'supply-cart', kind: 'crate', label: 'SUPPLY CART', x: 263, y: 288, stickers: [], behavior: 'idle' }
+  ],
+  goals: [
+    { id: 'clear-sidewalk', x: 126, y: 288, radius: 38, targetId: 'street-barrier', requires: ['TINY'], label: 'CLEAR PATH' },
+    { id: 'steady-cart', x: 263, y: 288, radius: 38, targetId: 'supply-cart', requires: ['HEAVY'], label: 'STEADY CART' }
+  ],
+  goalOrder: 'sequential',
+  fixtures: [
+    { kind: 'wall', x: 195, y: 299, w: 14, h: 114 },
+    { kind: 'gate', x: 195, y: 390, w: 348, h: 16, opensAfter: 1 },
+    { kind: 'gate', x: 195, y: 190, w: 348, h: 16, opensAfter: 2 }
+  ],
+  treasure: { x: 66, y: 548 },
+  gem: { x: 329, y: 345 },
+  exit: { x: 195, y: 70 },
+  par: 2,
+  solution: [
+    { source: 'little-bot', target: 'street-barrier', sticker: 'TINY' },
+    { source: 'weighty-rock', target: 'supply-cart', sticker: 'HEAVY' }
+  ],
+  mission: {
+    kind: 'neighbors',
+    people: [
+      { x: 66, y: 322, name: 'LEAH', greeting: 'The barrier is in my way. Can you shrink it?', thanks: 'Ah, the sidewalk is clear. Thanks for helping!', needsGoal: 0 },
+      { x: 330, y: 139, name: 'MOSHE', greeting: 'That supply cart keeps sliding. It needs some weight!', thanks: 'The cart is steady. Now we can bring everything inside!', needsGoal: 1 }
+    ]
+  }
 })];
 
 export function getLevel(number: number): Level {
