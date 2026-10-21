@@ -279,6 +279,42 @@ export const LEVELS: Level[] = [LevelSchema.parse({
     kind: 'neighbors',
     people: [{ x: 315, y: 215, name: 'TOVA', greeting: 'Our little village model has stopped moving. Can you reach its tiny switch?', thanks: 'The model moves again! The children will love seeing our village.' , needsGoal: 1 }]
   }
+}), LevelSchema.parse({
+  number: 9,
+  name: 'The Floating Bridge',
+  world: 2,
+  hint: 'Float the supply raft, then borrow FLOATING for yourself. Cross the stream and bring both parcels to Reizel!',
+  entities: [
+    { id: 'player', kind: 'bandit', label: 'YOU', x: 195, y: 519, stickers: [], behavior: 'idle' },
+    { id: 'supply-raft', kind: 'wagon', label: 'SUPPLY RAFT', x: 195, y: 445, stickers: [], behavior: 'idle' },
+    { id: 'float-turtle', kind: 'turtle', label: 'FLOAT TURTLE', x: 72, y: 500, stickers: ['FLOATING'], behavior: 'idle' },
+    { id: 'float-frog', kind: 'frog', label: 'FLOAT FROG', x: 316, y: 500, stickers: ['FLOATING'], behavior: 'idle' }
+  ],
+  goals: [
+    { id: 'float-raft', x: 195, y: 445, radius: 38, targetId: 'supply-raft', requires: ['FLOATING'], label: 'FLOAT RAFT' },
+    { id: 'north-bank', x: 195, y: 270, radius: 35, targetId: 'player', requires: ['FLOATING'], label: 'NORTH BANK' }
+  ],
+  goalOrder: 'sequential',
+  fixtures: [
+    { kind: 'hazard', x: 195, y: 360, w: 350, h: 75 },
+    { kind: 'gate', x: 195, y: 133, w: 348, h: 16, opensAfter: 2 }
+  ],
+  treasure: { x: 66, y: 550 },
+  gem: { x: 63, y: 234 },
+  exit: { x: 195, y: 70 },
+  par: 2,
+  solution: [
+    { source: 'float-turtle', target: 'supply-raft', sticker: 'FLOATING' },
+    { source: 'float-frog', target: 'player', sticker: 'FLOATING' }
+  ],
+  mission: {
+    kind: 'delivery',
+    items: [{ x: 65, y: 445 }, { x: 318, y: 443 }],
+    itemName: 'village supplies',
+    stationLabel: 'FAR BANK',
+    station: { x: 309, y: 212 },
+    npc: { x: 350, y: 261, name: 'REIZEL', greeting: 'The stream is up! Can you float the supplies to our side?', thanks: 'You crossed safely with everything we needed. Thank you!' }
+  }
 })];
 
 export function getLevel(number: number): Level {

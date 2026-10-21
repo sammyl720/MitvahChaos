@@ -21,6 +21,27 @@ test('has distinct identity, character choice, and isolated storage', async ({pa
   expect(await page.evaluate(() => localStorage.getItem('sticker-chaos-progress'))).toBeNull();
 });
 
+test('keeps the mission hint outside the playfield', async ({page}) => {
+  await page.goto('/');
+  await page.getByRole('button', {name:/PLAY/}).first().click();
+  await page.getByRole('button', {name:/Level 1: The Runaway Pushka/}).click();
+  const hint = page.locator('.stage-hint');
+  const stage = page.locator('.stage-shell');
+  await expect(page.locator('canvas')).toBeVisible();
+  await expect(hint).toContainText('MAGNETIC');
+  const hintBox = await hint.boundingBox();
+  const stageBox = await stage.boundingBox();
+  expect(hintBox).not.toBeNull();
+  expect(stageBox).not.toBeNull();
+  expect(hintBox!.y + hintBox!.height).toBeLessThanOrEqual(stageBox!.y + 1);
+  await tapWorld(page, 86, 280);
+  await expect(hint).toContainText('selected');
+  const updatedStageBox = await stage.boundingBox();
+  expect(updatedStageBox).not.toBeNull();
+  expect(Math.abs(updatedStageBox!.y - stageBox!.y)).toBeLessThanOrEqual(1);
+  expect(Math.abs(updatedStageBox!.height - stageBox!.height)).toBeLessThanOrEqual(1);
+});
+
 test('transfers MAGNETIC and completes the pushka mission', async ({page}) => {
   test.setTimeout(90000);
   await page.addInitScript(({key, progress}) => {
@@ -253,6 +274,38 @@ test('shrinks through the little passage and helps Tova restart the model', asyn
   await page.getByRole('button', {name:'HELP NEIGHBOR'}).click();
   await expect(page.locator('.mission-strip')).toContainText('Neighbors helped: 1/1');
   await tapWorld(page, 66, 547);
+  await expect(page.getByText('🎁 ✓')).toBeVisible({timeout:20000});
+  await tapWorld(page, 195, 70);
+  await expect(page.getByRole('heading', {name:'Mitzvah accomplished!'})).toBeVisible({timeout:20000});
+});
+
+test('floats the supply raft and carries parcels across the stream', async ({page}) => {
+  test.setTimeout(90000);
+  await page.addInitScript(({key, progress}) => {
+    localStorage.setItem(key, JSON.stringify(progress));
+  }, {key:PROGRESS_KEY, progress:{...DEFAULT_PROGRESS, completedLevels:[1,2,3,4,5,6,7,8], settings:{...DEFAULT_PROGRESS.settings, controlMode:'tap'}}});
+  await page.goto('/');
+  await page.getByRole('button', {name:/PLAY/}).first().click();
+  await page.getByRole('button', {name:/Level 9: The Floating Bridge/}).click();
+  await expect(page.locator('canvas')).toBeVisible();
+  await tapWorld(page, 72, 500);
+  await page.getByRole('button', {name:/FLOATING/}).click();
+  await tapWorld(page, 195, 445);
+  await expect(page.getByText('1/2 switches')).toBeVisible();
+  await tapWorld(page, 316, 500);
+  await page.getByRole('button', {name:/FLOATING/}).click();
+  await tapWorld(page, 195, 519);
+  await tapWorld(page, 195, 270);
+  await expect(page.getByText('2/2 switches')).toBeVisible({timeout:20000});
+  await tapWorld(page, 65, 445);
+  await expect(page.locator('.mission-strip')).toContainText('Bag: 1', {timeout:20000});
+  await tapWorld(page, 318, 443);
+  await expect(page.locator('.mission-strip')).toContainText('Bag: 2', {timeout:20000});
+  await tapWorld(page, 265, 212);
+  await expect(page.getByRole('button', {name:'DELIVER ITEM'})).toBeEnabled({timeout:20000});
+  await page.getByRole('button', {name:'DELIVER ITEM'}).click();
+  await expect(page.locator('.mission-strip')).toContainText('Delivered: 2/2');
+  await tapWorld(page, 66, 550);
   await expect(page.getByText('🎁 ✓')).toBeVisible({timeout:20000});
   await tapWorld(page, 195, 70);
   await expect(page.getByRole('heading', {name:'Mitzvah accomplished!'})).toBeVisible({timeout:20000});

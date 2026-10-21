@@ -77,6 +77,7 @@ export function unlockedAchievements(progress: GameProgress): string[] {
   add(progress.completedLevels.includes(6), 'wagon-wrangler');
   add(progress.completedLevels.includes(7), 'soup-saver');
   add(progress.completedLevels.includes(8), 'little-village-helper');
+  add(progress.completedLevels.includes(9), 'stream-shliach');
   add(progress.chickenTransforms >= 10, 'chicken-whisperer');
   add(progress.bounceCollisions >= 25, 'bounce-master');
   add(progress.combinations.length >= 5, 'mad-scientist');

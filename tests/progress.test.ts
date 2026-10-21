@@ -20,6 +20,7 @@ describe('local progress', () => {
     expect(unlockedAchievements(progress)).toContain('wagon-wrangler');
     expect(unlockedAchievements(progress)).toContain('soup-saver');
     expect(unlockedAchievements(progress)).toContain('little-village-helper');
+    expect(unlockedAchievements(progress)).toContain('stream-shliach');
     expect(unlockedCosmetics(progress)).toContain('backpack');
     expect(unlockedCosmetics(progress)).toContain('kindness-pin');
     expect(unlockedCosmetics(progress)).toContain('village-scarf');

@@ -74,6 +74,7 @@ export class GameScene extends Phaser.Scene {
   private tick = 0;
   private lastBounce = 0;
   private lastCollisionSound = 0;
+  private lastHazardNotice = -2000;
   private lastVisualTrail = new Map<string, number>();
   private lastMagnetVisual = 0;
   private reactUntil = new Map<string, number>();
@@ -230,6 +231,15 @@ export class GameScene extends Phaser.Scene {
           g.fillStyle(0xffedba).fillRoundedRect(x + 11, 234, 9, 12, 2);
         }
         this.add.text(195, 178, 'LITTLE VILLAGE MODEL', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '11px', color: '#654f61', backgroundColor: '#fff5d9', padding: { x: 7, y: 4 } }).setOrigin(.5).setDepth(1);
+      }
+      if (this.level.number === 9) {
+        g.fillStyle(0xd9c190, .9).fillRoundedRect(104, 303, 180, 14, 5);
+        g.fillStyle(0xd9c190, .9).fillRoundedRect(104, 405, 180, 14, 5);
+        for (const x of [112, 165, 219, 273]) {
+          g.fillStyle(0x9e775e).fillRoundedRect(x, 300, 7, 22, 2);
+          g.fillStyle(0x9e775e).fillRoundedRect(x, 397, 7, 22, 2);
+        }
+        this.add.text(195, 176, 'VILLAGE STREAM', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '11px', color: '#654f61', backgroundColor: '#fff5d9', padding: { x: 7, y: 4 } }).setOrigin(.5).setDepth(1);
       }
     } else if (this.level.world === 3) {
       for (const x of [19, 348]) {
@@ -886,7 +896,15 @@ export class GameScene extends Phaser.Scene {
       }
       for (const fixture of this.level.fixtures) {
         if (Math.abs(piece.sprite.x - fixture.x) > fixture.w / 2 || Math.abs(piece.sprite.y - fixture.y) > fixture.h / 2) continue;
-        if (fixture.kind === 'hazard' && !effectiveStats(entity).canFloat) piece.sprite.setVelocity(piece.sprite.body?.velocity.x ?? 0, piece.sprite.y < fixture.y ? -105 : 105);
+        if (fixture.kind === 'hazard' && !effectiveStats(entity).canFloat) {
+          if (this.level.number === 9 && entity.id === 'player') {
+            const side = piece.sprite.y < fixture.y ? -1 : 1;
+            piece.sprite.y = fixture.y + side * (fixture.h / 2 + effectiveStats(entity).radius + 2);
+            piece.sprite.setVelocity(0, 0);
+            this.tapRoute = [];
+            if (this.tick - this.lastHazardNotice > 1200) { this.lastHazardNotice = this.tick; this.say('The stream is too deep. Try FLOATING!'); }
+          } else piece.sprite.setVelocity(piece.sprite.body?.velocity.x ?? 0, piece.sprite.y < fixture.y ? -105 : 105);
+        }
         if (fixture.kind === 'conveyor' && !effectiveStats(entity).canFloat) piece.sprite.setVelocity((piece.sprite.body?.velocity.x ?? 0) + (fixture.dx ?? 0) * .35, (piece.sprite.body?.velocity.y ?? 0) + (fixture.dy ?? 0) * .35);
       }
       this.engine.updateMotion(entity.id,piece.sprite.x,piece.sprite.y,piece.sprite.body?.velocity.x ?? 0,piece.sprite.body?.velocity.y ?? 0);
