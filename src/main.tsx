@@ -18,7 +18,8 @@ const COSMETICS = [
   { id:'kindness-pin', name:'Kindness Pin', icon:'❤️', detail:'Help both neighbors on Kingston Avenue.' },
   { id:'rainbow', name:'Rainbow Outfit', icon:'🌈', detail:'Complete the Crown Heights world.' },
   { id:'village-scarf', name:'Village Scarf', icon:'🧣', detail:'Help Golda in The Runaway Wagon.' },
-  { id:'rescue-badge', name:'Rescue Badge', icon:'🪢', detail:'Rescue Shmuel’s wagon and deliver the parcels.' }
+  { id:'rescue-badge', name:'Rescue Badge', icon:'🪢', detail:'Rescue Shmuel’s wagon and deliver the parcels.' },
+  { id:'festival-cap', name:'Festival Cap', icon:'🎉', detail:'Help Chaya prepare the dreidel game.' }
 ];
 const ACHIEVEMENTS = [
   { id:'first-sticker', name:'First Sticker', icon:'🏷️', detail:'Make your first sticker transfer.' },
@@ -31,7 +32,8 @@ const ACHIEVEMENTS = [
   { id:'soup-saver', name:'Soup Saver', icon:'🥣', detail:'Carry every supply safely to Basya’s soup pot.' },
   { id:'little-village-helper', name:'Little Village Helper', icon:'🏘️', detail:'Reach the tiny switch and help Tova.' },
   { id:'stream-shliach', name:'Stream Shliach', icon:'🛶', detail:'Float the supplies across to Reizel.' },
-  { id:'shtetl-rescuer', name:'Shtetl Rescuer', icon:'🪢', detail:'Free the wagon and help Shmuel’s family.' }
+  { id:'shtetl-rescuer', name:'Shtetl Rescuer', icon:'🪢', detail:'Free the wagon and help Shmuel’s family.' },
+  { id:'dreidel-guide', name:'Dreidel Guide', icon:'🎲', detail:'Bring the giant toy to Chaya’s game table.' }
 ];
 
 function Logo({ small = false }: { small?: boolean }) { return <div className={`logo ${small ? 'small' : ''}`}><span className="logo-star">✦</span>MITZVAH <strong>CHAOS</strong><span className="logo-star">✦</span></div>; }

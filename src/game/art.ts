@@ -21,7 +21,7 @@ function eyes(ctx: CanvasRenderingContext2D, y = 55, spacing = 25): void {
 function draw(ctx: CanvasRenderingContext2D, kind: EntityKind, character: 'boy' | 'girl' = 'boy'): void {
   ctx.clearRect(0, 0, 128, 128);
   ellipse(ctx, 64, 109, 39, 9, 'rgba(42,27,86,.17)', 'transparent', 0);
-  const palettes: Record<EntityKind, string> = { bandit:'#8657dc', chicken:'#fff7e1', apple:'#f75d66', snail:'#f2b86f', rock:'#9097ad', boulder:'#7e8a9c', ball:'#fc9cce', turtle:'#61cbb3', robot:'#70bce6', knight:'#a3aed6', key:'#ffcf56', frog:'#78d18b', crate:'#dfae71', challah:'#e9a84f', wagon:'#c68755' };
+  const palettes: Record<EntityKind, string> = { bandit:'#8657dc', chicken:'#fff7e1', apple:'#f75d66', snail:'#f2b86f', rock:'#9097ad', boulder:'#7e8a9c', ball:'#fc9cce', turtle:'#61cbb3', robot:'#70bce6', knight:'#a3aed6', key:'#ffcf56', frog:'#78d18b', crate:'#dfae71', challah:'#e9a84f', wagon:'#c68755', dreidel:'#7964c8' };
   const fill = palettes[kind];
   if (kind === 'bandit') {
     rounded(ctx, 87, 52, 29, 51, 9, '#ee9b62', '#714d61', 4); // backpack
@@ -90,6 +90,13 @@ function draw(ctx: CanvasRenderingContext2D, kind: EntityKind, character: 'boy' 
     ellipse(ctx, 47, 60, 3, 5, '#392f48', 'transparent', 0);
     ellipse(ctx, 81, 60, 3, 5, '#392f48', 'transparent', 0);
     ctx.beginPath();ctx.arc(64, 62, 10, .2, Math.PI-.2);ctx.strokeStyle='#704c57';ctx.lineWidth=3;ctx.stroke();
+  } else if (kind === 'dreidel') {
+    rounded(ctx, 57, 7, 14, 30, 5, '#e9bd75', '#6e4b73', 4);
+    ctx.beginPath();ctx.moveTo(26,38);ctx.lineTo(102,38);ctx.lineTo(109,82);ctx.lineTo(64,114);ctx.lineTo(19,82);ctx.closePath();ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle='#4f437b';ctx.lineWidth=6;ctx.stroke();
+    ctx.beginPath();ctx.moveTo(64,40);ctx.lineTo(64,110);ctx.moveTo(102,41);ctx.lineTo(64,65);ctx.lineTo(26,41);ctx.strokeStyle='#c7adfa';ctx.lineWidth=4;ctx.stroke();
+    ellipse(ctx, 64, 77, 18, 19, '#fce4aa', '#624f9a', 3);
+    ellipse(ctx, 58, 75, 2, 4, '#4f437b', 'transparent', 0);ellipse(ctx, 70, 75, 2, 4, '#4f437b', 'transparent', 0);
+    ctx.beginPath();ctx.arc(64, 81, 6, .15, Math.PI-.15);ctx.strokeStyle='#4f437b';ctx.lineWidth=2;ctx.stroke();
   } else if (kind === 'key') {
     ellipse(ctx, 48, 50, 25, 25, fill, '#ae8543',6);ellipse(ctx, 48, 50, 11, 11, '#fff1ba','transparent',0);
     rounded(ctx, 62, 48, 44, 16, 5, fill, '#ae8543',4);rounded(ctx, 91, 58, 11, 18, 2, fill, '#ae8543',3);

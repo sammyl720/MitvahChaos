@@ -79,6 +79,7 @@ export function unlockedAchievements(progress: GameProgress): string[] {
   add(progress.completedLevels.includes(8), 'little-village-helper');
   add(progress.completedLevels.includes(9), 'stream-shliach');
   add(progress.completedLevels.includes(10), 'shtetl-rescuer');
+  add(progress.completedLevels.includes(11), 'dreidel-guide');
   add(progress.chickenTransforms >= 10, 'chicken-whisperer');
   add(progress.bounceCollisions >= 25, 'bounce-master');
   add(progress.combinations.length >= 5, 'mad-scientist');
@@ -96,6 +97,7 @@ export function unlockedCosmetics(progress: GameProgress): string[] {
   add(progress.completedLevels.includes(4), 'kindness-pin');
   add(progress.completedLevels.includes(6), 'village-scarf');
   add(progress.completedLevels.includes(10), 'rescue-badge');
+  add(progress.completedLevels.includes(11), 'festival-cap');
   add(progress.completedLevels.some((number) => number >= 10), 'robot');
   add(progress.completedLevels.some((number) => number >= 15), 'knight');
   add(progress.completedLevels.includes(20), 'golden');

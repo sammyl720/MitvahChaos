@@ -356,6 +356,43 @@ export const LEVELS: Level[] = [LevelSchema.parse({
     station: { x: 309, y: 209 },
     npc: { x: 350, y: 259, name: 'SHMUEL', greeting: 'Our delivery wagon is stuck in the mud. Can you rescue it and bring the parcels to the family?', thanks: 'The wagon is free and the parcels arrived. What a helpful team!' }
   }
+}), LevelSchema.parse({
+  number: 11,
+  name: 'Dreidel Disaster',
+  world: 3,
+  hint: 'Give the giant toy dreidel BOUNCY, then SLIPPERY. Watch it spin toward the game table before helping Chaya decorate!',
+  entities: [
+    { id: 'player', kind: 'bandit', label: 'YOU', x: 195, y: 520, stickers: [], behavior: 'idle' },
+    { id: 'giant-dreidel', kind: 'dreidel', label: 'GIANT DREIDEL', x: 80, y: 310, stickers: ['BIG'], behavior: 'idle' },
+    { id: 'bounce-ball', kind: 'ball', label: 'BOUNCE BALL', x: 72, y: 505, stickers: ['BOUNCY'], behavior: 'idle' },
+    { id: 'slick-snail', kind: 'snail', label: 'SLICK SNAIL', x: 315, y: 502, stickers: ['SLIPPERY'], behavior: 'idle' }
+  ],
+  goals: [
+    { id: 'dreidel-bounce', x: 80, y: 310, radius: 43, targetId: 'giant-dreidel', requires: ['BIG', 'BOUNCY'], label: 'BOUNCE DREIDEL' },
+    { id: 'dreidel-table', x: 302, y: 310, radius: 31, targetId: 'giant-dreidel', requires: ['BIG', 'BOUNCY', 'SLIPPERY'], minSpeed: 100, label: 'GAME TABLE' }
+  ],
+  goalOrder: 'sequential',
+  fixtures: [
+    { kind: 'gate', x: 195, y: 406, w: 348, h: 16, opensAfter: 1 },
+    { kind: 'gate', x: 195, y: 136, w: 348, h: 16, opensAfter: 2 },
+    { kind: 'wall', x: 196, y: 224, w: 28, h: 36 }
+  ],
+  treasure: { x: 67, y: 550 },
+  gem: { x: 67, y: 213 },
+  exit: { x: 195, y: 70 },
+  par: 2,
+  solution: [
+    { source: 'bounce-ball', target: 'giant-dreidel', sticker: 'BOUNCY' },
+    { source: 'slick-snail', target: 'giant-dreidel', sticker: 'SLIPPERY' }
+  ],
+  mission: {
+    kind: 'delivery',
+    items: [{ x: 79, y: 453 }, { x: 303, y: 456 }],
+    itemName: 'paper decorations',
+    stationLabel: 'GAME TABLE',
+    station: { x: 306, y: 208 },
+    npc: { x: 349, y: 258, name: 'CHAYA', greeting: 'Our giant toy dreidel is loose! Guide it to the game table, then bring the decorations for our Chanukah gathering.', thanks: 'The table is ready and everyone can play. Thank you!' }
+  }
 })];
 
 export function getLevel(number: number): Level {

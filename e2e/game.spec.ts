@@ -345,3 +345,34 @@ test('rescues the wagon from mud and delivers its parcels', async ({page}) => {
   await tapWorld(page, 195, 70);
   await expect(page.getByRole('heading', {name:'Mitzvah accomplished!'})).toBeVisible({timeout:20000});
 });
+
+test('guides the giant dreidel and decorates Chaya’s game table', async ({page}) => {
+  test.setTimeout(90000);
+  await page.addInitScript(({key, progress}) => {
+    localStorage.setItem(key, JSON.stringify(progress));
+  }, {key:PROGRESS_KEY, progress:{...DEFAULT_PROGRESS, completedLevels:[1,2,3,4,5,6,7,8,9,10], settings:{...DEFAULT_PROGRESS.settings, controlMode:'tap'}}});
+  await page.goto('/');
+  await page.getByRole('button', {name:/PLAY/}).first().click();
+  await page.getByRole('button', {name:/Level 11: Dreidel Disaster/}).click();
+  await expect(page.locator('canvas')).toBeVisible();
+  await tapWorld(page, 72, 505);
+  await page.getByRole('button', {name:/BOUNCY/}).click();
+  await tapWorld(page, 80, 310);
+  await expect(page.getByText('1/2 switches')).toBeVisible();
+  await tapWorld(page, 315, 502);
+  await page.getByRole('button', {name:/SLIPPERY/}).click();
+  await tapWorld(page, 80, 310);
+  await expect(page.getByText('2/2 switches')).toBeVisible({timeout:20000});
+  await tapWorld(page, 79, 453);
+  await expect(page.locator('.mission-strip')).toContainText('Bag: 1', {timeout:20000});
+  await tapWorld(page, 303, 456);
+  await expect(page.locator('.mission-strip')).toContainText('Bag: 2', {timeout:20000});
+  await tapWorld(page, 260, 208);
+  await expect(page.getByRole('button', {name:'DELIVER ITEM'})).toBeEnabled({timeout:20000});
+  await page.getByRole('button', {name:'DELIVER ITEM'}).click();
+  await expect(page.locator('.mission-strip')).toContainText('Delivered: 2/2');
+  await tapWorld(page, 67, 550);
+  await expect(page.getByText('🎁 ✓')).toBeVisible({timeout:20000});
+  await tapWorld(page, 195, 70);
+  await expect(page.getByRole('heading', {name:'Mitzvah accomplished!'})).toBeVisible({timeout:20000});
+});
