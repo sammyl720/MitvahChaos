@@ -21,7 +21,8 @@ const COSMETICS = [
   { id:'rescue-badge', name:'Rescue Badge', icon:'🪢', detail:'Rescue Shmuel’s wagon and deliver the parcels.' },
   { id:'festival-cap', name:'Festival Cap', icon:'🎉', detail:'Help Chaya prepare the dreidel game.' },
   { id:'blue-sash', name:'Blue Sash', icon:'🩵', detail:'Assemble Nechama’s Chanukah display.' },
-  { id:'purim-ribbon', name:'Purim Ribbon', icon:'🎀', detail:'Share mishloach manos with two neighbors.' }
+  { id:'purim-ribbon', name:'Purim Ribbon', icon:'🎀', detail:'Share mishloach manos with two neighbors.' },
+  { id:'prep-apron', name:'Preparation Apron', icon:'🧺', detail:'Help Rachel clear the Pesach workshop.' }
 ];
 const ACHIEVEMENTS = [
   { id:'first-sticker', name:'First Sticker', icon:'🏷️', detail:'Make your first sticker transfer.' },
@@ -37,7 +38,8 @@ const ACHIEVEMENTS = [
   { id:'shtetl-rescuer', name:'Shtetl Rescuer', icon:'🪢', detail:'Free the wagon and help Shmuel’s family.' },
   { id:'dreidel-guide', name:'Dreidel Guide', icon:'🎲', detail:'Bring the giant toy to Chaya’s game table.' },
   { id:'display-helper', name:'Display Helper', icon:'🕎', detail:'Find and assemble all three decorative pieces.' },
-  { id:'purim-courier', name:'Purim Courier', icon:'🎁', detail:'Deliver a Purim package to each neighbor.' }
+  { id:'purim-courier', name:'Purim Courier', icon:'🎁', detail:'Deliver a Purim package to each neighbor.' },
+  { id:'pesach-prep-helper', name:'Pesach Prep Helper', icon:'🧺', detail:'Clear the passage and prepare the table.' }
 ];
 
 function Logo({ small = false }: { small?: boolean }) { return <div className={`logo ${small ? 'small' : ''}`}><span className="logo-star">✦</span>MITZVAH <strong>CHAOS</strong><span className="logo-star">✦</span></div>; }

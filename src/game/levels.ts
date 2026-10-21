@@ -469,6 +469,44 @@ export const LEVELS: Level[] = [LevelSchema.parse({
       { x: 316, y: 226, name: 'YEHUDA', greeting: 'Can you bring me a Purim package too?', thanks: 'Thank you! Now I can celebrate with my family.' }
     ]
   }
+}), LevelSchema.parse({
+  number: 14,
+  name: 'Matzah Mountain',
+  world: 3,
+  hint: 'Move BIG from the oversized supply box to the packing cart, then give the box TINY to clear the workshop passage. Bring clean coverings to Rachel!',
+  entities: [
+    { id: 'player', kind: 'bandit', label: 'YOU', x: 195, y: 520, stickers: [], behavior: 'idle' },
+    { id: 'matzah-box', kind: 'crate', label: 'SUPPLY BOX', x: 195, y: 315, stickers: ['BIG'], behavior: 'idle' },
+    { id: 'packing-cart', kind: 'wagon', label: 'PACKING CART', x: 305, y: 474, stickers: [], behavior: 'idle' },
+    { id: 'tiny-snail', kind: 'snail', label: 'TINY SNAIL', x: 72, y: 508, stickers: ['TINY'], behavior: 'idle' }
+  ],
+  goals: [
+    { id: 'load-cart', x: 305, y: 474, radius: 40, targetId: 'packing-cart', requires: ['BIG'], label: 'LOAD CART' },
+    { id: 'clear-passage', x: 195, y: 315, radius: 36, targetId: 'matzah-box', requires: ['TINY'], label: 'CLEAR PASSAGE' }
+  ],
+  goalOrder: 'sequential',
+  fixtures: [
+    { kind: 'gate', x: 195, y: 408, w: 348, h: 16, opensAfter: 1 },
+    { kind: 'wall', x: 70, y: 315, w: 140, h: 18 },
+    { kind: 'wall', x: 320, y: 315, w: 140, h: 18 },
+    { kind: 'gate', x: 195, y: 135, w: 348, h: 16, opensAfter: 2 }
+  ],
+  treasure: { x: 135, y: 550 },
+  gem: { x: 67, y: 215 },
+  exit: { x: 195, y: 70 },
+  par: 2,
+  solution: [
+    { source: 'matzah-box', target: 'packing-cart', sticker: 'BIG' },
+    { source: 'tiny-snail', target: 'matzah-box', sticker: 'TINY' }
+  ],
+  mission: {
+    kind: 'delivery',
+    items: [{ x: 68, y: 455 }, { x: 318, y: 273 }],
+    itemName: 'clean table coverings',
+    stationLabel: 'PREP TABLE',
+    station: { x: 309, y: 209 },
+    npc: { x: 350, y: 258, name: 'RACHEL', greeting: 'The supply box is blocking our Pesach preparation room. Can you make a path and bring the clean table coverings?', thanks: 'The room is clear and the table is ready. Thank you!' }
+  }
 })];
 
 export function getLevel(number: number): Level {

@@ -299,6 +299,16 @@ export class GameScene extends Phaser.Scene {
         }
         this.add.text(195, 167, 'PURIM GIFT ROUTE', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '11px', color: '#624f7a', backgroundColor: '#fff5dc', padding: { x: 7, y: 4 } }).setOrigin(.5).setDepth(1);
       }
+      if (this.level.number === 14) {
+        for (const [x, y] of [[43, 246], [288, 249], [44, 365]] as const) {
+          g.fillStyle(0xe9cc98, .82).fillRoundedRect(x, y, 57, 32, 4);
+          g.lineStyle(2, 0x9c7194).strokeRoundedRect(x, y, 57, 32, 4);
+          g.lineStyle(2, 0xf8e9c9).lineBetween(x + 10, y + 8, x + 46, y + 8);
+        }
+        g.fillStyle(0xfff1d6, .75).fillRoundedRect(143, 355, 104, 29, 6);
+        g.lineStyle(2, 0xbb9c9a).strokeRoundedRect(143, 355, 104, 29, 6);
+        this.add.text(195, 167, 'PESACH PREPARATION', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '11px', color: '#624f7a', backgroundColor: '#fff5dc', padding: { x: 7, y: 4 } }).setOrigin(.5).setDepth(1);
+      }
     } else {
       for (const [x, bend, color] of [[25, 127, 0x67dce6], [365, 261, 0xe599f5]] as const) {
         g.lineStyle(9, color, .5).lineBetween(x, 101, x, 525);
@@ -611,14 +621,14 @@ export class GameScene extends Phaser.Scene {
     const texture = entity.id === 'player' && this.character === 'girl' ? 'character-bandit-girl' : this.level.number === 20 && entity.id === this.level.bossId ? 'boss-robot' : `character-${entity.kind}`;
     const sprite = this.physics.add.image(entity.x, entity.y, texture).setDepth(5);
     if (entity.id === 'player') {
-      const tints: Record<string, number> = { rainbow: 0xffc4ee, robot: 0xb5eaff, knight: 0xd4d9ff, golden: 0xffd765, chicken: 0xffeed1, 'tiny-crown': 0xebc7ff, shabbos: 0xfff4e2, courier: 0xd8f6ff, 'kindness-pin': 0xffd7e2, 'village-scarf': 0xffdfce, 'rescue-badge': 0xffedbf, 'festival-cap': 0xe9d8ff, 'blue-sash': 0xc6efff, 'purim-ribbon': 0xffd8ee };
+      const tints: Record<string, number> = { rainbow: 0xffc4ee, robot: 0xb5eaff, knight: 0xd4d9ff, golden: 0xffd765, chicken: 0xffeed1, 'tiny-crown': 0xebc7ff, shabbos: 0xfff4e2, courier: 0xd8f6ff, 'kindness-pin': 0xffd7e2, 'village-scarf': 0xffdfce, 'rescue-badge': 0xffedbf, 'festival-cap': 0xe9d8ff, 'blue-sash': 0xc6efff, 'purim-ribbon': 0xffd8ee, 'prep-apron': 0xffeed2 };
       if (tints[this.cosmetic]) sprite.setTint(tints[this.cosmetic]);
     }
     sprite.setInteractive({ useHandCursor: true });
     sprite.on('pointerdown', () => this.onEntityTap(entity.id));
     const name = this.add.text(entity.x, entity.y + stats.radius + 13, entity.label ?? entity.kind.toUpperCase(), { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '10px', fontStyle: 'bold', color: '#453465', backgroundColor: '#fff9e6', padding: { x: 5, y: 2 } }).setOrigin(.5).setDepth(10);
     if (entity.id === 'player' && this.cosmetic !== 'classic') {
-      const icons: Record<string,string> = { rainbow:'🌈', robot:'🤖', knight:'🛡️', golden:'👑', chicken:'🐔', 'tiny-crown':'✨', backpack:'🎒', shabbos:'✦', courier:'🧢', 'kindness-pin':'♥', 'village-scarf':'🧣', 'rescue-badge':'🪢', 'festival-cap':'🎉', 'blue-sash':'🩵', 'purim-ribbon':'🎀' };
+      const icons: Record<string,string> = { rainbow:'🌈', robot:'🤖', knight:'🛡️', golden:'👑', chicken:'🐔', 'tiny-crown':'✨', backpack:'🎒', shabbos:'✦', courier:'🧢', 'kindness-pin':'♥', 'village-scarf':'🧣', 'rescue-badge':'🪢', 'festival-cap':'🎉', 'blue-sash':'🩵', 'purim-ribbon':'🎀', 'prep-apron':'🧺' };
       this.costumeMark = this.add.text(entity.x,entity.y - stats.radius - 15,icons[this.cosmetic] ?? '',{fontSize:'23px'}).setOrigin(.5).setDepth(11);
     }
     const piece = { sprite, name, badges: [] as Phaser.GameObjects.Text[], shadow };

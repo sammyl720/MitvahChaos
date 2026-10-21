@@ -82,6 +82,7 @@ export function unlockedAchievements(progress: GameProgress): string[] {
   add(progress.completedLevels.includes(11), 'dreidel-guide');
   add(progress.completedLevels.includes(12), 'display-helper');
   add(progress.completedLevels.includes(13), 'purim-courier');
+  add(progress.completedLevels.includes(14), 'pesach-prep-helper');
   add(progress.chickenTransforms >= 10, 'chicken-whisperer');
   add(progress.bounceCollisions >= 25, 'bounce-master');
   add(progress.combinations.length >= 5, 'mad-scientist');
@@ -102,6 +103,7 @@ export function unlockedCosmetics(progress: GameProgress): string[] {
   add(progress.completedLevels.includes(11), 'festival-cap');
   add(progress.completedLevels.includes(12), 'blue-sash');
   add(progress.completedLevels.includes(13), 'purim-ribbon');
+  add(progress.completedLevels.includes(14), 'prep-apron');
   add(progress.completedLevels.some((number) => number >= 10), 'robot');
   add(progress.completedLevels.some((number) => number >= 15), 'knight');
   add(progress.completedLevels.includes(20), 'golden');

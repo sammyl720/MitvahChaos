@@ -8,7 +8,7 @@ import { findTapRoute } from '../src/game/navigation';
 describe('The Runaway Pushka', () => {
   const level = LEVELS[0];
   it('has a valid original layout and a solvable sticker transfer', () => {
-    expect(LEVELS).toHaveLength(13);
+    expect(LEVELS).toHaveLength(14);
     expect(LevelSchema.safeParse(level).success).toBe(true);
     const engine = new StickerEngine(level.entities);
     for (const step of level.solution) expect(engine.transfer(step.source, step.target, step.sticker).ok).toBe(true);
@@ -170,6 +170,32 @@ describe('Purim Delivery Dash', () => {
     expect(findTapRoute(start, recipient!, 18, level.fixtures, 1, [], false)).not.toBeNull();
     expect(findTapRoute(start, level.exit, 18, level.fixtures, 1, [], false)).toBeNull();
     expect(findTapRoute(start, level.exit, 18, level.fixtures, 2, [], false)).not.toBeNull();
+  });
+});
+
+describe('Matzah Mountain', () => {
+  const level = LEVELS[13];
+  it('moves BIG onto the cart, shrinks the box, and keeps the table coverings as inventory', () => {
+    expect(LevelSchema.safeParse(level).success).toBe(true);
+    const engine = new StickerEngine(level.entities);
+    const originalBoxRadius = effectiveStats(engine.get('matzah-box')!).radius;
+    for (const step of level.solution) expect(engine.transfer(step.source, step.target, step.sticker).ok).toBe(true);
+    expect(effectiveStats(engine.get('packing-cart')!).radius).toBeGreaterThan(45);
+    expect(effectiveStats(engine.get('matzah-box')!).radius).toBeLessThan(originalBoxRadius / 2);
+    let mission = startMission(level);
+    mission = collectCoin(collectCoin(mission, 0), 1);
+    expect(missionComplete(level, mission)).toBe(false);
+    expect(missionComplete(level, depositCoins(mission))).toBe(true);
+  });
+  it('opens a route around the shrunken box to Rachel and the exit', () => {
+    const start = level.entities[0];
+    const station = level.mission?.kind === 'delivery' ? level.mission.station : null;
+    expect(station).not.toBeNull();
+    expect(findTapRoute(start, station!, 18, level.fixtures, 0, [], false)).toBeNull();
+    const obstacles = level.entities.filter((entity) => entity.id !== 'player').map((entity) => ({ x: entity.x, y: entity.y, radius: entity.id === 'matzah-box' ? 12.65 : effectiveStats({ kind: entity.kind, stickers: entity.id === 'packing-cart' ? ['BIG'] : [] }).radius }));
+    expect(findTapRoute(start, station!, 18, level.fixtures, 2, obstacles, false)).not.toBeNull();
+    expect(findTapRoute(start, level.exit, 18, level.fixtures, 1, obstacles, false)).toBeNull();
+    expect(findTapRoute(start, level.exit, 18, level.fixtures, 2, obstacles, false)).not.toBeNull();
   });
 });
 

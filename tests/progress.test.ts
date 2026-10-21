@@ -25,6 +25,7 @@ describe('local progress', () => {
     expect(unlockedAchievements(progress)).toContain('dreidel-guide');
     expect(unlockedAchievements(progress)).toContain('display-helper');
     expect(unlockedAchievements(progress)).toContain('purim-courier');
+    expect(unlockedAchievements(progress)).toContain('pesach-prep-helper');
     expect(unlockedCosmetics(progress)).toContain('backpack');
     expect(unlockedCosmetics(progress)).toContain('kindness-pin');
     expect(unlockedCosmetics(progress)).toContain('village-scarf');
@@ -32,6 +33,7 @@ describe('local progress', () => {
     expect(unlockedCosmetics(progress)).toContain('festival-cap');
     expect(unlockedCosmetics(progress)).toContain('blue-sash');
     expect(unlockedCosmetics(progress)).toContain('purim-ribbon');
+    expect(unlockedCosmetics(progress)).toContain('prep-apron');
     expect(unlockedCosmetics(progress)).toContain('tiny-crown');
   });
 });
