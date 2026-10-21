@@ -63,6 +63,7 @@ export class GameScene extends Phaser.Scene {
   private mission: MissionState;
   private coinSprites: { x: number; y: number; sprite: Phaser.GameObjects.Container }[] = [];
   private assemblyDisplay?: Phaser.GameObjects.Text;
+  private sukkahArt?: Phaser.GameObjects.Graphics;
   private gem = false;
   private transfers = 0;
   private completed = false;
@@ -309,6 +310,11 @@ export class GameScene extends Phaser.Scene {
         g.lineStyle(2, 0xbb9c9a).strokeRoundedRect(143, 355, 104, 29, 6);
         this.add.text(195, 167, 'PESACH PREPARATION', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '11px', color: '#624f7a', backgroundColor: '#fff5dc', padding: { x: 7, y: 4 } }).setOrigin(.5).setDepth(1);
       }
+      if (this.level.number === 15) {
+        g.fillStyle(0xf3e7c6, .78).fillRoundedRect(112, 185, 166, 105, 9);
+        g.lineStyle(3, 0xa88a79).strokeRoundedRect(112, 185, 166, 105, 9);
+        this.add.text(195, 169, 'SUKKAH BUILD SITE', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '11px', color: '#624f7a', backgroundColor: '#fff5dc', padding: { x: 7, y: 4 } }).setOrigin(.5).setDepth(1);
+      }
     } else {
       for (const [x, bend, color] of [[25, 127, 0x67dce6], [365, 261, 0xe599f5]] as const) {
         g.lineStyle(9, color, .5).lineBetween(x, 101, x, 525);
@@ -433,6 +439,7 @@ export class GameScene extends Phaser.Scene {
     ]).setDepth(13).setSize(54, 61).setInteractive({ useHandCursor: true });
     stationSprite.on('pointerdown', () => this.deposit());
     if (assembly) this.assemblyDisplay = this.add.text(station.x, station.y - 43, '◇ '.repeat(missionGoalCount(this.level)).trim(), { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '13px', color: '#604c83', backgroundColor: '#fff6dc', padding: { x: 3, y: 1 } }).setOrigin(.5).setDepth(15);
+    if (this.level.number === 15) { this.sukkahArt = this.add.graphics().setDepth(1); this.updateSukkahArt(); }
     this.add.text(station.x, station.y + 36, this.level.mission.kind === 'delivery' ? this.level.mission.stationLabel : 'PUSHKA', { fontSize: '11px', color: '#5a397e', backgroundColor: '#fff7de', padding: { x: 5, y: 3 } }).setOrigin(.5).setDepth(14);
     const npc = this.level.mission.npc;
     const friend = this.add.container(npc.x, npc.y, [
@@ -541,9 +548,31 @@ export class GameScene extends Phaser.Scene {
     const count = mission?.kind === 'delivery' && mission.assembly ? 1 : this.mission.carried;
     this.mission = mission?.kind === 'delivery' && mission.assembly ? assemblePart(this.mission) : depositCoins(this.mission);
     if (mission?.kind === 'delivery' && mission.assembly) this.assemblyDisplay?.setText(`${'◆ '.repeat(this.mission.deposited)}${'◇ '.repeat(missionGoalCount(this.level) - this.mission.deposited)}`.trim());
+    if (this.level.number === 15) this.updateSukkahArt();
     this.burst(station.x, station.y, '#ffd66e');
     playSound('treasure', this.settings.effectsVolume);
-    this.say(missionComplete(this.level, this.mission) ? mission!.npc.thanks : mission?.kind === 'delivery' && mission.assembly ? `Display piece ${this.mission.deposited}/${missionGoalCount(this.level)} assembled!` : mission?.kind === 'delivery' ? `${count} item${count === 1 ? '' : 's'} delivered! Find the rest.` : `${count} coin${count === 1 ? '' : 's'} in the pushka! Find the rest.`);
+    this.say(missionComplete(this.level, this.mission) ? mission!.npc.thanks : mission?.kind === 'delivery' && mission.assembly ? `${this.level.number === 15 ? 'Sukkah section' : 'Display piece'} ${this.mission.deposited}/${missionGoalCount(this.level)} assembled!` : mission?.kind === 'delivery' ? `${count} item${count === 1 ? '' : 's'} delivered! Find the rest.` : `${count} coin${count === 1 ? '' : 's'} in the pushka! Find the rest.`);
+  }
+  private updateSukkahArt(): void {
+    const g = this.sukkahArt;
+    if (!g) return;
+    g.clear();
+    const stage = this.mission.deposited;
+    g.fillStyle(0xcaa879, .67).fillRoundedRect(124, 267, 143, 10, 4);
+    if (stage >= 1) {
+      g.fillStyle(0xb89169, .9).fillRoundedRect(131, 216, 128, 50, 3);
+      for (let x = 144; x < 255; x += 24) g.lineStyle(2, 0x8c684f).lineBetween(x, 219, x, 264);
+    }
+    if (stage >= 2) {
+      for (const x of [121, 268]) {
+        g.fillStyle(0xa47d5c, .95).fillRoundedRect(x, 202, 7, 66, 2);
+        g.fillStyle(0xd0aa79, .9).fillRoundedRect(x + (x < 195 ? 7 : -11), 224, 11, 39, 2);
+      }
+    }
+    if (stage >= 3) {
+      for (let x = 123; x <= 267; x += 15) g.fillStyle(x % 2 ? 0x9d8762 : 0xb29665).fillRoundedRect(x, 192, 9, 19, 3);
+      g.lineStyle(4, 0x826b54).lineBetween(118, 211, 273, 211);
+    }
   }
   private addExit(): void {
     const { x, y } = this.level.exit;
@@ -621,14 +650,14 @@ export class GameScene extends Phaser.Scene {
     const texture = entity.id === 'player' && this.character === 'girl' ? 'character-bandit-girl' : this.level.number === 20 && entity.id === this.level.bossId ? 'boss-robot' : `character-${entity.kind}`;
     const sprite = this.physics.add.image(entity.x, entity.y, texture).setDepth(5);
     if (entity.id === 'player') {
-      const tints: Record<string, number> = { rainbow: 0xffc4ee, robot: 0xb5eaff, knight: 0xd4d9ff, golden: 0xffd765, chicken: 0xffeed1, 'tiny-crown': 0xebc7ff, shabbos: 0xfff4e2, courier: 0xd8f6ff, 'kindness-pin': 0xffd7e2, 'village-scarf': 0xffdfce, 'rescue-badge': 0xffedbf, 'festival-cap': 0xe9d8ff, 'blue-sash': 0xc6efff, 'purim-ribbon': 0xffd8ee, 'prep-apron': 0xffeed2 };
+      const tints: Record<string, number> = { rainbow: 0xffc4ee, robot: 0xb5eaff, knight: 0xd4d9ff, golden: 0xffd765, chicken: 0xffeed1, 'tiny-crown': 0xebc7ff, shabbos: 0xfff4e2, courier: 0xd8f6ff, 'kindness-pin': 0xffd7e2, 'village-scarf': 0xffdfce, 'rescue-badge': 0xffedbf, 'festival-cap': 0xe9d8ff, 'blue-sash': 0xc6efff, 'purim-ribbon': 0xffd8ee, 'prep-apron': 0xffeed2, 'festival-scarf': 0xdcf3c4 };
       if (tints[this.cosmetic]) sprite.setTint(tints[this.cosmetic]);
     }
     sprite.setInteractive({ useHandCursor: true });
     sprite.on('pointerdown', () => this.onEntityTap(entity.id));
     const name = this.add.text(entity.x, entity.y + stats.radius + 13, entity.label ?? entity.kind.toUpperCase(), { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '10px', fontStyle: 'bold', color: '#453465', backgroundColor: '#fff9e6', padding: { x: 5, y: 2 } }).setOrigin(.5).setDepth(10);
     if (entity.id === 'player' && this.cosmetic !== 'classic') {
-      const icons: Record<string,string> = { rainbow:'🌈', robot:'🤖', knight:'🛡️', golden:'👑', chicken:'🐔', 'tiny-crown':'✨', backpack:'🎒', shabbos:'✦', courier:'🧢', 'kindness-pin':'♥', 'village-scarf':'🧣', 'rescue-badge':'🪢', 'festival-cap':'🎉', 'blue-sash':'🩵', 'purim-ribbon':'🎀', 'prep-apron':'🧺' };
+      const icons: Record<string,string> = { rainbow:'🌈', robot:'🤖', knight:'🛡️', golden:'👑', chicken:'🐔', 'tiny-crown':'✨', backpack:'🎒', shabbos:'✦', courier:'🧢', 'kindness-pin':'♥', 'village-scarf':'🧣', 'rescue-badge':'🪢', 'festival-cap':'🎉', 'blue-sash':'🩵', 'purim-ribbon':'🎀', 'prep-apron':'🧺', 'festival-scarf':'🌿' };
       this.costumeMark = this.add.text(entity.x,entity.y - stats.radius - 15,icons[this.cosmetic] ?? '',{fontSize:'23px'}).setOrigin(.5).setDepth(11);
     }
     const piece = { sprite, name, badges: [] as Phaser.GameObjects.Text[], shadow };
@@ -943,6 +972,7 @@ export class GameScene extends Phaser.Scene {
     this.engine.resetLevel(); this.treasure = false; this.gem = false; this.transfers = 0; this.completed = false; this.armed = null; this.selectedId = null;
     this.mission = startMission(this.level);
     if (this.level.mission?.kind === 'delivery' && this.level.mission.assembly) this.assemblyDisplay?.setText('◇ '.repeat(missionGoalCount(this.level)).trim());
+    if (this.level.number === 15) this.updateSukkahArt();
     this.coinSprites.forEach((coin, index) => { coin.x = missionItems(this.level)[index].x; coin.y = missionItems(this.level)[index].y; coin.sprite.setPosition(coin.x, coin.y).setVisible(true); });
     this.goalHistory = []; this.lastTransferTarget = null;
     this.tapRoute = [];

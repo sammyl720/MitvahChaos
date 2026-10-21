@@ -20,19 +20,20 @@
 - Added **The Missing Menorah Pieces**: a narrow workshop opening, TINY and MAGNETIC stages, three safely stored decorative pieces, and a distinct one-piece-at-a-time assembly action.
 - Added **Purim Delivery Dash**: a FAST and SLIPPERY courier route, two mishloach manos packages, and separate gift delivery to Esti and Yehuda.
 - Added **Matzah Mountain**: a BIG supply box, TINY passage clearance, and delivery of clean table coverings to Rachel’s Pesach preparation room.
+- Completed the Yom Tov world with **The Great Sukkah Scramble**: three ordered sticker transfers, supply collection, and a visible walls-then-roof construction sequence.
 - Generalized mission inventory and station handling for both tzedakah deposits and supply deliveries; completing level 2 unlocks an outfit and achievement.
 - Made unreleased worlds visible as previews rather than showing the original StickerChaos levels under new names.
 
 ## Next milestones
 
 1. **Reusable action system:** Extend item delivery and neighbor assistance into richer cooperation, preparation sequences, and story event triggers. Keep inventory independent from stickers.
-2. **Worlds 3–4:** Implement six more original solvable levels, distinct scenery, and progression. Validate each documented solution and its physical route.
+2. **Worlds 3–4:** Implement five more original solvable levels, distinct scenery, and progression. Validate each documented solution and its physical route.
 3. **Art, audio, and rewards:** Expand original environment and character animation, create suitably licensed or original Chassidic-inspired music and effects, achievements, and cosmetic unlocks.
 4. **Release QA:** Run all automated gates, mobile screenshots, offline PWA checks, actual iPhone/iPod Safari performance checks, and religious content review. Prepare a separate deployment.
 
 ## Known issues and limits
 
-- Only levels 1–14 are playable. The original engine includes code for unreleased features and worlds that will be adapted during later milestones.
+- Only levels 1–15 are playable. The original engine includes code for unreleased features and worlds that will be adapted during later milestones.
 - Mission actions support coin collection, item delivery, staged neighbor assistance, and simple display assembly, and separate gifts for multiple recipients. Preparation sequences and richer cooperation remain to be built.
 - Current music comes from the inherited procedural audio system and needs a new music direction.
 - Community review of dialogue and cultural detail is pending.

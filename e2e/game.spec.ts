@@ -477,3 +477,42 @@ test('clears the Pesach workshop and brings table coverings', async ({page}) => 
   await tapWorld(page, 195, 70);
   await expect(page.getByRole('heading', {name:'Mitzvah accomplished!'})).toBeVisible({timeout:20000});
 });
+
+test('builds the sukkah walls and roof from gathered supplies', async ({page}) => {
+  test.setTimeout(100000);
+  await page.addInitScript(({key, progress}) => {
+    localStorage.setItem(key, JSON.stringify(progress));
+  }, {key:PROGRESS_KEY, progress:{...DEFAULT_PROGRESS, completedLevels:[1,2,3,4,5,6,7,8,9,10,11,12,13,14], settings:{...DEFAULT_PROGRESS.settings, controlMode:'tap'}}});
+  await page.goto('/');
+  await page.getByRole('button', {name:/PLAY/}).first().click();
+  await page.getByRole('button', {name:/Level 15: The Great Sukkah Scramble/}).click();
+  await expect(page.locator('canvas')).toBeVisible();
+  await tapWorld(page, 195, 335);
+  await page.getByRole('button', {name:/BIG/}).click();
+  await tapWorld(page, 75, 265);
+  await expect(page.getByText('1/3 switches')).toBeVisible();
+  await tapWorld(page, 72, 510);
+  await page.getByRole('button', {name:/TINY/}).click();
+  await tapWorld(page, 195, 335);
+  await expect(page.getByText('2/3 switches')).toBeVisible();
+  await tapWorld(page, 316, 513);
+  await page.getByRole('button', {name:/HEAVY/}).click();
+  await tapWorld(page, 306, 374);
+  await expect(page.getByText('3/3 switches')).toBeVisible();
+  await tapWorld(page, 65, 459);
+  await expect(page.locator('.mission-strip')).toContainText('Bag: 1', {timeout:20000});
+  await tapWorld(page, 318, 455);
+  await expect(page.locator('.mission-strip')).toContainText('Bag: 2', {timeout:20000});
+  await tapWorld(page, 195, 242);
+  await expect(page.locator('.mission-strip')).toContainText('Bag: 3', {timeout:20000});
+  await tapWorld(page, 265, 209);
+  await expect(page.getByRole('button', {name:'ASSEMBLE PIECE'})).toBeEnabled({timeout:20000});
+  for (let count = 1; count <= 3; count++) {
+    await page.getByRole('button', {name:'ASSEMBLE PIECE'}).click();
+    await expect(page.locator('.mission-strip')).toContainText(`Assembled: ${count}/3`);
+  }
+  await tapWorld(page, 140, 551);
+  await expect(page.getByText('🎁 ✓')).toBeVisible({timeout:20000});
+  await tapWorld(page, 195, 70);
+  await expect(page.getByRole('heading', {name:'Mitzvah accomplished!'})).toBeVisible({timeout:20000});
+});

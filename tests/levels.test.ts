@@ -8,7 +8,7 @@ import { findTapRoute } from '../src/game/navigation';
 describe('The Runaway Pushka', () => {
   const level = LEVELS[0];
   it('has a valid original layout and a solvable sticker transfer', () => {
-    expect(LEVELS).toHaveLength(14);
+    expect(LEVELS).toHaveLength(15);
     expect(LevelSchema.safeParse(level).success).toBe(true);
     const engine = new StickerEngine(level.entities);
     for (const step of level.solution) expect(engine.transfer(step.source, step.target, step.sticker).ok).toBe(true);
@@ -31,6 +31,37 @@ describe('The Runaway Pushka', () => {
     expect(findTapRoute(start, level.exit, 18, level.fixtures, 0, [], false)).toBeNull();
     expect(findTapRoute(start, level.exit, 18, level.fixtures, 1, [], false)).not.toBeNull();
     for (const coin of missionItems(level)) expect(findTapRoute(start, coin, 18, level.fixtures, 1, [], false)).not.toBeNull();
+  });
+});
+
+describe('The Great Sukkah Scramble', () => {
+  const level = LEVELS[14];
+  it('loads the cart, clears the passage, and steadies the support in order', () => {
+    expect(LevelSchema.safeParse(level).success).toBe(true);
+    const engine = new StickerEngine(level.entities);
+    for (const step of level.solution) expect(engine.transfer(step.source, step.target, step.sticker).ok).toBe(true);
+    expect(engine.get('supply-cart')?.stickers).toContain('BIG');
+    expect(effectiveStats(engine.get('blocking-box')!).radius).toBeLessThan(18);
+    expect(effectiveStats(engine.get('support-base')!).mass).toBeGreaterThanOrEqual(10);
+    expect(level.goals.map(goal => goal.targetId)).toEqual(['supply-cart', 'blocking-box', 'support-base']);
+  });
+  it('builds walls before roof slats and opens the exit after the third switch', () => {
+    const start = level.entities[0];
+    const station = level.mission?.kind === 'delivery' ? level.mission.station : null;
+    expect(station).not.toBeNull();
+    expect(level.mission?.kind === 'delivery' && level.mission.assembly).toBe(true);
+    let mission = startMission(level);
+    for (let index = 0; index < 3; index++) mission = collectCoin(mission, index);
+    expect(missionComplete(level, mission)).toBe(false);
+    for (let count = 1; count <= 3; count++) {
+      mission = assemblePart(mission);
+      expect(mission.deposited).toBe(count);
+    }
+    expect(missionComplete(level, mission)).toBe(true);
+    expect(findTapRoute(start, level.exit, 18, level.fixtures, 2, [], false)).toBeNull();
+    for (const destination of [...missionItems(level), station!, level.treasure, level.exit]) {
+      expect(findTapRoute(start, destination, 18, level.fixtures, 3, [], false)).not.toBeNull();
+    }
   });
 });
 

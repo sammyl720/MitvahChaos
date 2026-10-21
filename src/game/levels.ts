@@ -507,6 +507,49 @@ export const LEVELS: Level[] = [LevelSchema.parse({
     station: { x: 309, y: 209 },
     npc: { x: 350, y: 258, name: 'RACHEL', greeting: 'The supply box is blocking our Pesach preparation room. Can you make a path and bring the clean table coverings?', thanks: 'The room is clear and the table is ready. Thank you!' }
   }
+}), LevelSchema.parse({
+  number: 15,
+  name: 'The Great Sukkah Scramble',
+  world: 3,
+  hint: 'Move BIG onto the supply cart, shrink the blocking box with TINY, and make the support HEAVY. Gather three bundles to finish the sukkah!',
+  entities: [
+    { id: 'player', kind: 'bandit', label: 'YOU', x: 195, y: 520, stickers: [], behavior: 'idle' },
+    { id: 'blocking-box', kind: 'crate', label: 'SUPPLY BOX', x: 195, y: 335, stickers: ['BIG'], behavior: 'idle' },
+    { id: 'supply-cart', kind: 'wagon', label: 'SUPPLY CART', x: 75, y: 265, stickers: [], behavior: 'idle' },
+    { id: 'tiny-snail', kind: 'snail', label: 'TINY SNAIL', x: 72, y: 510, stickers: ['TINY'], behavior: 'idle' },
+    { id: 'support-base', kind: 'boulder', label: 'SUPPORT BASE', x: 306, y: 374, stickers: [], behavior: 'idle' },
+    { id: 'weight-rock', kind: 'rock', label: 'WEIGHT ROCK', x: 316, y: 513, stickers: ['HEAVY'], behavior: 'idle' }
+  ],
+  goals: [
+    { id: 'load-supplies', x: 75, y: 265, radius: 39, targetId: 'supply-cart', requires: ['BIG'], label: 'LOAD SUPPLIES' },
+    { id: 'clear-site', x: 195, y: 335, radius: 36, targetId: 'blocking-box', requires: ['TINY'], label: 'CLEAR SITE' },
+    { id: 'steady-base', x: 306, y: 374, radius: 37, targetId: 'support-base', requires: ['HEAVY'], minMass: 10, label: 'STEADY BASE' }
+  ],
+  goalOrder: 'sequential',
+  fixtures: [
+    { kind: 'gate', x: 195, y: 408, w: 348, h: 16, opensAfter: 1 },
+    { kind: 'wall', x: 70, y: 335, w: 140, h: 18 },
+    { kind: 'wall', x: 320, y: 335, w: 140, h: 18 },
+    { kind: 'gate', x: 195, y: 135, w: 348, h: 16, opensAfter: 3 }
+  ],
+  treasure: { x: 140, y: 551 },
+  gem: { x: 65, y: 213 },
+  exit: { x: 195, y: 70 },
+  par: 3,
+  solution: [
+    { source: 'blocking-box', target: 'supply-cart', sticker: 'BIG' },
+    { source: 'tiny-snail', target: 'blocking-box', sticker: 'TINY' },
+    { source: 'weight-rock', target: 'support-base', sticker: 'HEAVY' }
+  ],
+  mission: {
+    kind: 'delivery',
+    assembly: true,
+    items: [{ x: 65, y: 459 }, { x: 318, y: 455 }, { x: 195, y: 242 }],
+    itemName: 'sukkah supply bundle',
+    stationLabel: 'BUILD SITE',
+    station: { x: 310, y: 209 },
+    npc: { x: 350, y: 261, name: 'MALKY', greeting: 'Our sukkah building supplies are scattered. Can you clear the area and help us build the walls before placing the roof slats?', thanks: 'The sukkah is ready for everyone to gather. Thank you for building with us!' }
+  }
 })];
 
 export function getLevel(number: number): Level {
