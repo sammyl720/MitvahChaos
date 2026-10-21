@@ -393,6 +393,45 @@ export const LEVELS: Level[] = [LevelSchema.parse({
     station: { x: 306, y: 208 },
     npc: { x: 349, y: 258, name: 'CHAYA', greeting: 'Our giant toy dreidel is loose! Guide it to the game table, then bring the decorations for our Chanukah gathering.', thanks: 'The table is ready and everyone can play. Thank you!' }
   }
+}), LevelSchema.parse({
+  number: 12,
+  name: 'The Missing Menorah Pieces',
+  world: 3,
+  hint: 'Borrow TINY to fit through the workshop opening, then MAGNETIC to gather the stored display pieces. Assemble them at Nechama’s table!',
+  entities: [
+    { id: 'player', kind: 'bandit', label: 'YOU', x: 195, y: 520, stickers: [], behavior: 'idle' },
+    { id: 'tiny-snail', kind: 'snail', label: 'TINY SNAIL', x: 72, y: 510, stickers: ['TINY'], behavior: 'idle' },
+    { id: 'magnet-bot', kind: 'robot', label: 'MAGNET BOT', x: 315, y: 510, stickers: ['MAGNETIC'], behavior: 'idle' },
+    { id: 'storage-crate', kind: 'crate', label: 'STORAGE', x: 94, y: 238, stickers: [], behavior: 'idle' }
+  ],
+  goals: [
+    { id: 'small-opening', x: 195, y: 520, radius: 37, targetId: 'player', requires: ['TINY'], label: 'SMALL OPENING' },
+    { id: 'metal-pull', x: 195, y: 520, radius: 37, targetId: 'player', requires: ['TINY', 'MAGNETIC'], minMagneticRadius: 100, label: 'DISPLAY MAGNET' }
+  ],
+  goalOrder: 'sequential',
+  fixtures: [
+    { kind: 'gate', x: 195, y: 405, w: 348, h: 16, opensAfter: 1 },
+    { kind: 'wall', x: 100, y: 315, w: 160, h: 20 },
+    { kind: 'wall', x: 290, y: 315, w: 160, h: 20 },
+    { kind: 'gate', x: 195, y: 135, w: 348, h: 16, opensAfter: 2 }
+  ],
+  treasure: { x: 67, y: 549 },
+  gem: { x: 67, y: 212 },
+  exit: { x: 195, y: 70 },
+  par: 2,
+  solution: [
+    { source: 'tiny-snail', target: 'player', sticker: 'TINY' },
+    { source: 'magnet-bot', target: 'player', sticker: 'MAGNETIC' }
+  ],
+  mission: {
+    kind: 'delivery',
+    assembly: true,
+    items: [{ x: 75, y: 455 }, { x: 195, y: 252 }, { x: 315, y: 275 }],
+    itemName: 'display pieces',
+    stationLabel: 'DISPLAY TABLE',
+    station: { x: 308, y: 205 },
+    npc: { x: 350, y: 261, name: 'NECHAMA', greeting: 'The decorative pieces are safely stored around the workshop. Can you bring them to our Chanukah display table?', thanks: 'Every piece is in place. Thank you for helping us prepare together!' }
+  }
 })];
 
 export function getLevel(number: number): Level {

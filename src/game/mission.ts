@@ -32,6 +32,11 @@ export function depositCoins(state: MissionState): MissionState {
   return { ...state, deposited: state.deposited + state.carried, carried: 0 };
 }
 
+export function assemblePart(state: MissionState): MissionState {
+  if (!state.carried) return state;
+  return { ...state, deposited: state.deposited + 1, carried: state.carried - 1 };
+}
+
 export function spillSupplies(state: MissionState): MissionState {
   if (!state.carried || state.deposited) return state;
   return { collected: state.collected.map(() => false), carried: 0, deposited: 0 };

@@ -23,11 +23,13 @@ describe('local progress', () => {
     expect(unlockedAchievements(progress)).toContain('stream-shliach');
     expect(unlockedAchievements(progress)).toContain('shtetl-rescuer');
     expect(unlockedAchievements(progress)).toContain('dreidel-guide');
+    expect(unlockedAchievements(progress)).toContain('display-helper');
     expect(unlockedCosmetics(progress)).toContain('backpack');
     expect(unlockedCosmetics(progress)).toContain('kindness-pin');
     expect(unlockedCosmetics(progress)).toContain('village-scarf');
     expect(unlockedCosmetics(progress)).toContain('rescue-badge');
     expect(unlockedCosmetics(progress)).toContain('festival-cap');
+    expect(unlockedCosmetics(progress)).toContain('blue-sash');
     expect(unlockedCosmetics(progress)).toContain('tiny-crown');
   });
 });

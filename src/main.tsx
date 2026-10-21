@@ -19,7 +19,8 @@ const COSMETICS = [
   { id:'rainbow', name:'Rainbow Outfit', icon:'🌈', detail:'Complete the Crown Heights world.' },
   { id:'village-scarf', name:'Village Scarf', icon:'🧣', detail:'Help Golda in The Runaway Wagon.' },
   { id:'rescue-badge', name:'Rescue Badge', icon:'🪢', detail:'Rescue Shmuel’s wagon and deliver the parcels.' },
-  { id:'festival-cap', name:'Festival Cap', icon:'🎉', detail:'Help Chaya prepare the dreidel game.' }
+  { id:'festival-cap', name:'Festival Cap', icon:'🎉', detail:'Help Chaya prepare the dreidel game.' },
+  { id:'blue-sash', name:'Blue Sash', icon:'🩵', detail:'Assemble Nechama’s Chanukah display.' }
 ];
 const ACHIEVEMENTS = [
   { id:'first-sticker', name:'First Sticker', icon:'🏷️', detail:'Make your first sticker transfer.' },
@@ -33,7 +34,8 @@ const ACHIEVEMENTS = [
   { id:'little-village-helper', name:'Little Village Helper', icon:'🏘️', detail:'Reach the tiny switch and help Tova.' },
   { id:'stream-shliach', name:'Stream Shliach', icon:'🛶', detail:'Float the supplies across to Reizel.' },
   { id:'shtetl-rescuer', name:'Shtetl Rescuer', icon:'🪢', detail:'Free the wagon and help Shmuel’s family.' },
-  { id:'dreidel-guide', name:'Dreidel Guide', icon:'🎲', detail:'Bring the giant toy to Chaya’s game table.' }
+  { id:'dreidel-guide', name:'Dreidel Guide', icon:'🎲', detail:'Bring the giant toy to Chaya’s game table.' },
+  { id:'display-helper', name:'Display Helper', icon:'🕎', detail:'Find and assemble all three decorative pieces.' }
 ];
 
 function Logo({ small = false }: { small?: boolean }) { return <div className={`logo ${small ? 'small' : ''}`}><span className="logo-star">✦</span>MITZVAH <strong>CHAOS</strong><span className="logo-star">✦</span></div>; }
@@ -102,7 +104,7 @@ function GameScreen({ number, onBack, onNext }: { number:number; onBack:()=>void
     <header className="game-top"><button className="icon-button" onClick={() => {setPaused(true);setMusicPaused(true);scene.current?.setPaused(true);}} aria-label="Pause">Ⅱ</button><div className="game-title"><small>{WORLD_NAMES[level.world-1]} · Level {number}</small><strong>{level.name}</strong></div><div className="game-progress"><span>🎁 {status.treasure?'✓':'0/1'}</span><span>💎 {status.gem?'✓':'0/1'}</span></div></header>
     <div className="stage-hint" role="status" aria-live="polite">{status.message || level.hint}</div>
     <section className={`stage-shell world-${level.world}`} aria-label={`${level.name} game area`}><div ref={host} className="game-canvas"/></section>
-    <div className="game-bottom">{level.mission && <div className="mission-strip"><span><b className="coin-symbol">●</b> {level.mission.kind === 'neighbors' ? `Neighbors helped: ${status.deposited}/${status.required}` : `Bag: ${status.carried} · ${level.mission.kind === 'delivery' ? 'Delivered' : 'Pushka'}: ${status.deposited}/${status.required}`}</span><button onClick={()=>scene.current?.deposit()} disabled={!status.nearStation || (level.mission.kind !== 'neighbors' && (!status.carried || (level.mission.kind === 'delivery' && level.mission.fragileZone && status.carried < status.required)))}>{level.mission.kind === 'neighbors' ? 'HELP NEIGHBOR' : level.mission.kind === 'delivery' ? 'DELIVER ITEM' : 'DEPOSIT COINS'}</button></div>}<div className="tool-row"><button className="tool-button" onClick={() => scene.current?.undo()} disabled={!status.canUndo}>↶ <span>UNDO</span></button><button className="tool-button" onClick={restart}>↻ <span>RESTART</span></button><div className="goal-count">⚡ {status.goals}/{status.totalGoals} switches</div></div>
+    <div className="game-bottom">{level.mission && <div className="mission-strip"><span><b className="coin-symbol">●</b> {level.mission.kind === 'neighbors' ? `Neighbors helped: ${status.deposited}/${status.required}` : `Bag: ${status.carried} · ${level.mission.kind === 'delivery' ? level.mission.assembly ? 'Assembled' : 'Delivered' : 'Pushka'}: ${status.deposited}/${status.required}`}</span><button onClick={()=>scene.current?.deposit()} disabled={!status.nearStation || (level.mission.kind !== 'neighbors' && (!status.carried || (level.mission.kind === 'delivery' && level.mission.fragileZone && status.carried < status.required)))}>{level.mission.kind === 'neighbors' ? 'HELP NEIGHBOR' : level.mission.kind === 'delivery' ? level.mission.assembly ? 'ASSEMBLE PIECE' : 'DELIVER ITEM' : 'DEPOSIT COINS'}</button></div>}<div className="tool-row"><button className="tool-button" onClick={() => scene.current?.undo()} disabled={!status.canUndo}>↶ <span>UNDO</span></button><button className="tool-button" onClick={restart}>↻ <span>RESTART</span></button><div className="goal-count">⚡ {status.goals}/{status.totalGoals} switches</div></div>
       <div className="control-row">{progress.settings.controlMode==='joystick'?<Joystick onMove={(x,y)=>scene.current?.setJoystick(x,y)}/>:<div className="tap-tip">👆 Tap the ground<br/>to move</div>}
       <div className="sticker-tray">{status.selected?<><span className="tray-title">{status.selected.kind.toUpperCase()} STICKERS</span><div className="tray-stickers">{status.selected.stickers.length?status.selected.stickers.map((sticker)=><button key={sticker} className={`sticker-pill ${status.armed===sticker?'armed':''}`} style={{'--sticker':STICKER_INFO[sticker].color} as React.CSSProperties} onClick={()=>scene.current?.selectSticker(sticker)}>{STICKER_INFO[sticker].icon} {sticker}</button>):<span className="tray-empty">Tap a stickered object</span>}</div></>:<><span className="tray-title">HOW TO PLAY</span><span className="tray-empty">Tap an object, choose a sticker, then tap a new home. Or drag a sticker!</span></>}</div></div>
     </div>

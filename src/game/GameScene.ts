@@ -7,7 +7,7 @@ import type { Fixture } from './model';
 import { findTapRoute, type Point } from './navigation';
 import { platformPosition } from './platform';
 import { StickerEngine } from './stickerEngine';
-import { collectCoin, depositCoins, helpNeighbor, missionComplete, missionGoalCount, missionItems, spillSupplies, startMission, type MissionState } from './mission';
+import { assemblePart, collectCoin, depositCoins, helpNeighbor, missionComplete, missionGoalCount, missionItems, spillSupplies, startMission, type MissionState } from './mission';
 
 export interface SceneStatus {
   selected: EntityState | null;
@@ -62,6 +62,7 @@ export class GameScene extends Phaser.Scene {
   private treasure = false;
   private mission: MissionState;
   private coinSprites: { x: number; y: number; sprite: Phaser.GameObjects.Container }[] = [];
+  private assemblyDisplay?: Phaser.GameObjects.Text;
   private gem = false;
   private transfers = 0;
   private completed = false;
@@ -277,6 +278,18 @@ export class GameScene extends Phaser.Scene {
         for (let x = 56; x <= 338; x += 47) g.fillStyle(x % 2 ? 0xffd782 : 0xa8e4e7, .9).fillTriangle(x - 9, 183, x + 9, 183, x, 203);
         this.add.text(195, 170, 'DREIDEL GAME', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '11px', color: '#624f7a', backgroundColor: '#fff5dc', padding: { x: 7, y: 4 } }).setOrigin(.5).setDepth(1);
       }
+      if (this.level.number === 12) {
+        g.fillStyle(0xf6e9c8, .83).fillRoundedRect(112, 173, 166, 93, 11);
+        g.lineStyle(3, 0xa881a5).strokeRoundedRect(112, 173, 166, 93, 11);
+        g.lineStyle(5, 0x8b73ae).lineBetween(132, 241, 258, 241);
+        for (let i = 0; i < 9; i++) {
+          const x = 140 + i * 14;
+          const top = i === 4 ? 191 : 205;
+          g.lineStyle(3, 0x8b73ae).lineBetween(x, 240, x, top + 5);
+          g.fillStyle(0x8b73ae).fillRoundedRect(x - 5, top, 10, 6, 2);
+        }
+        this.add.text(195, 163, 'CHANUKAH DISPLAY WORKSHOP', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '11px', color: '#624f7a', backgroundColor: '#fff5dc', padding: { x: 7, y: 4 } }).setOrigin(.5).setDepth(1);
+      }
     } else {
       for (const [x, bend, color] of [[25, 127, 0x67dce6], [365, 261, 0xe599f5]] as const) {
         g.lineStyle(9, color, .5).lineBetween(x, 101, x, 525);
@@ -324,6 +337,7 @@ export class GameScene extends Phaser.Scene {
     if (!this.level.mission) return;
     if (this.level.mission.kind === 'neighbors') { this.addNeighborMission(); return; }
     const delivery = this.level.mission.kind === 'delivery';
+    const assembly = this.level.mission.kind === 'delivery' && Boolean(this.level.mission.assembly);
     const tablecloth = this.level.mission.kind === 'delivery' && ['tablecloth', 'napkins'].includes(this.level.mission.itemName);
     const flourSacks = this.level.mission.kind === 'delivery' && this.level.mission.itemName === 'flour sacks';
     const soupSupplies = this.level.mission.kind === 'delivery' && this.level.mission.itemName === 'soup supplies';
@@ -333,7 +347,11 @@ export class GameScene extends Phaser.Scene {
       this.add.text(zone.x, zone.y, 'SPILL', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '11px', fontStyle: 'bold', color: '#6f413b' }).setOrigin(.5).setDepth(3);
     }
     this.coinSprites = missionItems(this.level).map(({ x, y }, index) => {
-      const sprite = this.add.container(x, y, soupSupplies ? [
+      const sprite = this.add.container(x, y, assembly ? [
+        this.add.rectangle(0, 0, 26, 29, 0xe6cf92).setStrokeStyle(3, 0x80628e),
+        this.add.circle(0, -2, 7, 0x8acbd2).setStrokeStyle(2, 0xffffff),
+        this.add.text(0, 1, String(index + 1), { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '11px', color: '#564275', fontStyle: 'bold' }).setOrigin(.5)
+      ] : soupSupplies ? [
         this.add.circle(0, 0, 16, index ? 0xe2aa63 : 0xe98063).setStrokeStyle(2, 0x855b59),
         this.add.text(0, 0, index ? '🥕' : '🥔', { fontSize: '20px' }).setOrigin(.5)
       ] : tablecloth ? [
@@ -359,7 +377,11 @@ export class GameScene extends Phaser.Scene {
       return { x, y, sprite };
     });
     const station = this.level.mission.station;
-    const stationSprite = this.add.container(station.x, station.y, soupSupplies ? [
+    const stationSprite = this.add.container(station.x, station.y, assembly ? [
+      this.add.rectangle(0, 15, 64, 30, 0xa87961).setStrokeStyle(3, 0x624b73),
+      this.add.rectangle(0, -7, 62, 15, 0xf4dcad).setStrokeStyle(2, 0x97769b),
+      this.add.circle(-20, -16, 4, 0x84c9d7), this.add.circle(0, -16, 4, 0x84c9d7), this.add.circle(20, -16, 4, 0x84c9d7)
+    ] : soupSupplies ? [
       this.add.ellipse(0, 14, 60, 23, 0x625569).setStrokeStyle(3, 0x443e59),
       this.add.rectangle(0, 0, 55, 33, 0xa66c62).setStrokeStyle(3, 0x625569),
       this.add.ellipse(0, -17, 56, 17, 0xe5a456).setStrokeStyle(3, 0xffd589),
@@ -390,6 +412,7 @@ export class GameScene extends Phaser.Scene {
       this.add.text(0, 7, '1', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '14px', fontStyle: 'bold', color: '#885874' }).setOrigin(.5)
     ]).setDepth(13).setSize(54, 61).setInteractive({ useHandCursor: true });
     stationSprite.on('pointerdown', () => this.deposit());
+    if (assembly) this.assemblyDisplay = this.add.text(station.x, station.y - 43, '◇ '.repeat(missionGoalCount(this.level)).trim(), { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '13px', color: '#604c83', backgroundColor: '#fff6dc', padding: { x: 3, y: 1 } }).setOrigin(.5).setDepth(15);
     this.add.text(station.x, station.y + 36, this.level.mission.kind === 'delivery' ? this.level.mission.stationLabel : 'PUSHKA', { fontSize: '11px', color: '#5a397e', backgroundColor: '#fff7de', padding: { x: 5, y: 3 } }).setOrigin(.5).setDepth(14);
     const npc = this.level.mission.npc;
     const friend = this.add.container(npc.x, npc.y, [
@@ -448,11 +471,12 @@ export class GameScene extends Phaser.Scene {
     if (Math.hypot(player.x - station.x, player.y - station.y) > 64) { this.say(mission?.kind === 'delivery' ? `Come closer to the ${mission.stationLabel.toLowerCase()}.` : 'Come closer to the pushka.'); return; }
     if (!this.mission.carried) { this.say(mission?.kind === 'delivery' ? `Find the ${mission.itemName} first!` : 'Find the runaway coins first!'); return; }
     if (mission?.kind === 'delivery' && mission.fragileZone && this.mission.carried < missionGoalCount(this.level)) { this.say('Bring all the soup supplies together, and keep them clear of the spill!'); return; }
-    const count = this.mission.carried;
-    this.mission = depositCoins(this.mission);
+    const count = mission?.kind === 'delivery' && mission.assembly ? 1 : this.mission.carried;
+    this.mission = mission?.kind === 'delivery' && mission.assembly ? assemblePart(this.mission) : depositCoins(this.mission);
+    if (mission?.kind === 'delivery' && mission.assembly) this.assemblyDisplay?.setText(`${'◆ '.repeat(this.mission.deposited)}${'◇ '.repeat(missionGoalCount(this.level) - this.mission.deposited)}`.trim());
     this.burst(station.x, station.y, '#ffd66e');
     playSound('treasure', this.settings.effectsVolume);
-    this.say(missionComplete(this.level, this.mission) ? mission!.npc.thanks : mission?.kind === 'delivery' ? `${count} item${count === 1 ? '' : 's'} delivered! Find the rest.` : `${count} coin${count === 1 ? '' : 's'} in the pushka! Find the rest.`);
+    this.say(missionComplete(this.level, this.mission) ? mission!.npc.thanks : mission?.kind === 'delivery' && mission.assembly ? `Display piece ${this.mission.deposited}/${missionGoalCount(this.level)} assembled!` : mission?.kind === 'delivery' ? `${count} item${count === 1 ? '' : 's'} delivered! Find the rest.` : `${count} coin${count === 1 ? '' : 's'} in the pushka! Find the rest.`);
   }
   private addExit(): void {
     const { x, y } = this.level.exit;
@@ -530,14 +554,14 @@ export class GameScene extends Phaser.Scene {
     const texture = entity.id === 'player' && this.character === 'girl' ? 'character-bandit-girl' : this.level.number === 20 && entity.id === this.level.bossId ? 'boss-robot' : `character-${entity.kind}`;
     const sprite = this.physics.add.image(entity.x, entity.y, texture).setDepth(5);
     if (entity.id === 'player') {
-      const tints: Record<string, number> = { rainbow: 0xffc4ee, robot: 0xb5eaff, knight: 0xd4d9ff, golden: 0xffd765, chicken: 0xffeed1, 'tiny-crown': 0xebc7ff, shabbos: 0xfff4e2, courier: 0xd8f6ff, 'kindness-pin': 0xffd7e2, 'village-scarf': 0xffdfce, 'rescue-badge': 0xffedbf, 'festival-cap': 0xe9d8ff };
+      const tints: Record<string, number> = { rainbow: 0xffc4ee, robot: 0xb5eaff, knight: 0xd4d9ff, golden: 0xffd765, chicken: 0xffeed1, 'tiny-crown': 0xebc7ff, shabbos: 0xfff4e2, courier: 0xd8f6ff, 'kindness-pin': 0xffd7e2, 'village-scarf': 0xffdfce, 'rescue-badge': 0xffedbf, 'festival-cap': 0xe9d8ff, 'blue-sash': 0xc6efff };
       if (tints[this.cosmetic]) sprite.setTint(tints[this.cosmetic]);
     }
     sprite.setInteractive({ useHandCursor: true });
     sprite.on('pointerdown', () => this.onEntityTap(entity.id));
     const name = this.add.text(entity.x, entity.y + stats.radius + 13, entity.label ?? entity.kind.toUpperCase(), { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '10px', fontStyle: 'bold', color: '#453465', backgroundColor: '#fff9e6', padding: { x: 5, y: 2 } }).setOrigin(.5).setDepth(10);
     if (entity.id === 'player' && this.cosmetic !== 'classic') {
-      const icons: Record<string,string> = { rainbow:'🌈', robot:'🤖', knight:'🛡️', golden:'👑', chicken:'🐔', 'tiny-crown':'✨', backpack:'🎒', shabbos:'✦', courier:'🧢', 'kindness-pin':'♥', 'village-scarf':'🧣', 'rescue-badge':'🪢', 'festival-cap':'🎉' };
+      const icons: Record<string,string> = { rainbow:'🌈', robot:'🤖', knight:'🛡️', golden:'👑', chicken:'🐔', 'tiny-crown':'✨', backpack:'🎒', shabbos:'✦', courier:'🧢', 'kindness-pin':'♥', 'village-scarf':'🧣', 'rescue-badge':'🪢', 'festival-cap':'🎉', 'blue-sash':'🩵' };
       this.costumeMark = this.add.text(entity.x,entity.y - stats.radius - 15,icons[this.cosmetic] ?? '',{fontSize:'23px'}).setOrigin(.5).setDepth(11);
     }
     const piece = { sprite, name, badges: [] as Phaser.GameObjects.Text[], shadow };
@@ -849,6 +873,7 @@ export class GameScene extends Phaser.Scene {
     this.completionTimer?.remove(); this.completionTimer = undefined;
     this.engine.resetLevel(); this.treasure = false; this.gem = false; this.transfers = 0; this.completed = false; this.armed = null; this.selectedId = null;
     this.mission = startMission(this.level);
+    if (this.level.mission?.kind === 'delivery' && this.level.mission.assembly) this.assemblyDisplay?.setText('◇ '.repeat(missionGoalCount(this.level)).trim());
     this.coinSprites.forEach((coin, index) => { coin.x = missionItems(this.level)[index].x; coin.y = missionItems(this.level)[index].y; coin.sprite.setPosition(coin.x, coin.y).setVisible(true); });
     this.goalHistory = []; this.lastTransferTarget = null;
     this.tapRoute = [];

@@ -2,13 +2,13 @@ import { describe, expect, it } from 'vitest';
 import { LEVELS } from '../src/game/levels';
 import { LevelSchema } from '../src/game/model';
 import { StickerEngine, effectiveStats } from '../src/game/stickerEngine';
-import { collectCoin, depositCoins, helpNeighbor, missionComplete, missionGoalCount, missionItems, spillSupplies, startMission } from '../src/game/mission';
+import { assemblePart, collectCoin, depositCoins, helpNeighbor, missionComplete, missionGoalCount, missionItems, spillSupplies, startMission } from '../src/game/mission';
 import { findTapRoute } from '../src/game/navigation';
 
 describe('The Runaway Pushka', () => {
   const level = LEVELS[0];
   it('has a valid original layout and a solvable sticker transfer', () => {
-    expect(LEVELS).toHaveLength(11);
+    expect(LEVELS).toHaveLength(12);
     expect(LevelSchema.safeParse(level).success).toBe(true);
     const engine = new StickerEngine(level.entities);
     for (const step of level.solution) expect(engine.transfer(step.source, step.target, step.sticker).ok).toBe(true);
@@ -112,6 +112,35 @@ describe('Dreidel Disaster', () => {
     expect(findTapRoute(start, station!, 18, level.fixtures, 1, [], false)).not.toBeNull();
     expect(findTapRoute(start, level.exit, 18, level.fixtures, 1, [], false)).toBeNull();
     expect(findTapRoute(start, level.exit, 18, level.fixtures, 2, [], false)).not.toBeNull();
+  });
+});
+
+describe('The Missing Menorah Pieces', () => {
+  const level = LEVELS[11];
+  it('requires a small magnetic hero and three separate assembly actions', () => {
+    expect(LevelSchema.safeParse(level).success).toBe(true);
+    const engine = new StickerEngine(level.entities);
+    for (const step of level.solution) expect(engine.transfer(step.source, step.target, step.sticker).ok).toBe(true);
+    const player = engine.get('player')!;
+    expect(effectiveStats(player).radius).toBeLessThan(11);
+    expect(effectiveStats(player).magneticRadius).toBeGreaterThanOrEqual(100);
+    let mission = startMission(level);
+    for (let index = 0; index < 3; index++) mission = collectCoin(mission, index);
+    expect(mission).toMatchObject({carried: 3, deposited: 0});
+    mission = assemblePart(mission);
+    expect(mission).toMatchObject({carried: 2, deposited: 1});
+    mission = assemblePart(assemblePart(mission));
+    expect(missionComplete(level, mission)).toBe(true);
+    expect(assemblePart(mission)).toBe(mission);
+  });
+  it('makes the workshop opening physically too narrow at normal size', () => {
+    const start = level.entities[0];
+    const station = level.mission?.kind === 'delivery' ? level.mission.station : null;
+    expect(station).not.toBeNull();
+    expect(findTapRoute(start, station!, 18, level.fixtures, 2, [], false)).toBeNull();
+    expect(findTapRoute(start, station!, 9.9, level.fixtures, 2, [], false)).not.toBeNull();
+    expect(findTapRoute(start, level.exit, 9.9, level.fixtures, 1, [], false)).toBeNull();
+    expect(findTapRoute(start, level.exit, 9.9, level.fixtures, 2, [], false)).not.toBeNull();
   });
 });
 

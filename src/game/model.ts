@@ -97,6 +97,7 @@ export const LevelSchema = z.object({
       items: z.array(z.object({ x: z.number(), y: z.number() })).min(1),
       itemName: z.string(),
       stationLabel: z.string(),
+      assembly: z.boolean().optional(),
       station: z.object({ x: z.number(), y: z.number() }),
       fragileZone: z.object({ x: z.number(), y: z.number(), w: z.number().positive(), h: z.number().positive() }).optional(),
       npc: z.object({ x: z.number(), y: z.number(), name: z.string(), greeting: z.string(), thanks: z.string() })
