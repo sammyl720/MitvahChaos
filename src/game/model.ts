@@ -103,6 +103,12 @@ export const LevelSchema = z.object({
       npc: z.object({ x: z.number(), y: z.number(), name: z.string(), greeting: z.string(), thanks: z.string() })
     }),
     z.object({
+      kind: z.literal('deliveries'),
+      items: z.array(z.object({ x: z.number(), y: z.number() })).min(2),
+      itemName: z.string(),
+      people: z.array(z.object({ x: z.number(), y: z.number(), name: z.string(), greeting: z.string(), thanks: z.string() })).min(2)
+    }),
+    z.object({
       kind: z.literal('neighbors'),
       people: z.array(z.object({ x: z.number(), y: z.number(), name: z.string(), greeting: z.string(), thanks: z.string(), needsGoal: z.number().int().nonnegative() })).min(1)
     })

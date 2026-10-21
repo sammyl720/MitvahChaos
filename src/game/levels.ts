@@ -401,8 +401,7 @@ export const LEVELS: Level[] = [LevelSchema.parse({
   entities: [
     { id: 'player', kind: 'bandit', label: 'YOU', x: 195, y: 520, stickers: [], behavior: 'idle' },
     { id: 'tiny-snail', kind: 'snail', label: 'TINY SNAIL', x: 72, y: 510, stickers: ['TINY'], behavior: 'idle' },
-    { id: 'magnet-bot', kind: 'robot', label: 'MAGNET BOT', x: 315, y: 510, stickers: ['MAGNETIC'], behavior: 'idle' },
-    { id: 'storage-crate', kind: 'crate', label: 'STORAGE', x: 94, y: 238, stickers: [], behavior: 'idle' }
+    { id: 'magnet-bot', kind: 'robot', label: 'MAGNET BOT', x: 315, y: 510, stickers: ['MAGNETIC'], behavior: 'idle' }
   ],
   goals: [
     { id: 'small-opening', x: 195, y: 520, radius: 37, targetId: 'player', requires: ['TINY'], label: 'SMALL OPENING' },
@@ -411,11 +410,11 @@ export const LEVELS: Level[] = [LevelSchema.parse({
   goalOrder: 'sequential',
   fixtures: [
     { kind: 'gate', x: 195, y: 405, w: 348, h: 16, opensAfter: 1 },
-    { kind: 'wall', x: 100, y: 315, w: 160, h: 20 },
-    { kind: 'wall', x: 290, y: 315, w: 160, h: 20 },
+    { kind: 'wall', x: 99, y: 315, w: 156, h: 20 },
+    { kind: 'wall', x: 291, y: 315, w: 156, h: 20 },
     { kind: 'gate', x: 195, y: 135, w: 348, h: 16, opensAfter: 2 }
   ],
-  treasure: { x: 67, y: 549 },
+  treasure: { x: 135, y: 550 },
   gem: { x: 67, y: 212 },
   exit: { x: 195, y: 70 },
   par: 2,
@@ -431,6 +430,44 @@ export const LEVELS: Level[] = [LevelSchema.parse({
     stationLabel: 'DISPLAY TABLE',
     station: { x: 308, y: 205 },
     npc: { x: 350, y: 261, name: 'NECHAMA', greeting: 'The decorative pieces are safely stored around the workshop. Can you bring them to our Chanukah display table?', thanks: 'Every piece is in place. Thank you for helping us prepare together!' }
+  }
+}), LevelSchema.parse({
+  number: 13,
+  name: 'Purim Delivery Dash',
+  world: 3,
+  hint: 'Borrow FAST, then give the courier cart SLIPPERY to slide through the delivery lane. Bring one mishloach manos package to each neighbor!',
+  entities: [
+    { id: 'player', kind: 'bandit', label: 'YOU', x: 195, y: 520, stickers: [], behavior: 'idle' },
+    { id: 'fast-bot', kind: 'robot', label: 'FAST BOT', x: 70, y: 507, stickers: ['FAST'], behavior: 'idle' },
+    { id: 'slick-snail', kind: 'snail', label: 'SLICK SNAIL', x: 316, y: 507, stickers: ['SLIPPERY'], behavior: 'idle' },
+    { id: 'courier-cart', kind: 'crate', label: 'COURIER CART', x: 80, y: 325, stickers: [], behavior: 'idle' }
+  ],
+  goals: [
+    { id: 'fast-courier', x: 195, y: 520, radius: 38, targetId: 'player', requires: ['FAST'], label: 'FAST COURIER' },
+    { id: 'delivery-lane', x: 300, y: 325, radius: 30, targetId: 'courier-cart', requires: ['SLIPPERY'], minSpeed: 100, label: 'DELIVERY LANE' }
+  ],
+  goalOrder: 'sequential',
+  fixtures: [
+    { kind: 'gate', x: 195, y: 400, w: 348, h: 16, opensAfter: 1 },
+    { kind: 'wall', x: 195, y: 220, w: 23, h: 73 },
+    { kind: 'gate', x: 195, y: 135, w: 348, h: 16, opensAfter: 2 }
+  ],
+  treasure: { x: 65, y: 551 },
+  gem: { x: 321, y: 300 },
+  exit: { x: 195, y: 70 },
+  par: 2,
+  solution: [
+    { source: 'fast-bot', target: 'player', sticker: 'FAST' },
+    { source: 'slick-snail', target: 'courier-cart', sticker: 'SLIPPERY' }
+  ],
+  mission: {
+    kind: 'deliveries',
+    items: [{ x: 68, y: 458 }, { x: 319, y: 458 }],
+    itemName: 'mishloach manos package',
+    people: [
+      { x: 75, y: 226, name: 'ESTI', greeting: 'A Purim package for me? What a kind surprise!', thanks: 'Thank you for sharing Purim joy!' },
+      { x: 316, y: 226, name: 'YEHUDA', greeting: 'Can you bring me a Purim package too?', thanks: 'Thank you! Now I can celebrate with my family.' }
+    ]
   }
 })];
 

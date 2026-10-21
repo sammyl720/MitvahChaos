@@ -2,13 +2,13 @@ import { describe, expect, it } from 'vitest';
 import { LEVELS } from '../src/game/levels';
 import { LevelSchema } from '../src/game/model';
 import { StickerEngine, effectiveStats } from '../src/game/stickerEngine';
-import { assemblePart, collectCoin, depositCoins, helpNeighbor, missionComplete, missionGoalCount, missionItems, spillSupplies, startMission } from '../src/game/mission';
+import { assemblePart, collectCoin, deliverGift, depositCoins, helpNeighbor, missionComplete, missionGoalCount, missionItems, spillSupplies, startMission } from '../src/game/mission';
 import { findTapRoute } from '../src/game/navigation';
 
 describe('The Runaway Pushka', () => {
   const level = LEVELS[0];
   it('has a valid original layout and a solvable sticker transfer', () => {
-    expect(LEVELS).toHaveLength(12);
+    expect(LEVELS).toHaveLength(13);
     expect(LevelSchema.safeParse(level).success).toBe(true);
     const engine = new StickerEngine(level.entities);
     for (const step of level.solution) expect(engine.transfer(step.source, step.target, step.sticker).ok).toBe(true);
@@ -141,6 +141,35 @@ describe('The Missing Menorah Pieces', () => {
     expect(findTapRoute(start, station!, 9.9, level.fixtures, 2, [], false)).not.toBeNull();
     expect(findTapRoute(start, level.exit, 9.9, level.fixtures, 1, [], false)).toBeNull();
     expect(findTapRoute(start, level.exit, 9.9, level.fixtures, 2, [], false)).not.toBeNull();
+    expect(findTapRoute(level.treasure, level.exit, 9.9, level.fixtures, 2, level.entities.filter((entity) => entity.id !== 'player').map((entity) => ({ x: entity.x, y: entity.y, radius: effectiveStats({ kind: entity.kind, stickers: [] }).radius })), false)).not.toBeNull();
+  });
+});
+
+describe('Purim Delivery Dash', () => {
+  const level = LEVELS[12];
+  it('uses FAST on the hero and SLIPPERY on the cart while tracking each gift recipient separately', () => {
+    expect(LevelSchema.safeParse(level).success).toBe(true);
+    const engine = new StickerEngine(level.entities);
+    for (const step of level.solution) expect(engine.transfer(step.source, step.target, step.sticker).ok).toBe(true);
+    const player = engine.get('player')!;
+    expect(effectiveStats(player).speed).toBeGreaterThan(300);
+    expect(effectiveStats(engine.get('courier-cart')!).drag).toBeLessThan(100);
+    let mission = startMission(level);
+    mission = collectCoin(collectCoin(mission, 0), 1);
+    mission = deliverGift(mission, 0);
+    expect(mission).toMatchObject({carried: 1, deposited: 1, served: [true, false]});
+    expect(deliverGift(mission, 0)).toBe(mission);
+    mission = deliverGift(mission, 1);
+    expect(missionComplete(level, mission)).toBe(true);
+  });
+  it('opens the gift route after the fast switch and the exit after the dash', () => {
+    const start = level.entities[0];
+    const recipient = level.mission?.kind === 'deliveries' ? level.mission.people[0] : null;
+    expect(recipient).not.toBeNull();
+    expect(findTapRoute(start, recipient!, 18, level.fixtures, 0, [], false)).toBeNull();
+    expect(findTapRoute(start, recipient!, 18, level.fixtures, 1, [], false)).not.toBeNull();
+    expect(findTapRoute(start, level.exit, 18, level.fixtures, 1, [], false)).toBeNull();
+    expect(findTapRoute(start, level.exit, 18, level.fixtures, 2, [], false)).not.toBeNull();
   });
 });
 

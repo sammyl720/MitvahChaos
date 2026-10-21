@@ -7,7 +7,7 @@ import type { Fixture } from './model';
 import { findTapRoute, type Point } from './navigation';
 import { platformPosition } from './platform';
 import { StickerEngine } from './stickerEngine';
-import { assemblePart, collectCoin, depositCoins, helpNeighbor, missionComplete, missionGoalCount, missionItems, spillSupplies, startMission, type MissionState } from './mission';
+import { assemblePart, collectCoin, deliverGift, depositCoins, helpNeighbor, missionComplete, missionGoalCount, missionItems, spillSupplies, startMission, type MissionState } from './mission';
 
 export interface SceneStatus {
   selected: EntityState | null;
@@ -290,6 +290,15 @@ export class GameScene extends Phaser.Scene {
         }
         this.add.text(195, 163, 'CHANUKAH DISPLAY WORKSHOP', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '11px', color: '#624f7a', backgroundColor: '#fff5dc', padding: { x: 7, y: 4 } }).setOrigin(.5).setDepth(1);
       }
+      if (this.level.number === 13) {
+        g.fillStyle(0xf3c7de, .7).fillRoundedRect(165, 275, 60, 115, 14);
+        for (const y of [299, 336, 373]) g.fillStyle(0xfff1d9, .95).fillTriangle(195, y - 13, 182, y + 6, 208, y + 6);
+        for (const [x, y, color] of [[69, 310, 0xffd36e], [319, 348, 0x8fd5d7], [115, 377, 0xe39ac6], [279, 285, 0xffd36e]] as const) {
+          g.fillStyle(color, .9).fillCircle(x, y, 6);
+          g.fillStyle(0xffffff, .75).fillCircle(x - 2, y - 2, 2);
+        }
+        this.add.text(195, 167, 'PURIM GIFT ROUTE', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '11px', color: '#624f7a', backgroundColor: '#fff5dc', padding: { x: 7, y: 4 } }).setOrigin(.5).setDepth(1);
+      }
     } else {
       for (const [x, bend, color] of [[25, 127, 0x67dce6], [365, 261, 0xe599f5]] as const) {
         g.lineStyle(9, color, .5).lineBetween(x, 101, x, 525);
@@ -336,6 +345,7 @@ export class GameScene extends Phaser.Scene {
   private addMission(): void {
     if (!this.level.mission) return;
     if (this.level.mission.kind === 'neighbors') { this.addNeighborMission(); return; }
+    if (this.level.mission.kind === 'deliveries') { this.addGiftMission(); return; }
     const delivery = this.level.mission.kind === 'delivery';
     const assembly = this.level.mission.kind === 'delivery' && Boolean(this.level.mission.assembly);
     const tablecloth = this.level.mission.kind === 'delivery' && ['tablecloth', 'napkins'].includes(this.level.mission.itemName);
@@ -441,6 +451,45 @@ export class GameScene extends Phaser.Scene {
       this.add.text(npc.x, npc.y + 29, npc.name, { fontSize: '10px', color: '#50366e', backgroundColor: '#fff7de', padding: { x: 4, y: 2 } }).setOrigin(.5).setDepth(13);
     });
   }
+  private addGiftMission(): void {
+    const mission = this.level.mission;
+    if (mission?.kind !== 'deliveries') return;
+    this.coinSprites = mission.items.map(({x, y}) => {
+      const sprite = this.add.container(x, y, [
+        this.add.rectangle(0, 0, 27, 25, 0xe6a4ce).setStrokeStyle(2, 0x79518a),
+        this.add.rectangle(0, -3, 27, 5, 0xffe4aa),
+        this.add.rectangle(0, 0, 5, 25, 0xffe4aa)
+      ]).setDepth(14);
+      if (!this.settings.reducedMotion) this.tweens.add({ targets: sprite, scale: 1.12, duration: 760, yoyo: true, repeat: -1 });
+      return {x, y, sprite};
+    });
+    mission.people.forEach((npc, index) => {
+      const friend = this.add.container(npc.x, npc.y, [
+        this.add.ellipse(0, 14, 38, 34, index ? 0x77b7d9 : 0xdc97bf).setStrokeStyle(2, 0x634469),
+        this.add.circle(0, -6, 18, 0x5a4051),
+        this.add.circle(0, -4, 14, 0xeec397),
+        this.add.circle(-5, -7, 2, 0x47344a), this.add.circle(5, -7, 2, 0x47344a),
+        this.add.arc(0, 0, 5, 15, 165, false, 0x000000, 0).setStrokeStyle(2, 0x94546b)
+      ]).setDepth(12).setSize(42, 53).setInteractive({ useHandCursor: true });
+      friend.on('pointerdown', () => this.deliverTo(index));
+      this.add.text(npc.x, npc.y + 29, npc.name, { fontSize: '10px', color: '#50366e', backgroundColor: '#fff7de', padding: { x: 4, y: 2 } }).setOrigin(.5).setDepth(13);
+    });
+  }
+  private deliverTo(index: number): void {
+    const mission = this.level.mission;
+    const player = this.engine.get('player');
+    if (mission?.kind !== 'deliveries' || !player || this.paused || this.completed) return;
+    const npc = mission.people[index];
+    if (!npc) return;
+    if (Math.hypot(player.x - npc.x, player.y - npc.y) > 72) { this.say(`Come closer to ${npc.name}.`); return; }
+    if (this.mission.served[index]) { this.say(npc.thanks); return; }
+    if (!this.mission.carried) { this.say(`Find a ${mission.itemName} first!`); return; }
+    this.mission = deliverGift(this.mission, index);
+    this.burst(npc.x, npc.y, '#f3a6d2');
+    playSound('goal', this.settings.effectsVolume);
+    this.say(npc.thanks);
+    this.emitStatus();
+  }
   private helpNeighbor(index: number): void {
     const mission = this.level.mission;
     const player = this.engine.get('player');
@@ -457,6 +506,14 @@ export class GameScene extends Phaser.Scene {
   }
   deposit(): void {
     const mission = this.level.mission;
+    if (mission?.kind === 'deliveries') {
+      const player = this.engine.get('player');
+      if (!player) return;
+      const index = mission.people.findIndex((npc, person) => !this.mission.served[person] && Math.hypot(player.x - npc.x, player.y - npc.y) <= 72);
+      if (index < 0) this.say('Come closer to someone waiting for a gift.');
+      else this.deliverTo(index);
+      return;
+    }
     if (mission?.kind === 'neighbors') {
       const player = this.engine.get('player');
       if (!player) return;
@@ -554,14 +611,14 @@ export class GameScene extends Phaser.Scene {
     const texture = entity.id === 'player' && this.character === 'girl' ? 'character-bandit-girl' : this.level.number === 20 && entity.id === this.level.bossId ? 'boss-robot' : `character-${entity.kind}`;
     const sprite = this.physics.add.image(entity.x, entity.y, texture).setDepth(5);
     if (entity.id === 'player') {
-      const tints: Record<string, number> = { rainbow: 0xffc4ee, robot: 0xb5eaff, knight: 0xd4d9ff, golden: 0xffd765, chicken: 0xffeed1, 'tiny-crown': 0xebc7ff, shabbos: 0xfff4e2, courier: 0xd8f6ff, 'kindness-pin': 0xffd7e2, 'village-scarf': 0xffdfce, 'rescue-badge': 0xffedbf, 'festival-cap': 0xe9d8ff, 'blue-sash': 0xc6efff };
+      const tints: Record<string, number> = { rainbow: 0xffc4ee, robot: 0xb5eaff, knight: 0xd4d9ff, golden: 0xffd765, chicken: 0xffeed1, 'tiny-crown': 0xebc7ff, shabbos: 0xfff4e2, courier: 0xd8f6ff, 'kindness-pin': 0xffd7e2, 'village-scarf': 0xffdfce, 'rescue-badge': 0xffedbf, 'festival-cap': 0xe9d8ff, 'blue-sash': 0xc6efff, 'purim-ribbon': 0xffd8ee };
       if (tints[this.cosmetic]) sprite.setTint(tints[this.cosmetic]);
     }
     sprite.setInteractive({ useHandCursor: true });
     sprite.on('pointerdown', () => this.onEntityTap(entity.id));
     const name = this.add.text(entity.x, entity.y + stats.radius + 13, entity.label ?? entity.kind.toUpperCase(), { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '10px', fontStyle: 'bold', color: '#453465', backgroundColor: '#fff9e6', padding: { x: 5, y: 2 } }).setOrigin(.5).setDepth(10);
     if (entity.id === 'player' && this.cosmetic !== 'classic') {
-      const icons: Record<string,string> = { rainbow:'🌈', robot:'🤖', knight:'🛡️', golden:'👑', chicken:'🐔', 'tiny-crown':'✨', backpack:'🎒', shabbos:'✦', courier:'🧢', 'kindness-pin':'♥', 'village-scarf':'🧣', 'rescue-badge':'🪢', 'festival-cap':'🎉', 'blue-sash':'🩵' };
+      const icons: Record<string,string> = { rainbow:'🌈', robot:'🤖', knight:'🛡️', golden:'👑', chicken:'🐔', 'tiny-crown':'✨', backpack:'🎒', shabbos:'✦', courier:'🧢', 'kindness-pin':'♥', 'village-scarf':'🧣', 'rescue-badge':'🪢', 'festival-cap':'🎉', 'blue-sash':'🩵', 'purim-ribbon':'🎀' };
       this.costumeMark = this.add.text(entity.x,entity.y - stats.radius - 15,icons[this.cosmetic] ?? '',{fontSize:'23px'}).setOrigin(.5).setDepth(11);
     }
     const piece = { sprite, name, badges: [] as Phaser.GameObjects.Text[], shadow };
@@ -781,6 +838,8 @@ export class GameScene extends Phaser.Scene {
     const mission = this.level.mission;
     const nearStation = mission?.kind === 'neighbors'
       ? mission.people.some((npc, index) => !this.mission.collected[index] && player && Math.hypot(player.x - npc.x, player.y - npc.y) <= 72)
+      : mission?.kind === 'deliveries'
+      ? mission.people.some((npc, index) => !this.mission.served[index] && player && Math.hypot(player.x - npc.x, player.y - npc.y) <= 72)
       : Boolean(mission && player && Math.hypot(player.x - mission.station.x, player.y - mission.station.y) <= 64);
     this.callbacks.onStatus({ selected: this.selectedId ? this.engine.get(this.selectedId) ?? null : null, armed: this.armed, transfers: this.transfers, treasure: this.treasure, gem: this.gem, goals: this.goalActive.filter(Boolean).length, totalGoals: this.goalActive.length, message: this.message, canUndo: this.engine.undoCount > 0, carried: this.mission.carried, deposited: this.mission.deposited, required: missionGoalCount(this.level), nearStation: Boolean(nearStation) });
   }
@@ -1005,7 +1064,7 @@ export class GameScene extends Phaser.Scene {
         this.mission = collectCoin(this.mission, index);
         coin.sprite.setVisible(false);
         playSound('gem', this.settings.effectsVolume);
-        this.say(mission.kind === 'delivery' ? `${mission.itemName} in your bag. Bring it to ${mission.npc.name}!` : `${this.mission.carried} coin${this.mission.carried === 1 ? '' : 's'} in your bag. Find the pushka!`);
+        this.say(mission.kind === 'delivery' ? `${mission.itemName} in your bag. Bring it to ${mission.npc.name}!` : mission.kind === 'deliveries' ? `${mission.itemName} in your bag. Find a neighbor waiting for a gift!` : `${this.mission.carried} coin${this.mission.carried === 1 ? '' : 's'} in your bag. Find the pushka!`);
       }
     });
   }
