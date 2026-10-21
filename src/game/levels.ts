@@ -315,6 +315,47 @@ export const LEVELS: Level[] = [LevelSchema.parse({
     station: { x: 309, y: 212 },
     npc: { x: 350, y: 261, name: 'REIZEL', greeting: 'The stream is up! Can you float the supplies to our side?', thanks: 'You crossed safely with everything we needed. Thank you!' }
   }
+}), LevelSchema.parse({
+  number: 10,
+  name: 'The Great Wagon Rescue',
+  world: 2,
+  hint: 'Float the stalled wagon, make the tow anchor HEAVY, then give the wagon SLIPPERY to slide through the mud!',
+  entities: [
+    { id: 'player', kind: 'bandit', label: 'YOU', x: 195, y: 521, stickers: [], behavior: 'idle' },
+    { id: 'stalled-wagon', kind: 'wagon', label: 'STALLED WAGON', x: 73, y: 300, stickers: [], behavior: 'idle' },
+    { id: 'float-turtle', kind: 'turtle', label: 'FLOAT TURTLE', x: 70, y: 510, stickers: ['FLOATING'], behavior: 'idle' },
+    { id: 'tow-anchor', kind: 'crate', label: 'TOW ANCHOR', x: 300, y: 470, stickers: [], behavior: 'idle' },
+    { id: 'weight-rock', kind: 'boulder', label: 'WEIGHT ROCK', x: 315, y: 532, stickers: ['HEAVY'], behavior: 'idle' },
+    { id: 'slick-snail', kind: 'snail', label: 'SLICK SNAIL', x: 195, y: 452, stickers: ['SLIPPERY'], behavior: 'idle' }
+  ],
+  goals: [
+    { id: 'float-wagon', x: 73, y: 300, radius: 38, targetId: 'stalled-wagon', requires: ['FLOATING'], label: 'FLOAT WAGON' },
+    { id: 'anchor-tow', x: 300, y: 470, radius: 38, targetId: 'tow-anchor', requires: ['HEAVY'], minMass: 7, label: 'ANCHOR TOW' },
+    { id: 'rescue-wagon', x: 300, y: 300, radius: 30, targetId: 'stalled-wagon', requires: ['FLOATING', 'SLIPPERY'], minSpeed: 100, label: 'RESCUE PAD' }
+  ],
+  goalOrder: 'sequential',
+  fixtures: [
+    { kind: 'hazard', x: 195, y: 300, w: 215, h: 78 },
+    { kind: 'gate', x: 195, y: 400, w: 348, h: 16, opensAfter: 2 },
+    { kind: 'gate', x: 195, y: 134, w: 348, h: 16, opensAfter: 3 }
+  ],
+  treasure: { x: 65, y: 551 },
+  gem: { x: 64, y: 241 },
+  exit: { x: 195, y: 70 },
+  par: 3,
+  solution: [
+    { source: 'float-turtle', target: 'stalled-wagon', sticker: 'FLOATING' },
+    { source: 'weight-rock', target: 'tow-anchor', sticker: 'HEAVY' },
+    { source: 'slick-snail', target: 'stalled-wagon', sticker: 'SLIPPERY' }
+  ],
+  mission: {
+    kind: 'delivery',
+    items: [{ x: 65, y: 436 }, { x: 260, y: 440 }],
+    itemName: 'wagon parcels',
+    stationLabel: 'FAMILY',
+    station: { x: 309, y: 209 },
+    npc: { x: 350, y: 259, name: 'SHMUEL', greeting: 'Our delivery wagon is stuck in the mud. Can you rescue it and bring the parcels to the family?', thanks: 'The wagon is free and the parcels arrived. What a helpful team!' }
+  }
 })];
 
 export function getLevel(number: number): Level {

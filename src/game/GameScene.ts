@@ -241,6 +241,14 @@ export class GameScene extends Phaser.Scene {
         }
         this.add.text(195, 176, 'VILLAGE STREAM', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '11px', color: '#654f61', backgroundColor: '#fff5d9', padding: { x: 7, y: 4 } }).setOrigin(.5).setDepth(1);
       }
+      if (this.level.number === 10) {
+        g.fillStyle(0xd0ac7c, .8).fillRoundedRect(35, 242, 320, 121, 17);
+        for (const x of [86, 302]) {
+          g.fillStyle(0x8b665d).fillRoundedRect(x, 242, 9, 108, 3);
+          g.fillStyle(0xf3d9a8).fillRoundedRect(x - 5, 239, 19, 10, 3);
+        }
+        this.add.text(195, 177, 'WAGON RESCUE ROUTE', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '11px', color: '#654f61', backgroundColor: '#fff5d9', padding: { x: 7, y: 4 } }).setOrigin(.5).setDepth(1);
+      }
     } else if (this.level.world === 3) {
       for (const x of [19, 348]) {
         g.fillStyle(0x788ab0, .65).fillRoundedRect(x, 160, 25, 374, 5);
@@ -459,8 +467,9 @@ export class GameScene extends Phaser.Scene {
         continue;
       }
       if (definition.kind === 'hazard') {
-        this.add.rectangle(definition.x, definition.y, definition.w, definition.h, 0x69cbe7, .8).setStrokeStyle(4, 0xe4fcff, .9).setDepth(2);
-        for (let x = definition.x - definition.w / 2 + 17; x < definition.x + definition.w / 2; x += 35) this.add.text(x, definition.y, '〰', { color: '#e9ffff', fontSize: '20px' }).setOrigin(.5).setDepth(3);
+        const mud = this.level.number === 10;
+        this.add.rectangle(definition.x, definition.y, definition.w, definition.h, mud ? 0x9b7860 : 0x69cbe7, .8).setStrokeStyle(4, mud ? 0xe9cc9d : 0xe4fcff, .9).setDepth(2);
+        for (let x = definition.x - definition.w / 2 + 17; x < definition.x + definition.w / 2; x += 35) this.add.text(x, definition.y, '〰', { color: mud ? '#e5c598' : '#e9ffff', fontSize: '20px' }).setOrigin(.5).setDepth(3);
         continue;
       }
       const gate = definition.kind === 'gate';
@@ -513,14 +522,14 @@ export class GameScene extends Phaser.Scene {
     const texture = entity.id === 'player' && this.character === 'girl' ? 'character-bandit-girl' : this.level.number === 20 && entity.id === this.level.bossId ? 'boss-robot' : `character-${entity.kind}`;
     const sprite = this.physics.add.image(entity.x, entity.y, texture).setDepth(5);
     if (entity.id === 'player') {
-      const tints: Record<string, number> = { rainbow: 0xffc4ee, robot: 0xb5eaff, knight: 0xd4d9ff, golden: 0xffd765, chicken: 0xffeed1, 'tiny-crown': 0xebc7ff, shabbos: 0xfff4e2, courier: 0xd8f6ff, 'kindness-pin': 0xffd7e2, 'village-scarf': 0xffdfce };
+      const tints: Record<string, number> = { rainbow: 0xffc4ee, robot: 0xb5eaff, knight: 0xd4d9ff, golden: 0xffd765, chicken: 0xffeed1, 'tiny-crown': 0xebc7ff, shabbos: 0xfff4e2, courier: 0xd8f6ff, 'kindness-pin': 0xffd7e2, 'village-scarf': 0xffdfce, 'rescue-badge': 0xffedbf };
       if (tints[this.cosmetic]) sprite.setTint(tints[this.cosmetic]);
     }
     sprite.setInteractive({ useHandCursor: true });
     sprite.on('pointerdown', () => this.onEntityTap(entity.id));
     const name = this.add.text(entity.x, entity.y + stats.radius + 13, entity.label ?? entity.kind.toUpperCase(), { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '10px', fontStyle: 'bold', color: '#453465', backgroundColor: '#fff9e6', padding: { x: 5, y: 2 } }).setOrigin(.5).setDepth(10);
     if (entity.id === 'player' && this.cosmetic !== 'classic') {
-      const icons: Record<string,string> = { rainbow:'🌈', robot:'🤖', knight:'🛡️', golden:'👑', chicken:'🐔', 'tiny-crown':'✨', backpack:'🎒', shabbos:'✦', courier:'🧢', 'kindness-pin':'♥', 'village-scarf':'🧣' };
+      const icons: Record<string,string> = { rainbow:'🌈', robot:'🤖', knight:'🛡️', golden:'👑', chicken:'🐔', 'tiny-crown':'✨', backpack:'🎒', shabbos:'✦', courier:'🧢', 'kindness-pin':'♥', 'village-scarf':'🧣', 'rescue-badge':'🪢' };
       this.costumeMark = this.add.text(entity.x,entity.y - stats.radius - 15,icons[this.cosmetic] ?? '',{fontSize:'23px'}).setOrigin(.5).setDepth(11);
     }
     const piece = { sprite, name, badges: [] as Phaser.GameObjects.Text[], shadow };

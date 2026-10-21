@@ -8,7 +8,7 @@ import { findTapRoute } from '../src/game/navigation';
 describe('The Runaway Pushka', () => {
   const level = LEVELS[0];
   it('has a valid original layout and a solvable sticker transfer', () => {
-    expect(LEVELS).toHaveLength(9);
+    expect(LEVELS).toHaveLength(10);
     expect(LevelSchema.safeParse(level).success).toBe(true);
     const engine = new StickerEngine(level.entities);
     for (const step of level.solution) expect(engine.transfer(step.source, step.target, step.sticker).ok).toBe(true);
@@ -57,6 +57,33 @@ describe('The Floating Bridge', () => {
     expect(findTapRoute(start, station!, 18, level.fixtures, 2, [], true)).not.toBeNull();
     expect(findTapRoute(start, level.exit, 18, level.fixtures, 1, [], true)).toBeNull();
     expect(findTapRoute(start, level.exit, 18, level.fixtures, 2, [], true)).not.toBeNull();
+  });
+});
+
+describe('The Great Wagon Rescue', () => {
+  const level = LEVELS[9];
+  it('combines buoyancy, a weighted anchor, and a fast wagon slide', () => {
+    expect(LevelSchema.safeParse(level).success).toBe(true);
+    const engine = new StickerEngine(level.entities);
+    for (const step of level.solution) expect(engine.transfer(step.source, step.target, step.sticker).ok).toBe(true);
+    const wagon = engine.get('stalled-wagon')!;
+    expect(effectiveStats(wagon).canFloat).toBe(true);
+    expect(effectiveStats(wagon).drag).toBeLessThan(effectiveStats({ ...wagon, stickers: ['FLOATING'] }).drag);
+    expect(effectiveStats(engine.get('tow-anchor')!).mass).toBeGreaterThanOrEqual(level.goals[1].minMass!);
+    let mission = startMission(level);
+    mission = collectCoin(mission, 0);
+    mission = collectCoin(mission, 1);
+    expect(missionComplete(level, mission)).toBe(false);
+    expect(missionComplete(level, depositCoins(mission))).toBe(true);
+  });
+  it('opens the parcel route after the anchor and the exit after rescue', () => {
+    const start = level.entities[0];
+    const station = level.mission?.kind === 'delivery' ? level.mission.station : null;
+    expect(station).not.toBeNull();
+    expect(findTapRoute(start, station!, 18, level.fixtures, 1, [], false)).toBeNull();
+    expect(findTapRoute(start, station!, 18, level.fixtures, 2, [], false)).not.toBeNull();
+    expect(findTapRoute(start, level.exit, 18, level.fixtures, 2, [], false)).toBeNull();
+    expect(findTapRoute(start, level.exit, 18, level.fixtures, 3, [], false)).not.toBeNull();
   });
 });
 

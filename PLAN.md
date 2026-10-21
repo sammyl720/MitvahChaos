@@ -15,19 +15,20 @@
 - Added **Chicken Soup Catastrophe**: a blocked kitchen, ordered TINY and HEAVY changes, a spill zone that resets carried supplies, and a safe route to Basya's pot.
 - Added **The Tiny Shtetl**: a miniature passage too narrow for a full sized hero, a model mechanism, Tova's request, and a documented two sticker solution.
 - Added **The Floating Bridge**: a deep stream, FLOATING raft and hero stages, and a supply delivery across the water to Reizel.
+- Completed the Shtetl world with **The Great Wagon Rescue**: a muddy wagon route, FLOATING and SLIPPERY wagon stages, a HEAVY tow anchor, Shmuel’s parcel delivery, and a rescue badge reward.
 - Generalized mission inventory and station handling for both tzedakah deposits and supply deliveries; completing level 2 unlocks an outfit and achievement.
 - Made unreleased worlds visible as previews rather than showing the original StickerChaos levels under new names.
 
 ## Next milestones
 
 1. **Reusable action system:** Extend item delivery and neighbor assistance into richer cooperation, preparation sequences, and story event triggers. Keep inventory independent from stickers.
-2. **Worlds 2–4:** Implement eleven more original solvable levels, distinct scenery, and progression. Validate each documented solution and its physical route.
+2. **Worlds 3–4:** Implement ten more original solvable levels, distinct scenery, and progression. Validate each documented solution and its physical route.
 3. **Art, audio, and rewards:** Expand original environment and character animation, create suitably licensed or original Chassidic-inspired music and effects, achievements, and cosmetic unlocks.
 4. **Release QA:** Run all automated gates, mobile screenshots, offline PWA checks, actual iPhone/iPod Safari performance checks, and religious content review. Prepare a separate deployment.
 
 ## Known issues and limits
 
-- Only levels 1–9 are playable. The original engine includes code for unreleased features and worlds that will be adapted during later milestones.
+- Only levels 1–10 are playable. The original engine includes code for unreleased features and worlds that will be adapted during later milestones.
 - Mission actions support coin collection, item delivery, and staged neighbor assistance. Preparation sequences and richer cooperation remain to be built.
 - Current music comes from the inherited procedural audio system and needs a new music direction.
 - Community review of dialogue and cultural detail is pending.
