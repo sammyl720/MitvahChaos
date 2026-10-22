@@ -30,6 +30,7 @@ describe('local progress', () => {
     expect(unlockedAchievements(progress)).toContain('desert-helper');
     expect(unlockedAchievements(progress)).toContain('winter-helper');
     expect(unlockedAchievements(progress)).toContain('jungle-guide');
+    expect(unlockedAchievements(progress)).toContain('machine-maker');
     expect(unlockedCosmetics(progress)).toContain('backpack');
     expect(unlockedCosmetics(progress)).toContain('kindness-pin');
     expect(unlockedCosmetics(progress)).toContain('village-scarf');
@@ -42,6 +43,7 @@ describe('local progress', () => {
     expect(unlockedCosmetics(progress)).toContain('desert-wrap');
     expect(unlockedCosmetics(progress)).toContain('winter-scarf');
     expect(unlockedCosmetics(progress)).toContain('leaf-pin');
+    expect(unlockedCosmetics(progress)).toContain('spark-sash');
     expect(unlockedCosmetics(progress)).toContain('tiny-crown');
   });
 });

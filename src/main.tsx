@@ -26,7 +26,8 @@ const COSMETICS = [
   { id:'festival-scarf', name:'Festival Scarf', icon:'🌿', detail:'Help Malky finish the sukkah.' },
   { id:'desert-wrap', name:'Desert Wrap', icon:'☀️', detail:'Bring supplies across the dry wadi.' },
   { id:'winter-scarf', name:'Winter Scarf', icon:'❄️', detail:'Recover Rivka’s winter supplies.' },
-  { id:'leaf-pin', name:'Leaf Pin', icon:'🍃', detail:'Help both neighbors at the jungle gathering.' }
+  { id:'leaf-pin', name:'Leaf Pin', icon:'🍃', detail:'Help both neighbors at the jungle gathering.' },
+  { id:'spark-sash', name:'Spark Sash', icon:'✨', detail:'Assemble the celebration machine.' }
 ];
 const ACHIEVEMENTS = [
   { id:'first-sticker', name:'First Sticker', icon:'🏷️', detail:'Make your first sticker transfer.' },
@@ -47,7 +48,8 @@ const ACHIEVEMENTS = [
   { id:'sukkah-builder', name:'Sukkah Builder', icon:'🌿', detail:'Build the walls and roof with Malky.' },
   { id:'desert-helper', name:'Desert Helper', icon:'☀️', detail:'Deliver both community supply packs to Ezra.' },
   { id:'winter-helper', name:'Winter Helper', icon:'❄️', detail:'Find and bring all three winter supply packs.' },
-  { id:'jungle-guide', name:'Jungle Guide', icon:'🍃', detail:'Create a safe path and help both neighbors.' }
+  { id:'jungle-guide', name:'Jungle Guide', icon:'🍃', detail:'Create a safe path and help both neighbors.' },
+  { id:'machine-maker', name:'Machine Maker', icon:'⚙️', detail:'Build the three-part celebration machine.' }
 ];
 
 function Logo({ small = false }: { small?: boolean }) { return <div className={`logo ${small ? 'small' : ''}`}><span className="logo-star">✦</span>MITZVAH <strong>CHAOS</strong><span className="logo-star">✦</span></div>; }

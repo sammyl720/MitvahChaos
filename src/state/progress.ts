@@ -87,6 +87,7 @@ export function unlockedAchievements(progress: GameProgress): string[] {
   add(progress.completedLevels.includes(16), 'desert-helper');
   add(progress.completedLevels.includes(17), 'winter-helper');
   add(progress.completedLevels.includes(18), 'jungle-guide');
+  add(progress.completedLevels.includes(19), 'machine-maker');
   add(progress.chickenTransforms >= 10, 'chicken-whisperer');
   add(progress.bounceCollisions >= 25, 'bounce-master');
   add(progress.combinations.length >= 5, 'mad-scientist');
@@ -112,6 +113,7 @@ export function unlockedCosmetics(progress: GameProgress): string[] {
   add(progress.completedLevels.includes(16), 'desert-wrap');
   add(progress.completedLevels.includes(17), 'winter-scarf');
   add(progress.completedLevels.includes(18), 'leaf-pin');
+  add(progress.completedLevels.includes(19), 'spark-sash');
   add(progress.completedLevels.some((number) => number >= 10), 'robot');
   add(progress.completedLevels.some((number) => number >= 15), 'knight');
   add(progress.completedLevels.includes(20), 'golden');

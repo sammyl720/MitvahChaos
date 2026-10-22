@@ -668,6 +668,50 @@ export const LEVELS: Level[] = [LevelSchema.parse({
       { x: 316, y: 224, name: 'MAYA', greeting: 'Please clear the vine path and steady the crossing too.', thanks: 'Now everyone can meet safely. Thank you!', needsGoal: 2 }
     ]
   }
+}), LevelSchema.parse({
+  number: 19,
+  name: 'The Worldwide Mitzvah Machine',
+  world: 4,
+  hint: 'Shrink the blocking crate, borrow FLOATING to cross the canal, then make the machine stabilizer HEAVY. Gather and assemble three parts to light the celebration machine!',
+  entities: [
+    { id: 'player', kind: 'bandit', label: 'YOU', x: 195, y: 520, stickers: [], behavior: 'idle' },
+    { id: 'blocking-crate', kind: 'crate', label: 'BLOCKING CRATE', x: 195, y: 355, stickers: [], behavior: 'idle' },
+    { id: 'tiny-snail', kind: 'snail', label: 'TINY SNAIL', x: 70, y: 510, stickers: ['TINY'], behavior: 'idle' },
+    { id: 'float-frog', kind: 'frog', label: 'FLOAT FROG', x: 315, y: 510, stickers: ['FLOATING'], behavior: 'idle' },
+    { id: 'weight-rock', kind: 'rock', label: 'WEIGHT ROCK', x: 281, y: 465, stickers: ['HEAVY'], behavior: 'idle' },
+    { id: 'machine-stabilizer', kind: 'boulder', label: 'STABILIZER', x: 85, y: 223, stickers: [], behavior: 'idle' }
+  ],
+  goals: [
+    { id: 'clear-workshop', x: 195, y: 355, radius: 36, targetId: 'blocking-crate', requires: ['TINY'], label: 'CLEAR WORKSHOP' },
+    { id: 'cross-canal', x: 195, y: 520, radius: 38, targetId: 'player', requires: ['FLOATING'], label: 'CROSS CANAL' },
+    { id: 'steady-machine', x: 85, y: 223, radius: 37, targetId: 'machine-stabilizer', requires: ['HEAVY'], minMass: 10, label: 'STEADY MACHINE' }
+  ],
+  goalOrder: 'sequential',
+  fixtures: [
+    { kind: 'gate', x: 195, y: 408, w: 348, h: 16, opensAfter: 1 },
+    { kind: 'wall', x: 70, y: 355, w: 140, h: 18 },
+    { kind: 'wall', x: 320, y: 355, w: 140, h: 18 },
+    { kind: 'hazard', x: 195, y: 290, w: 350, h: 70 },
+    { kind: 'gate', x: 195, y: 135, w: 348, h: 16, opensAfter: 3 }
+  ],
+  treasure: { x: 140, y: 551 },
+  gem: { x: 65, y: 201 },
+  exit: { x: 195, y: 70 },
+  par: 3,
+  solution: [
+    { source: 'tiny-snail', target: 'blocking-crate', sticker: 'TINY' },
+    { source: 'float-frog', target: 'player', sticker: 'FLOATING' },
+    { source: 'weight-rock', target: 'machine-stabilizer', sticker: 'HEAVY' }
+  ],
+  mission: {
+    kind: 'delivery',
+    assembly: true,
+    items: [{ x: 65, y: 459 }, { x: 315, y: 386 }, { x: 220, y: 245 }],
+    itemName: 'machine part',
+    stationLabel: 'MACHINE',
+    station: { x: 311, y: 205 },
+    npc: { x: 350, y: 260, name: 'NOAM', greeting: 'Our celebration machine needs its three parts. Can you clear the workshop, cross the canal, and help me assemble it?', thanks: 'The machine is ready to brighten our gathering. Thank you for putting it together!' }
+  }
 })];
 
 export function getLevel(number: number): Level {
