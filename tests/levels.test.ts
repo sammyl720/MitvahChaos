@@ -8,7 +8,7 @@ import { findTapRoute } from '../src/game/navigation';
 describe('The Runaway Pushka', () => {
   const level = LEVELS[0];
   it('has a valid original layout and a solvable sticker transfer', () => {
-    expect(LEVELS).toHaveLength(15);
+    expect(LEVELS).toHaveLength(16);
     expect(LevelSchema.safeParse(level).success).toBe(true);
     const engine = new StickerEngine(level.entities);
     for (const step of level.solution) expect(engine.transfer(step.source, step.target, step.sticker).ok).toBe(true);
@@ -62,6 +62,34 @@ describe('The Great Sukkah Scramble', () => {
     for (const destination of [...missionItems(level), station!, level.treasure, level.exit]) {
       expect(findTapRoute(start, destination, 18, level.fixtures, 3, [], false)).not.toBeNull();
     }
+  });
+});
+
+describe('The Desert Delivery', () => {
+  const level = LEVELS[15];
+  it('floats the cargo and hero before weighting the far anchor', () => {
+    expect(LevelSchema.safeParse(level).success).toBe(true);
+    const engine = new StickerEngine(level.entities);
+    for (const step of level.solution) expect(engine.transfer(step.source, step.target, step.sticker).ok).toBe(true);
+    expect(effectiveStats(engine.get('cargo-glider')!).canFloat).toBe(true);
+    expect(effectiveStats(engine.get('player')!).canFloat).toBe(true);
+    expect(effectiveStats(engine.get('far-anchor')!).mass).toBeGreaterThanOrEqual(10);
+  });
+  it('makes the dry wadi a real route barrier until FLOATING is acquired', () => {
+    const start = level.entities[0];
+    const station = level.mission?.kind === 'delivery' ? level.mission.station : null;
+    expect(station).not.toBeNull();
+    expect(findTapRoute(start, station!, 18, level.fixtures, 3, [], false)).toBeNull();
+    expect(findTapRoute(start, level.exit, 18, level.fixtures, 2, [], true)).toBeNull();
+    for (const destination of [...missionItems(level), station!, level.treasure, level.exit]) {
+      expect(findTapRoute(start, destination, 18, level.fixtures, 3, [], true)).not.toBeNull();
+    }
+    let mission = startMission(level);
+    mission = collectCoin(mission, 0);
+    mission = collectCoin(mission, 1);
+    expect(missionComplete(level, mission)).toBe(false);
+    mission = depositCoins(mission);
+    expect(missionComplete(level, mission)).toBe(true);
   });
 });
 

@@ -142,7 +142,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private drawBackground(): void {
-    const p = palette[this.level.world - 1];
+    const p = this.level.number === 16 ? { sky: 0xf7d7a0, ground: 0xf2c980, accent: 0xc58c60, dark: '#704d45' } : palette[this.level.world - 1];
     const g = this.add.graphics();
     g.fillStyle(p.sky).fillRect(0, 0, W, H);
     g.fillStyle(p.ground).fillRoundedRect(8, 33, W - 16, H - 44, 36);
@@ -161,6 +161,12 @@ export class GameScene extends Phaser.Scene {
     } else if (this.level.world === 3) {
       for (let i = 0; i < 9; i++) { g.fillStyle(0x879bc2, .28).fillRoundedRect(18 + i * 44, 110 + (i % 2) * 205, 33, 58, 5); }
       if (this.level.number === 12) g.fillStyle(0x8bd4e6,.7).fillRoundedRect(114, 344, 163, 38, 15);
+    } else if (this.level.number === 16) {
+      for (const [x, y, radius] of [[65, 226, 55], [312, 199, 69], [75, 505, 53], [315, 510, 58]] as const) {
+        g.fillStyle(0xdeab71, .55).fillEllipse(x, y, radius * 2, radius * .7);
+        g.fillStyle(0xffe3a7, .62).fillEllipse(x - 8, y - 7, radius * 1.5, radius * .45);
+      }
+      g.fillStyle(0xb67b5b, .37).fillRoundedRect(15, 310, 360, 86, 9);
     } else {
       for (let i = 0; i < 7; i++) { g.lineStyle(7, 0xe891ec, .25).strokeCircle(33 + i * 57, 168 + (i % 3) * 148, 24); g.fillStyle(0x7fe1ed, .2).fillCircle(33 + i * 57, 168 + (i % 3) * 148, 10); }
       g.lineStyle(8, 0x7ed7df, .3).lineBetween(20, 350, 369, 350);
@@ -315,6 +321,17 @@ export class GameScene extends Phaser.Scene {
         g.lineStyle(3, 0xa88a79).strokeRoundedRect(112, 185, 166, 105, 9);
         this.add.text(195, 169, 'SUKKAH BUILD SITE', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '11px', color: '#624f7a', backgroundColor: '#fff5dc', padding: { x: 7, y: 4 } }).setOrigin(.5).setDepth(1);
       }
+    } else if (this.level.number === 16) {
+      for (const [x, y] of [[35, 171], [337, 183], [36, 432], [339, 473]] as const) {
+        g.fillStyle(0xa87452, .82).fillRoundedRect(x - 7, y, 14, 56, 6);
+        g.fillStyle(0x6fa37b, .9).fillEllipse(x, y - 5, 44, 17);
+        g.fillStyle(0x84b68c, .8).fillEllipse(x - 13, y - 20, 18, 43);
+        g.fillStyle(0x84b68c, .8).fillEllipse(x + 13, y - 19, 18, 43);
+      }
+      g.fillStyle(0xe4aa73, .82).fillRoundedRect(131, 172, 128, 72, 7);
+      g.lineStyle(3, 0x966845).strokeRoundedRect(131, 172, 128, 72, 7);
+      g.fillStyle(0xf7e0b3, .9).fillTriangle(122, 174, 195, 145, 268, 174);
+      this.add.text(195, 163, 'DESERT WELCOME TENT', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '11px', color: '#694a3b', backgroundColor: '#fff0c9', padding: { x: 7, y: 4 } }).setOrigin(.5).setDepth(1);
     } else {
       for (const [x, bend, color] of [[25, 127, 0x67dce6], [365, 261, 0xe599f5]] as const) {
         g.lineStyle(9, color, .5).lineBetween(x, 101, x, 525);
@@ -596,8 +613,9 @@ export class GameScene extends Phaser.Scene {
       }
       if (definition.kind === 'hazard') {
         const mud = this.level.number === 10;
-        this.add.rectangle(definition.x, definition.y, definition.w, definition.h, mud ? 0x9b7860 : 0x69cbe7, .8).setStrokeStyle(4, mud ? 0xe9cc9d : 0xe4fcff, .9).setDepth(2);
-        for (let x = definition.x - definition.w / 2 + 17; x < definition.x + definition.w / 2; x += 35) this.add.text(x, definition.y, '〰', { color: mud ? '#e5c598' : '#e9ffff', fontSize: '20px' }).setOrigin(.5).setDepth(3);
+        const wadi = this.level.number === 16;
+        this.add.rectangle(definition.x, definition.y, definition.w, definition.h, mud ? 0x9b7860 : wadi ? 0x9f6956 : 0x69cbe7, .8).setStrokeStyle(4, mud ? 0xe9cc9d : wadi ? 0xe5b47c : 0xe4fcff, .9).setDepth(2);
+        for (let x = definition.x - definition.w / 2 + 17; x < definition.x + definition.w / 2; x += 35) this.add.text(x, definition.y, wadi ? '◡' : '〰', { color: mud ? '#e5c598' : wadi ? '#efbd87' : '#e9ffff', fontSize: '20px' }).setOrigin(.5).setDepth(3);
         continue;
       }
       const gate = definition.kind === 'gate';
@@ -650,14 +668,14 @@ export class GameScene extends Phaser.Scene {
     const texture = entity.id === 'player' && this.character === 'girl' ? 'character-bandit-girl' : this.level.number === 20 && entity.id === this.level.bossId ? 'boss-robot' : `character-${entity.kind}`;
     const sprite = this.physics.add.image(entity.x, entity.y, texture).setDepth(5);
     if (entity.id === 'player') {
-      const tints: Record<string, number> = { rainbow: 0xffc4ee, robot: 0xb5eaff, knight: 0xd4d9ff, golden: 0xffd765, chicken: 0xffeed1, 'tiny-crown': 0xebc7ff, shabbos: 0xfff4e2, courier: 0xd8f6ff, 'kindness-pin': 0xffd7e2, 'village-scarf': 0xffdfce, 'rescue-badge': 0xffedbf, 'festival-cap': 0xe9d8ff, 'blue-sash': 0xc6efff, 'purim-ribbon': 0xffd8ee, 'prep-apron': 0xffeed2, 'festival-scarf': 0xdcf3c4 };
+      const tints: Record<string, number> = { rainbow: 0xffc4ee, robot: 0xb5eaff, knight: 0xd4d9ff, golden: 0xffd765, chicken: 0xffeed1, 'tiny-crown': 0xebc7ff, shabbos: 0xfff4e2, courier: 0xd8f6ff, 'kindness-pin': 0xffd7e2, 'village-scarf': 0xffdfce, 'rescue-badge': 0xffedbf, 'festival-cap': 0xe9d8ff, 'blue-sash': 0xc6efff, 'purim-ribbon': 0xffd8ee, 'prep-apron': 0xffeed2, 'festival-scarf': 0xdcf3c4, 'desert-wrap': 0xffddb0 };
       if (tints[this.cosmetic]) sprite.setTint(tints[this.cosmetic]);
     }
     sprite.setInteractive({ useHandCursor: true });
     sprite.on('pointerdown', () => this.onEntityTap(entity.id));
     const name = this.add.text(entity.x, entity.y + stats.radius + 13, entity.label ?? entity.kind.toUpperCase(), { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '10px', fontStyle: 'bold', color: '#453465', backgroundColor: '#fff9e6', padding: { x: 5, y: 2 } }).setOrigin(.5).setDepth(10);
     if (entity.id === 'player' && this.cosmetic !== 'classic') {
-      const icons: Record<string,string> = { rainbow:'🌈', robot:'🤖', knight:'🛡️', golden:'👑', chicken:'🐔', 'tiny-crown':'✨', backpack:'🎒', shabbos:'✦', courier:'🧢', 'kindness-pin':'♥', 'village-scarf':'🧣', 'rescue-badge':'🪢', 'festival-cap':'🎉', 'blue-sash':'🩵', 'purim-ribbon':'🎀', 'prep-apron':'🧺', 'festival-scarf':'🌿' };
+      const icons: Record<string,string> = { rainbow:'🌈', robot:'🤖', knight:'🛡️', golden:'👑', chicken:'🐔', 'tiny-crown':'✨', backpack:'🎒', shabbos:'✦', courier:'🧢', 'kindness-pin':'♥', 'village-scarf':'🧣', 'rescue-badge':'🪢', 'festival-cap':'🎉', 'blue-sash':'🩵', 'purim-ribbon':'🎀', 'prep-apron':'🧺', 'festival-scarf':'🌿', 'desert-wrap':'☀️' };
       this.costumeMark = this.add.text(entity.x,entity.y - stats.radius - 15,icons[this.cosmetic] ?? '',{fontSize:'23px'}).setOrigin(.5).setDepth(11);
     }
     const piece = { sprite, name, badges: [] as Phaser.GameObjects.Text[], shadow };
@@ -1038,12 +1056,12 @@ export class GameScene extends Phaser.Scene {
       for (const fixture of this.level.fixtures) {
         if (Math.abs(piece.sprite.x - fixture.x) > fixture.w / 2 || Math.abs(piece.sprite.y - fixture.y) > fixture.h / 2) continue;
         if (fixture.kind === 'hazard' && !effectiveStats(entity).canFloat) {
-          if (this.level.number === 9 && entity.id === 'player') {
+          if ((this.level.number === 9 || this.level.number === 16) && entity.id === 'player') {
             const side = piece.sprite.y < fixture.y ? -1 : 1;
             piece.sprite.y = fixture.y + side * (fixture.h / 2 + effectiveStats(entity).radius + 2);
             piece.sprite.setVelocity(0, 0);
             this.tapRoute = [];
-            if (this.tick - this.lastHazardNotice > 1200) { this.lastHazardNotice = this.tick; this.say('The stream is too deep. Try FLOATING!'); }
+            if (this.tick - this.lastHazardNotice > 1200) { this.lastHazardNotice = this.tick; this.say(this.level.number === 16 ? 'The dry wadi is too wide. Try FLOATING!' : 'The stream is too deep. Try FLOATING!'); }
           } else piece.sprite.setVelocity(piece.sprite.body?.velocity.x ?? 0, piece.sprite.y < fixture.y ? -105 : 105);
         }
         if (fixture.kind === 'conveyor' && !effectiveStats(entity).canFloat) piece.sprite.setVelocity((piece.sprite.body?.velocity.x ?? 0) + (fixture.dx ?? 0) * .35, (piece.sprite.body?.velocity.y ?? 0) + (fixture.dy ?? 0) * .35);

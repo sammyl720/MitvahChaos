@@ -550,6 +550,46 @@ export const LEVELS: Level[] = [LevelSchema.parse({
     station: { x: 310, y: 209 },
     npc: { x: 350, y: 261, name: 'MALKY', greeting: 'Our sukkah building supplies are scattered. Can you clear the area and help us build the walls before placing the roof slats?', thanks: 'The sukkah is ready for everyone to gather. Thank you for building with us!' }
   }
+}), LevelSchema.parse({
+  number: 16,
+  name: 'The Desert Delivery',
+  world: 4,
+  hint: 'Give the cargo glider FLOATING, borrow FLOATING for yourself, and make the far-bank anchor HEAVY. Carry the supplies across the dry wadi to Ezra!',
+  entities: [
+    { id: 'player', kind: 'bandit', label: 'YOU', x: 195, y: 520, stickers: [], behavior: 'idle' },
+    { id: 'cargo-glider', kind: 'wagon', label: 'CARGO GLIDER', x: 195, y: 449, stickers: [], behavior: 'idle' },
+    { id: 'float-turtle', kind: 'turtle', label: 'FLOAT TURTLE', x: 72, y: 510, stickers: ['FLOATING'], behavior: 'idle' },
+    { id: 'float-frog', kind: 'frog', label: 'FLOAT FROG', x: 316, y: 510, stickers: ['FLOATING'], behavior: 'idle' },
+    { id: 'far-anchor', kind: 'boulder', label: 'FAR ANCHOR', x: 85, y: 255, stickers: [], behavior: 'idle' },
+    { id: 'weight-rock', kind: 'rock', label: 'WEIGHT ROCK', x: 282, y: 460, stickers: ['HEAVY'], behavior: 'idle' }
+  ],
+  goals: [
+    { id: 'float-cargo', x: 195, y: 449, radius: 38, targetId: 'cargo-glider', requires: ['FLOATING'], label: 'FLOAT CARGO' },
+    { id: 'cross-wadi', x: 195, y: 520, radius: 38, targetId: 'player', requires: ['FLOATING'], label: 'CROSS WADI' },
+    { id: 'steady-anchor', x: 85, y: 255, radius: 38, targetId: 'far-anchor', requires: ['HEAVY'], minMass: 10, label: 'STEADY ANCHOR' }
+  ],
+  goalOrder: 'sequential',
+  fixtures: [
+    { kind: 'hazard', x: 195, y: 352, w: 350, h: 94 },
+    { kind: 'gate', x: 195, y: 135, w: 348, h: 16, opensAfter: 3 }
+  ],
+  treasure: { x: 140, y: 551 },
+  gem: { x: 65, y: 205 },
+  exit: { x: 195, y: 70 },
+  par: 3,
+  solution: [
+    { source: 'float-turtle', target: 'cargo-glider', sticker: 'FLOATING' },
+    { source: 'float-frog', target: 'player', sticker: 'FLOATING' },
+    { source: 'weight-rock', target: 'far-anchor', sticker: 'HEAVY' }
+  ],
+  mission: {
+    kind: 'delivery',
+    items: [{ x: 65, y: 455 }, { x: 305, y: 275 }],
+    itemName: 'community supply pack',
+    stationLabel: 'WELCOME TENT',
+    station: { x: 311, y: 207 },
+    npc: { x: 350, y: 265, name: 'EZRA', greeting: 'Our community supplies are on both sides of the dry wadi. Can you float across and bring them to the welcome tent?', thanks: 'Everything arrived safely. Now our visitors have what they need!' }
+  }
 })];
 
 export function getLevel(number: number): Level {
