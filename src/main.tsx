@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import Phaser from 'phaser';
 import { GameScene, type SceneStatus } from './game/GameScene';
-import { playSound, setMusicPaused, setMusicVolume, startMusic, stopMusic } from './game/audio';
+import { playSound, setMusicPaused, setMusicVolume, startCelebrationMusic, startMusic, stopMusic } from './game/audio';
 import { getLevel, LEVELS, WORLD_ICONS, WORLD_NAMES } from './game/levels';
 import { missionGoalCount } from './game/mission';
 import { STICKER_INFO, STICKERS, type StickerType } from './game/model';
@@ -27,7 +27,8 @@ const COSMETICS = [
   { id:'desert-wrap', name:'Desert Wrap', icon:'☀️', detail:'Bring supplies across the dry wadi.' },
   { id:'winter-scarf', name:'Winter Scarf', icon:'❄️', detail:'Recover Rivka’s winter supplies.' },
   { id:'leaf-pin', name:'Leaf Pin', icon:'🍃', detail:'Help both neighbors at the jungle gathering.' },
-  { id:'spark-sash', name:'Spark Sash', icon:'✨', detail:'Assemble the celebration machine.' }
+  { id:'spark-sash', name:'Spark Sash', icon:'✨', detail:'Assemble the celebration machine.' },
+  { id:'golden', name:'Golden Celebration Outfit', icon:'👑', detail:'Complete The Grand Mitzvah Celebration.' }
 ];
 const ACHIEVEMENTS = [
   { id:'first-sticker', name:'First Sticker', icon:'🏷️', detail:'Make your first sticker transfer.' },
@@ -49,7 +50,9 @@ const ACHIEVEMENTS = [
   { id:'desert-helper', name:'Desert Helper', icon:'☀️', detail:'Deliver both community supply packs to Ezra.' },
   { id:'winter-helper', name:'Winter Helper', icon:'❄️', detail:'Find and bring all three winter supply packs.' },
   { id:'jungle-guide', name:'Jungle Guide', icon:'🍃', detail:'Create a safe path and help both neighbors.' },
-  { id:'machine-maker', name:'Machine Maker', icon:'⚙️', detail:'Build the three-part celebration machine.' }
+  { id:'machine-maker', name:'Machine Maker', icon:'⚙️', detail:'Build the three-part celebration machine.' },
+  { id:'grand-gathering', name:'Grand Gathering', icon:'🌍', detail:'Bring a welcome kit to both friends in the finale.' },
+  { id:'problem-solver', name:'Problem Solver', icon:'🏆', detail:'Complete all twenty missions.' }
 ];
 
 function Logo({ small = false }: { small?: boolean }) { return <div className={`logo ${small ? 'small' : ''}`}><span className="logo-star">✦</span>MITZVAH <strong>CHAOS</strong><span className="logo-star">✦</span></div>; }
@@ -87,7 +90,7 @@ function GameScreen({ number, onBack, onNext }: { number:number; onBack:()=>void
       onStatus: setStatus,
       onTransfer: (sticker,sourceKind,stickers) => recordTransfer(sticker,sourceKind,stickers),
       onBounce: () => recordBounce(),
-      onComplete: (stars,gem,tiny) => { completeLevel(number,stars,gem,tiny); setResult({stars,gem}); }
+      onComplete: (stars,gem,tiny) => { completeLevel(number,stars,gem,tiny); if (number === 20) startCelebrationMusic(progress.settings.musicVolume); setResult({stars,gem}); }
     }, progress.settings, progress.selectedCosmetic, progress.selectedCharacter);
     startMusic(level.world, progress.settings.musicVolume);
     scene.current = gameScene;
@@ -112,7 +115,7 @@ function GameScreen({ number, onBack, onNext }: { number:number; onBack:()=>void
     achievementsSeen.current = progress.achievements.length;
   },[progress.achievements.length,progress.settings.effectsVolume]);
   const resume = () => {setPaused(false);setPauseSettings(false);setMusicPaused(false);scene.current?.setPaused(false);};
-  const restart = () => {setResult(null);setPaused(false);setPauseSettings(false);setMusicPaused(false);scene.current?.setPaused(false);scene.current?.restart();};
+  const restart = () => {setResult(null);setPaused(false);setPauseSettings(false);setMusicPaused(false);if(number===20) startMusic(level.world,progress.settings.musicVolume);scene.current?.setPaused(false);scene.current?.restart();};
   const helpedName = level.mission?.kind === 'neighbors' || level.mission?.kind === 'deliveries' ? 'your neighbors' : level.mission ? level.mission.npc.name[0] + level.mission.npc.name.slice(1).toLowerCase() : 'someone';
   return <main className="game-screen">
     <header className="game-top"><button className="icon-button" onClick={() => {setPaused(true);setMusicPaused(true);scene.current?.setPaused(true);}} aria-label="Pause">Ⅱ</button><div className="game-title"><small>{WORLD_NAMES[level.world-1]} · Level {number}</small><strong>{level.name}</strong></div><div className="game-progress"><span>🎁 {status.treasure?'✓':'0/1'}</span><span>💎 {status.gem?'✓':'0/1'}</span></div></header>
@@ -123,7 +126,7 @@ function GameScreen({ number, onBack, onNext }: { number:number; onBack:()=>void
       <div className="sticker-tray">{status.selected?<><span className="tray-title">{status.selected.kind.toUpperCase()} STICKERS</span><div className="tray-stickers">{status.selected.stickers.length?status.selected.stickers.map((sticker)=><button key={sticker} className={`sticker-pill ${status.armed===sticker?'armed':''}`} style={{'--sticker':STICKER_INFO[sticker].color} as React.CSSProperties} onClick={()=>scene.current?.selectSticker(sticker)}>{STICKER_INFO[sticker].icon} {sticker}</button>):<span className="tray-empty">Tap a stickered object</span>}</div></>:<><span className="tray-title">HOW TO PLAY</span><span className="tray-empty">Tap an object, choose a sticker, then tap a new home. Or drag a sticker!</span></>}</div></div>
     </div>
     {paused && <div className="modal-backdrop"><div className="modal-card">{pauseSettings ? <><h2>Settings</h2><div className="pause-settings"><label>🎵 Music volume<input aria-label="Music volume" type="range" min="0" max="1" step="0.05" value={progress.settings.musicVolume} onChange={(event)=>setSettings({musicVolume:Number(event.target.value)})}/></label><label>🔊 Sound effects<input aria-label="Sound effects volume" type="range" min="0" max="1" step="0.05" value={progress.settings.effectsVolume} onChange={(event)=>setSettings({effectsVolume:Number(event.target.value)})}/></label><label className="pause-toggle">✨ Reduced motion<input type="checkbox" checked={progress.settings.reducedMotion} onChange={(event)=>setSettings({reducedMotion:event.target.checked})}/></label><label className="pause-toggle">🪶 Low graphics<input type="checkbox" checked={progress.settings.graphicsQuality==='low'} onChange={(event)=>setSettings({graphicsQuality:event.target.checked?'low':'standard'})}/></label><p>Graphics quality changes when you reopen a level.</p><div className="segmented"><button className={progress.settings.controlMode==='joystick'?'active':''} onClick={()=>setSettings({controlMode:'joystick'})}>Joystick</button><button className={progress.settings.controlMode==='tap'?'active':''} onClick={()=>setSettings({controlMode:'tap'})}>Tap to move</button></div></div><button className="secondary-button" onClick={()=>setPauseSettings(false)}>BACK TO PAUSE</button></> : <><div className="modal-icon">⏸️</div><h2>Taking a breather?</h2><p>Your sticker puzzle is right where you left it.</p><button className="primary-button" onClick={resume}>RESUME</button><button className="secondary-button" onClick={restart}>RESTART LEVEL</button><button className="secondary-button" onClick={()=>setPauseSettings(true)}>SETTINGS</button><button className="text-button" onClick={onBack}>WORLD MAP</button></>}</div></div>}
-    {result && <div className="modal-backdrop"><div className={`modal-card victory ${number===20?'finale':''}`}><div className="modal-icon">{number===20?'🌍':'🎉'}</div><h2>{number===20?'Grand celebration!':'Mitzvah accomplished!'}</h2><div className="big-stars">{'⭐'.repeat(result.stars)}{'☆'.repeat(3-result.stars)}</div><p>{result.gem?'You found the secret gem too!':`You helped ${helpedName}. Try again for the secret gem!`}</p><button className="primary-button" onClick={()=>number<LEVELS.length?onNext(number+1):onBack()}>{number<LEVELS.length?'NEXT LEVEL →':'WORLD MAP'}</button><button className="secondary-button" onClick={restart}>PLAY AGAIN</button></div></div>}
+    {result && <div className={`modal-backdrop ${progress.settings.reducedMotion?'reduced-motion':''}`}><div className={`modal-card victory ${number===20?'finale':''}`}>{number===20 && <div className="finale-confetti" aria-hidden="true">{Array.from({length:14},(_,index)=><span key={index} style={{left:`${(index*29)%100}%`,animationDelay:`-${index*.19}s`}}>✦</span>)}</div>}<div className="modal-icon">{number===20?'🌍':'🎉'}</div><h2>{number===20?'Grand celebration!':'Mitzvah accomplished!'}</h2>{number===20 && <><div className="finale-dance" aria-hidden="true"><span>🕺</span><span>🎉</span><span>💃</span></div><p>Welcome kits delivered. Everyone can celebrate together!</p></>}<div className="big-stars">{'⭐'.repeat(result.stars)}{'☆'.repeat(3-result.stars)}</div><p>{result.gem?'You found the secret gem too!':`You helped ${helpedName}. Try again for the secret gem!`}</p><button className="primary-button" onClick={()=>number<LEVELS.length?onNext(number+1):onBack()}>{number<LEVELS.length?'NEXT LEVEL →':'WORLD MAP'}</button><button className="secondary-button" onClick={restart}>PLAY AGAIN</button></div></div>}
   </main>;
 }
 

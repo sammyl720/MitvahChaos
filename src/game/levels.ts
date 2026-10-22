@@ -712,6 +712,48 @@ export const LEVELS: Level[] = [LevelSchema.parse({
     station: { x: 311, y: 205 },
     npc: { x: 350, y: 260, name: 'NOAM', greeting: 'Our celebration machine needs its three parts. Can you clear the workshop, cross the canal, and help me assemble it?', thanks: 'The machine is ready to brighten our gathering. Thank you for putting it together!' }
   }
+}), LevelSchema.parse({
+  number: 20,
+  name: 'The Grand Mitzvah Celebration',
+  world: 4,
+  hint: 'Borrow FAST, bounce the celebration ball into place, and make the welcome stand HEAVY. Carry a welcome kit to both friends to bring everyone together!',
+  entities: [
+    { id: 'player', kind: 'bandit', label: 'YOU', x: 195, y: 520, stickers: [], behavior: 'idle' },
+    { id: 'fast-bot', kind: 'robot', label: 'FAST BOT', x: 70, y: 508, stickers: ['FAST'], behavior: 'idle' },
+    { id: 'bounce-frog', kind: 'frog', label: 'BOUNCE FROG', x: 316, y: 508, stickers: ['BOUNCY'], behavior: 'idle' },
+    { id: 'celebration-ball', kind: 'ball', label: 'CELEBRATION BALL', x: 80, y: 320, stickers: [], behavior: 'idle' },
+    { id: 'weight-rock', kind: 'rock', label: 'WEIGHT ROCK', x: 283, y: 465, stickers: ['HEAVY'], behavior: 'idle' },
+    { id: 'welcome-stand', kind: 'boulder', label: 'WELCOME STAND', x: 125, y: 245, stickers: [], behavior: 'idle' }
+  ],
+  goals: [
+    { id: 'quick-preparation', x: 195, y: 520, radius: 38, targetId: 'player', requires: ['FAST'], label: 'PREPARE FAST' },
+    { id: 'balloons-in-place', x: 300, y: 320, radius: 32, targetId: 'celebration-ball', requires: ['BOUNCY'], minSpeed: 100, label: 'CELEBRATE' },
+    { id: 'steady-welcome', x: 125, y: 245, radius: 37, targetId: 'welcome-stand', requires: ['HEAVY'], minMass: 10, label: 'STEADY STAND' }
+  ],
+  goalOrder: 'sequential',
+  fixtures: [
+    { kind: 'gate', x: 195, y: 408, w: 348, h: 16, opensAfter: 1 },
+    { kind: 'gate', x: 195, y: 285, w: 348, h: 16, opensAfter: 2 },
+    { kind: 'gate', x: 195, y: 135, w: 348, h: 16, opensAfter: 3 }
+  ],
+  treasure: { x: 135, y: 551 },
+  gem: { x: 65, y: 201 },
+  exit: { x: 195, y: 70 },
+  par: 3,
+  solution: [
+    { source: 'fast-bot', target: 'player', sticker: 'FAST' },
+    { source: 'bounce-frog', target: 'celebration-ball', sticker: 'BOUNCY' },
+    { source: 'weight-rock', target: 'welcome-stand', sticker: 'HEAVY' }
+  ],
+  mission: {
+    kind: 'deliveries',
+    items: [{ x: 65, y: 455 }, { x: 318, y: 455 }],
+    itemName: 'welcome kit',
+    people: [
+      { x: 75, y: 222, name: 'MIRIAM', greeting: 'Can you bring a welcome kit for our guests?', thanks: 'Thank you! Our guests will feel right at home.' },
+      { x: 316, y: 222, name: 'YOSEF', greeting: 'Please bring a welcome kit to this side too.', thanks: 'Wonderful! Everyone can join the celebration now.' }
+    ]
+  }
 })];
 
 export function getLevel(number: number): Level {

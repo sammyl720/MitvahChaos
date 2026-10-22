@@ -26,3 +26,15 @@
 
 /* Keep the mission text in its own strip so it never covers the playfield. */
 .game-screen>.stage-hint{position:static;flex:none;transform:none;width:100%;height:52px;min-height:52px;max-height:52px;display:flex;align-items:center;justify-content:center;overflow:auto;margin:0;border:0;border-bottom:2px solid #ddc6ef;border-radius:0;box-shadow:none;background:#fff9e8;color:#69467e;text-align:center;font-size:clamp(.68rem,2.4vw,.82rem);font-weight:900;line-height:1.2;padding:4px 12px;touch-action:pan-y}
+
+.finale{position:relative;overflow:hidden;background:linear-gradient(150deg,#fff6ce,#f8d5e8 54%,#d3f0df)}
+.finale>*:not(.finale-confetti){position:relative;z-index:1}
+.finale-confetti{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.finale-confetti span{position:absolute;top:-30px;color:#df81b7;font-size:1.1rem;animation:finale-fall 3s linear infinite}
+.finale-confetti span:nth-child(3n){color:#e3aa58}.finale-confetti span:nth-child(3n+1){color:#63b7a6}
+.finale-dance{display:flex;justify-content:center;align-items:center;gap:13px;font-size:2rem;margin:6px 0}
+.finale-dance span{display:inline-block;animation:finale-dance .65s ease-in-out infinite alternate}
+.finale-dance span:nth-child(2){animation-delay:-.25s}.finale-dance span:nth-child(3){animation-delay:-.45s}
+@keyframes finale-fall{to{transform:translateY(420px) rotate(540deg)}}
+@keyframes finale-dance{to{transform:translateY(-9px) rotate(12deg)}}
+.reduced-motion .finale-confetti span,.reduced-motion .finale-dance span{animation:none}

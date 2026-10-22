@@ -143,7 +143,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private drawBackground(): void {
-    const p = this.level.number === 16 ? { sky: 0xf7d7a0, ground: 0xf2c980, accent: 0xc58c60, dark: '#704d45' } : this.level.number === 17 ? { sky: 0xbad7e7, ground: 0xe0eff5, accent: 0x83b7d0, dark: '#446c83' } : this.level.number === 18 ? { sky: 0x9ad7a8, ground: 0xb8dea3, accent: 0x66a27b, dark: '#38664c' } : this.level.number === 19 ? { sky: 0xa3dce0, ground: 0xd9e7cf, accent: 0x73b8ad, dark: '#3d6f70' } : palette[this.level.world - 1];
+    const p = this.level.number === 16 ? { sky: 0xf7d7a0, ground: 0xf2c980, accent: 0xc58c60, dark: '#704d45' } : this.level.number === 17 ? { sky: 0xbad7e7, ground: 0xe0eff5, accent: 0x83b7d0, dark: '#446c83' } : this.level.number === 18 ? { sky: 0x9ad7a8, ground: 0xb8dea3, accent: 0x66a27b, dark: '#38664c' } : this.level.number === 19 ? { sky: 0xa3dce0, ground: 0xd9e7cf, accent: 0x73b8ad, dark: '#3d6f70' } : this.level.number === 20 ? { sky: 0xfbd8ab, ground: 0xf1d5e5, accent: 0xc38bbd, dark: '#80557f' } : palette[this.level.world - 1];
     const g = this.add.graphics();
     g.fillStyle(p.sky).fillRect(0, 0, W, H);
     g.fillStyle(p.ground).fillRoundedRect(8, 33, W - 16, H - 44, 36);
@@ -186,6 +186,12 @@ export class GameScene extends Phaser.Scene {
         g.lineStyle(3, 0xe4f4d2, .75).strokeCircle(x, y, 27);
       }
       g.fillStyle(0x8bd0db, .56).fillRoundedRect(18, 252, 354, 75, 13);
+    } else if (this.level.number === 20) {
+      for (let i = 0; i < 18; i++) {
+        const x = 31 + (i * 57) % 332, y = 161 + (i * 83) % 371;
+        g.fillStyle([0xf6bd7d, 0x9ddbcf, 0xc9a9df][i % 3], .72).fillCircle(x, y, i % 2 ? 4 : 6);
+      }
+      g.fillStyle(0xffecc2, .64).fillRoundedRect(43, 304, 304, 58, 18);
     } else {
       for (let i = 0; i < 7; i++) { g.lineStyle(7, 0xe891ec, .25).strokeCircle(33 + i * 57, 168 + (i % 3) * 148, 24); g.fillStyle(0x7fe1ed, .2).fillCircle(33 + i * 57, 168 + (i % 3) * 148, 10); }
       g.lineStyle(8, 0x7ed7df, .3).lineBetween(20, 350, 369, 350);
@@ -381,6 +387,17 @@ export class GameScene extends Phaser.Scene {
         g.fillStyle(0xffdf91, .87).fillCircle(x, 154, 16);
       }
       this.add.text(195, 160, 'CELEBRATION WORKSHOP', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '11px', color: '#39686a', backgroundColor: '#e9f6dc', padding: { x: 7, y: 4 } }).setOrigin(.5).setDepth(1);
+    } else if (this.level.number === 20) {
+      g.lineStyle(4, 0xaa6fac, .78).lineBetween(28, 170, 362, 170);
+      for (let x = 43; x < 360; x += 36) g.fillStyle(x % 2 ? 0xf9c474 : 0x9bdace, .94).fillTriangle(x - 12, 171, x + 12, 171, x, 192);
+      g.fillStyle(0xd2a6bb, .82).fillRoundedRect(123, 183, 145, 78, 8);
+      g.fillStyle(0xffe5b6, .9).fillTriangle(111, 185, 195, 143, 280, 185);
+      for (const [x, y, color] of [[49, 216, 0xf5bd75], [342, 223, 0xa3dbcf], [45, 462, 0xc5a9e7], [346, 477, 0xf3b7cb]] as const) {
+        g.fillStyle(color, .9).fillCircle(x, y, 15);
+        g.lineStyle(2, 0xffffff, .8).strokeCircle(x, y, 15);
+        g.lineStyle(2, 0x8c7192, .6).lineBetween(x, y + 16, x, y + 55);
+      }
+      this.add.text(195, 160, 'GRAND MITZVAH GATHERING', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '11px', color: '#754c75', backgroundColor: '#fff0d4', padding: { x: 7, y: 4 } }).setOrigin(.5).setDepth(1);
     } else {
       for (const [x, bend, color] of [[25, 127, 0x67dce6], [365, 261, 0xe599f5]] as const) {
         g.lineStyle(9, color, .5).lineBetween(x, 101, x, 525);

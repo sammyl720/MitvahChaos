@@ -8,7 +8,7 @@ import { findTapRoute } from '../src/game/navigation';
 describe('The Runaway Pushka', () => {
   const level = LEVELS[0];
   it('has a valid original layout and a solvable sticker transfer', () => {
-    expect(LEVELS).toHaveLength(19);
+    expect(LEVELS).toHaveLength(20);
     expect(LevelSchema.safeParse(level).success).toBe(true);
     const engine = new StickerEngine(level.entities);
     for (const step of level.solution) expect(engine.transfer(step.source, step.target, step.sticker).ok).toBe(true);
@@ -175,6 +175,36 @@ describe('The Worldwide Mitzvah Machine', () => {
       mission = assemblePart(mission);
       expect(mission.deposited).toBe(count);
     }
+    expect(missionComplete(level, mission)).toBe(true);
+  });
+});
+
+describe('The Grand Mitzvah Celebration', () => {
+  const level = LEVELS[19];
+  it('combines FAST, BOUNCY, and HEAVY on the final route', () => {
+    expect(LevelSchema.safeParse(level).success).toBe(true);
+    const engine = new StickerEngine(level.entities);
+    const initialSpeed = effectiveStats(engine.get('player')!).speed;
+    for (const step of level.solution) expect(engine.transfer(step.source, step.target, step.sticker).ok).toBe(true);
+    expect(effectiveStats(engine.get('player')!).speed).toBeGreaterThan(initialSpeed);
+    expect(effectiveStats(engine.get('celebration-ball')!).restitution).toBeGreaterThan(.8);
+    expect(effectiveStats(engine.get('welcome-stand')!).mass).toBeGreaterThanOrEqual(10);
+  });
+  it('opens three route stages and requires a welcome kit for each friend', () => {
+    const start = level.entities[0];
+    const people = level.mission?.kind === 'deliveries' ? level.mission.people : [];
+    expect(people).toHaveLength(2);
+    expect(findTapRoute(start, people[0], 18, level.fixtures, 1, [], false)).toBeNull();
+    expect(findTapRoute(start, level.exit, 18, level.fixtures, 2, [], false)).toBeNull();
+    for (const destination of [...missionItems(level), ...people, level.treasure, level.exit]) {
+      expect(findTapRoute(start, destination, 18, level.fixtures, 3, [], false)).not.toBeNull();
+    }
+    let mission = startMission(level);
+    mission = collectCoin(mission, 0);
+    mission = collectCoin(mission, 1);
+    mission = deliverGift(mission, 0);
+    expect(missionComplete(level, mission)).toBe(false);
+    mission = deliverGift(mission, 1);
     expect(missionComplete(level, mission)).toBe(true);
   });
 });

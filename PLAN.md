@@ -25,19 +25,18 @@
 - Added **Snowy Shlichus**: a SLIPPERY sled crossing, MAGNETIC recovery of three winter supply packs, and a community home delivery.
 - Added **Jungle Mitzvah Mission**: BIG, BOUNCY, and HEAVY path stages, jungle scenery, and separate assistance for Avi and Maya.
 - Added **The Worldwide Mitzvah Machine**: three linked sticker puzzles, a canal crossing, and a visible three-part assembly display.
+- Completed the worldwide shlichus world with **The Grand Mitzvah Celebration**: FAST, BOUNCY, and HEAVY stages, two welcome-kit deliveries, a golden outfit reward, dancing, confetti, and an original synthesized finale melody.
 - Generalized mission inventory and station handling for both tzedakah deposits and supply deliveries; completing level 2 unlocks an outfit and achievement.
 - Made unreleased worlds visible as previews rather than showing the original StickerChaos levels under new names.
 
 ## Next milestones
 
-1. **Reusable action system:** Extend item delivery and neighbor assistance into richer cooperation, preparation sequences, and story event triggers. Keep inventory independent from stickers.
-2. **Worlds 3–4:** Implement the final original solvable level, distinct scenery, and progression. Validate each documented solution and its physical route.
-3. **Art, audio, and rewards:** Expand original environment and character animation, create suitably licensed or original Chassidic-inspired music and effects, achievements, and cosmetic unlocks.
-4. **Release QA:** Run all automated gates, mobile screenshots, offline PWA checks, actual iPhone/iPod Safari performance checks, and religious content review. Prepare a separate deployment.
+1. **Mission polish:** Extend delivery and neighbor assistance into richer cooperation, preparation sequences, and story events. Keep inventory independent from stickers.
+2. **Art and audio:** Expand original environment and character animation, and develop a broader original music direction for all four worlds.
+3. **Release QA:** Run the automated gates and mobile screenshots, verify offline PWA behavior, test on an actual iPhone or iPod touch, and obtain community review of religious content.
 
 ## Known issues and limits
 
-- Only levels 1–19 are playable. The original engine includes code for unreleased features and worlds that will be adapted during later milestones.
 - Mission actions support coin collection, item delivery, staged neighbor assistance, and simple display assembly, and separate gifts for multiple recipients. Preparation sequences and richer cooperation remain to be built.
-- Current music comes from the inherited procedural audio system and needs a new music direction.
+- Most world music comes from the inherited procedural audio system; the finale now has an original synthesized melody.
 - Community review of dialogue and cultural detail is pending.

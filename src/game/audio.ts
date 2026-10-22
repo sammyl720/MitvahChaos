@@ -59,6 +59,18 @@ export function startMusic(world: number, volume: number): void {
     musicStep++;
   }, 315);
 }
+// A short original melody for the final gathering, played with the same local synthesizer.
+const celebrationMelody = [523, 659, 784, 1047, 988, 784, 659, 698, 784, 880, 1047, 1175, 1047, 880, 784, 659];
+export function startCelebrationMusic(volume: number): void {
+  stopMusic(); musicStep = 0; musicPaused = false; musicVolume = volume;
+  musicTimer = window.setInterval(() => {
+    if (musicPaused) return;
+    const note = celebrationMelody[musicStep % celebrationMelody.length];
+    musicNote(note, musicVolume * 1.15);
+    if (musicStep % 2 === 0) musicNote(note / 2, musicVolume * .45);
+    musicStep++;
+  }, 245);
+}
 export function setMusicPaused(value: boolean): void { musicPaused = value; }
 export function setMusicVolume(value: number): void { musicVolume = value; }
 export function stopMusic(): void { if (musicTimer !== null) window.clearInterval(musicTimer); musicTimer = null; }
