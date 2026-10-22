@@ -8,7 +8,7 @@ import { findTapRoute } from '../src/game/navigation';
 describe('The Runaway Pushka', () => {
   const level = LEVELS[0];
   it('has a valid original layout and a solvable sticker transfer', () => {
-    expect(LEVELS).toHaveLength(17);
+    expect(LEVELS).toHaveLength(18);
     expect(LevelSchema.safeParse(level).success).toBe(true);
     const engine = new StickerEngine(level.entities);
     for (const step of level.solution) expect(engine.transfer(step.source, step.target, step.sticker).ok).toBe(true);
@@ -116,6 +116,34 @@ describe('Snowy Shlichus', () => {
     for (let index = 0; index < 3; index++) mission = collectCoin(mission, index);
     expect(missionComplete(level, mission)).toBe(false);
     expect(missionComplete(level, depositCoins(mission))).toBe(true);
+  });
+});
+
+describe('Jungle Mitzvah Mission', () => {
+  const level = LEVELS[17];
+  it('uses BIG, BOUNCY, and HEAVY on three distinct path objects', () => {
+    expect(LevelSchema.safeParse(level).success).toBe(true);
+    const engine = new StickerEngine(level.entities);
+    const initialRadius = effectiveStats(engine.get('bridge-crate')!).radius;
+    for (const step of level.solution) expect(engine.transfer(step.source, step.target, step.sticker).ok).toBe(true);
+    expect(effectiveStats(engine.get('bridge-crate')!).radius).toBeGreaterThan(initialRadius * 1.5);
+    expect(effectiveStats(engine.get('vine-ball')!).restitution).toBeGreaterThan(.8);
+    expect(effectiveStats(engine.get('counterweight')!).mass).toBeGreaterThanOrEqual(10);
+  });
+  it('requires two separate neighbor interactions and three gates stages', () => {
+    const start = level.entities[0];
+    const people = level.mission?.kind === 'neighbors' ? level.mission.people : [];
+    expect(people.map(person => person.needsGoal)).toEqual([0, 2]);
+    expect(findTapRoute(start, people[0], 18, level.fixtures, 0, [], false)).toBeNull();
+    expect(findTapRoute(start, level.exit, 18, level.fixtures, 2, [], false)).toBeNull();
+    for (const destination of [...people, level.treasure, level.exit]) {
+      expect(findTapRoute(start, destination, 18, level.fixtures, 3, [], false)).not.toBeNull();
+    }
+    let mission = startMission(level);
+    mission = helpNeighbor(mission, 0);
+    expect(missionComplete(level, mission)).toBe(false);
+    mission = helpNeighbor(mission, 1);
+    expect(missionComplete(level, mission)).toBe(true);
   });
 });
 

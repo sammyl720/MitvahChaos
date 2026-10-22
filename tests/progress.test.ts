@@ -29,6 +29,7 @@ describe('local progress', () => {
     expect(unlockedAchievements(progress)).toContain('sukkah-builder');
     expect(unlockedAchievements(progress)).toContain('desert-helper');
     expect(unlockedAchievements(progress)).toContain('winter-helper');
+    expect(unlockedAchievements(progress)).toContain('jungle-guide');
     expect(unlockedCosmetics(progress)).toContain('backpack');
     expect(unlockedCosmetics(progress)).toContain('kindness-pin');
     expect(unlockedCosmetics(progress)).toContain('village-scarf');
@@ -40,6 +41,7 @@ describe('local progress', () => {
     expect(unlockedCosmetics(progress)).toContain('festival-scarf');
     expect(unlockedCosmetics(progress)).toContain('desert-wrap');
     expect(unlockedCosmetics(progress)).toContain('winter-scarf');
+    expect(unlockedCosmetics(progress)).toContain('leaf-pin');
     expect(unlockedCosmetics(progress)).toContain('tiny-crown');
   });
 });

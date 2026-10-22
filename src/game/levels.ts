@@ -627,6 +627,47 @@ export const LEVELS: Level[] = [LevelSchema.parse({
     station: { x: 310, y: 207 },
     npc: { x: 350, y: 260, name: 'RIVKA', greeting: 'A gust scattered our winter supply packs. Could you guide the sled and bring all three packs to our community home?', thanks: 'The packs are all here. Everyone can stay warm. Thank you!' }
   }
+}), LevelSchema.parse({
+  number: 18,
+  name: 'Jungle Mitzvah Mission',
+  world: 4,
+  hint: 'Make the bridge crate BIG, bounce the vine ball across the path, then give the counterweight HEAVY. Help both neighbors reach the gathering!',
+  entities: [
+    { id: 'player', kind: 'bandit', label: 'YOU', x: 195, y: 520, stickers: [], behavior: 'idle' },
+    { id: 'big-fruit', kind: 'apple', label: 'BIG FRUIT', x: 70, y: 510, stickers: ['BIG'], behavior: 'idle' },
+    { id: 'bridge-crate', kind: 'crate', label: 'BRIDGE CRATE', x: 305, y: 471, stickers: [], behavior: 'idle' },
+    { id: 'bounce-frog', kind: 'frog', label: 'BOUNCE FROG', x: 72, y: 450, stickers: ['BOUNCY'], behavior: 'idle' },
+    { id: 'vine-ball', kind: 'ball', label: 'VINE BALL', x: 80, y: 315, stickers: [], behavior: 'idle' },
+    { id: 'weight-rock', kind: 'rock', label: 'WEIGHT ROCK', x: 315, y: 525, stickers: ['HEAVY'], behavior: 'idle' },
+    { id: 'counterweight', kind: 'boulder', label: 'COUNTERWEIGHT', x: 125, y: 250, stickers: [], behavior: 'idle' }
+  ],
+  goals: [
+    { id: 'make-bridge', x: 305, y: 471, radius: 38, targetId: 'bridge-crate', requires: ['BIG'], label: 'MAKE BRIDGE' },
+    { id: 'clear-vines', x: 300, y: 315, radius: 32, targetId: 'vine-ball', requires: ['BOUNCY'], minSpeed: 100, label: 'CLEAR VINES' },
+    { id: 'steady-path', x: 125, y: 250, radius: 37, targetId: 'counterweight', requires: ['HEAVY'], minMass: 10, label: 'STEADY PATH' }
+  ],
+  goalOrder: 'sequential',
+  fixtures: [
+    { kind: 'gate', x: 195, y: 400, w: 348, h: 16, opensAfter: 1 },
+    { kind: 'wall', x: 195, y: 240, w: 20, h: 70 },
+    { kind: 'gate', x: 195, y: 135, w: 348, h: 16, opensAfter: 3 }
+  ],
+  treasure: { x: 135, y: 550 },
+  gem: { x: 64, y: 200 },
+  exit: { x: 195, y: 70 },
+  par: 3,
+  solution: [
+    { source: 'big-fruit', target: 'bridge-crate', sticker: 'BIG' },
+    { source: 'bounce-frog', target: 'vine-ball', sticker: 'BOUNCY' },
+    { source: 'weight-rock', target: 'counterweight', sticker: 'HEAVY' }
+  ],
+  mission: {
+    kind: 'neighbors',
+    people: [
+      { x: 75, y: 224, name: 'AVI', greeting: 'Can you make the bridge sturdy so I can reach the gathering?', thanks: 'The bridge is ready. Thank you for helping me!', needsGoal: 0 },
+      { x: 316, y: 224, name: 'MAYA', greeting: 'Please clear the vine path and steady the crossing too.', thanks: 'Now everyone can meet safely. Thank you!', needsGoal: 2 }
+    ]
+  }
 })];
 
 export function getLevel(number: number): Level {

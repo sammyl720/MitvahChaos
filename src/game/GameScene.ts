@@ -142,7 +142,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private drawBackground(): void {
-    const p = this.level.number === 16 ? { sky: 0xf7d7a0, ground: 0xf2c980, accent: 0xc58c60, dark: '#704d45' } : this.level.number === 17 ? { sky: 0xbad7e7, ground: 0xe0eff5, accent: 0x83b7d0, dark: '#446c83' } : palette[this.level.world - 1];
+    const p = this.level.number === 16 ? { sky: 0xf7d7a0, ground: 0xf2c980, accent: 0xc58c60, dark: '#704d45' } : this.level.number === 17 ? { sky: 0xbad7e7, ground: 0xe0eff5, accent: 0x83b7d0, dark: '#446c83' } : this.level.number === 18 ? { sky: 0x9ad7a8, ground: 0xb8dea3, accent: 0x66a27b, dark: '#38664c' } : palette[this.level.world - 1];
     const g = this.add.graphics();
     g.fillStyle(p.sky).fillRect(0, 0, W, H);
     g.fillStyle(p.ground).fillRoundedRect(8, 33, W - 16, H - 44, 36);
@@ -173,6 +173,12 @@ export class GameScene extends Phaser.Scene {
         g.fillStyle(0xc7e1ef, .5).fillEllipse(x + 10, y + 8, width * .7, 20);
       }
       g.fillStyle(0xa7d6e6, .65).fillRoundedRect(21, 294, 348, 40, 18);
+    } else if (this.level.number === 18) {
+      for (const [x, y, width] of [[34, 183, 89], [362, 194, 91], [41, 445, 88], [352, 489, 104]] as const) {
+        g.fillStyle(0x53966c, .6).fillEllipse(x, y, width, 76);
+        g.fillStyle(0x88bb77, .55).fillEllipse(x + 10, y - 14, width * .78, 43);
+      }
+      g.fillStyle(0x8fbd9c, .6).fillRoundedRect(18, 295, 354, 51, 17);
     } else {
       for (let i = 0; i < 7; i++) { g.lineStyle(7, 0xe891ec, .25).strokeCircle(33 + i * 57, 168 + (i % 3) * 148, 24); g.fillStyle(0x7fe1ed, .2).fillCircle(33 + i * 57, 168 + (i % 3) * 148, 10); }
       g.lineStyle(8, 0x7ed7df, .3).lineBetween(20, 350, 369, 350);
@@ -348,6 +354,18 @@ export class GameScene extends Phaser.Scene {
       g.fillStyle(0x718c9e).fillTriangle(129, 175, 195, 140, 261, 175);
       g.fillStyle(0xf0f8f8, .9).fillTriangle(151, 161, 195, 139, 239, 161);
       this.add.text(195, 160, 'WINTER COMMUNITY HOME', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '11px', color: '#3c617a', backgroundColor: '#eff9fc', padding: { x: 7, y: 4 } }).setOrigin(.5).setDepth(1);
+    } else if (this.level.number === 18) {
+      for (const [x, y] of [[31, 166], [356, 181], [38, 425], [350, 474]] as const) {
+        g.fillStyle(0x775d48, .9).fillRoundedRect(x - 6, y, 12, 83, 5);
+        g.fillStyle(0x4f9167, .9).fillCircle(x, y - 3, 25);
+        g.fillStyle(0x78ad69, .84).fillCircle(x - 15, y + 5, 18);
+        g.fillStyle(0x78ad69, .84).fillCircle(x + 17, y + 6, 17);
+      }
+      g.lineStyle(5, 0x487d62, .75).lineBetween(15, 155, 152, 203);
+      g.lineStyle(5, 0x487d62, .75).lineBetween(375, 159, 250, 216);
+      g.fillStyle(0xb79569, .82).fillRoundedRect(132, 171, 126, 69, 6);
+      g.fillStyle(0x6e9d68, .9).fillTriangle(122, 174, 195, 142, 268, 174);
+      this.add.text(195, 160, 'JUNGLE GATHERING', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '11px', color: '#3a6848', backgroundColor: '#e5f4cf', padding: { x: 7, y: 4 } }).setOrigin(.5).setDepth(1);
     } else {
       for (const [x, bend, color] of [[25, 127, 0x67dce6], [365, 261, 0xe599f5]] as const) {
         g.lineStyle(9, color, .5).lineBetween(x, 101, x, 525);
@@ -684,14 +702,14 @@ export class GameScene extends Phaser.Scene {
     const texture = entity.id === 'player' && this.character === 'girl' ? 'character-bandit-girl' : this.level.number === 20 && entity.id === this.level.bossId ? 'boss-robot' : `character-${entity.kind}`;
     const sprite = this.physics.add.image(entity.x, entity.y, texture).setDepth(5);
     if (entity.id === 'player') {
-      const tints: Record<string, number> = { rainbow: 0xffc4ee, robot: 0xb5eaff, knight: 0xd4d9ff, golden: 0xffd765, chicken: 0xffeed1, 'tiny-crown': 0xebc7ff, shabbos: 0xfff4e2, courier: 0xd8f6ff, 'kindness-pin': 0xffd7e2, 'village-scarf': 0xffdfce, 'rescue-badge': 0xffedbf, 'festival-cap': 0xe9d8ff, 'blue-sash': 0xc6efff, 'purim-ribbon': 0xffd8ee, 'prep-apron': 0xffeed2, 'festival-scarf': 0xdcf3c4, 'desert-wrap': 0xffddb0, 'winter-scarf': 0xd9f3ff };
+      const tints: Record<string, number> = { rainbow: 0xffc4ee, robot: 0xb5eaff, knight: 0xd4d9ff, golden: 0xffd765, chicken: 0xffeed1, 'tiny-crown': 0xebc7ff, shabbos: 0xfff4e2, courier: 0xd8f6ff, 'kindness-pin': 0xffd7e2, 'village-scarf': 0xffdfce, 'rescue-badge': 0xffedbf, 'festival-cap': 0xe9d8ff, 'blue-sash': 0xc6efff, 'purim-ribbon': 0xffd8ee, 'prep-apron': 0xffeed2, 'festival-scarf': 0xdcf3c4, 'desert-wrap': 0xffddb0, 'winter-scarf': 0xd9f3ff, 'leaf-pin': 0xd7f3cc };
       if (tints[this.cosmetic]) sprite.setTint(tints[this.cosmetic]);
     }
     sprite.setInteractive({ useHandCursor: true });
     sprite.on('pointerdown', () => this.onEntityTap(entity.id));
     const name = this.add.text(entity.x, entity.y + stats.radius + 13, entity.label ?? entity.kind.toUpperCase(), { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '10px', fontStyle: 'bold', color: '#453465', backgroundColor: '#fff9e6', padding: { x: 5, y: 2 } }).setOrigin(.5).setDepth(10);
     if (entity.id === 'player' && this.cosmetic !== 'classic') {
-      const icons: Record<string,string> = { rainbow:'🌈', robot:'🤖', knight:'🛡️', golden:'👑', chicken:'🐔', 'tiny-crown':'✨', backpack:'🎒', shabbos:'✦', courier:'🧢', 'kindness-pin':'♥', 'village-scarf':'🧣', 'rescue-badge':'🪢', 'festival-cap':'🎉', 'blue-sash':'🩵', 'purim-ribbon':'🎀', 'prep-apron':'🧺', 'festival-scarf':'🌿', 'desert-wrap':'☀️', 'winter-scarf':'❄️' };
+      const icons: Record<string,string> = { rainbow:'🌈', robot:'🤖', knight:'🛡️', golden:'👑', chicken:'🐔', 'tiny-crown':'✨', backpack:'🎒', shabbos:'✦', courier:'🧢', 'kindness-pin':'♥', 'village-scarf':'🧣', 'rescue-badge':'🪢', 'festival-cap':'🎉', 'blue-sash':'🩵', 'purim-ribbon':'🎀', 'prep-apron':'🧺', 'festival-scarf':'🌿', 'desert-wrap':'☀️', 'winter-scarf':'❄️', 'leaf-pin':'🍃' };
       this.costumeMark = this.add.text(entity.x,entity.y - stats.radius - 15,icons[this.cosmetic] ?? '',{fontSize:'23px'}).setOrigin(.5).setDepth(11);
     }
     const piece = { sprite, name, badges: [] as Phaser.GameObjects.Text[], shadow };
