@@ -24,7 +24,8 @@ const COSMETICS = [
   { id:'purim-ribbon', name:'Purim Ribbon', icon:'🎀', detail:'Share mishloach manos with two neighbors.' },
   { id:'prep-apron', name:'Preparation Apron', icon:'🧺', detail:'Help Rachel clear the Pesach workshop.' },
   { id:'festival-scarf', name:'Festival Scarf', icon:'🌿', detail:'Help Malky finish the sukkah.' },
-  { id:'desert-wrap', name:'Desert Wrap', icon:'☀️', detail:'Bring supplies across the dry wadi.' }
+  { id:'desert-wrap', name:'Desert Wrap', icon:'☀️', detail:'Bring supplies across the dry wadi.' },
+  { id:'winter-scarf', name:'Winter Scarf', icon:'❄️', detail:'Recover Rivka’s winter supplies.' }
 ];
 const ACHIEVEMENTS = [
   { id:'first-sticker', name:'First Sticker', icon:'🏷️', detail:'Make your first sticker transfer.' },
@@ -43,7 +44,8 @@ const ACHIEVEMENTS = [
   { id:'purim-courier', name:'Purim Courier', icon:'🎁', detail:'Deliver a Purim package to each neighbor.' },
   { id:'pesach-prep-helper', name:'Pesach Prep Helper', icon:'🧺', detail:'Clear the passage and prepare the table.' },
   { id:'sukkah-builder', name:'Sukkah Builder', icon:'🌿', detail:'Build the walls and roof with Malky.' },
-  { id:'desert-helper', name:'Desert Helper', icon:'☀️', detail:'Deliver both community supply packs to Ezra.' }
+  { id:'desert-helper', name:'Desert Helper', icon:'☀️', detail:'Deliver both community supply packs to Ezra.' },
+  { id:'winter-helper', name:'Winter Helper', icon:'❄️', detail:'Find and bring all three winter supply packs.' }
 ];
 
 function Logo({ small = false }: { small?: boolean }) { return <div className={`logo ${small ? 'small' : ''}`}><span className="logo-star">✦</span>MITZVAH <strong>CHAOS</strong><span className="logo-star">✦</span></div>; }

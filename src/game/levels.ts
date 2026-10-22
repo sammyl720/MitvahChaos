@@ -590,6 +590,43 @@ export const LEVELS: Level[] = [LevelSchema.parse({
     station: { x: 311, y: 207 },
     npc: { x: 350, y: 265, name: 'EZRA', greeting: 'Our community supplies are on both sides of the dry wadi. Can you float across and bring them to the welcome tent?', thanks: 'Everything arrived safely. Now our visitors have what they need!' }
   }
+}), LevelSchema.parse({
+  number: 17,
+  name: 'Snowy Shlichus',
+  world: 4,
+  hint: 'Slide the supply sled across the icy lane with SLIPPERY, then borrow MAGNETIC to gather the three lost supply packs for Rivka!',
+  entities: [
+    { id: 'player', kind: 'bandit', label: 'YOU', x: 195, y: 520, stickers: [], behavior: 'idle' },
+    { id: 'supply-sled', kind: 'wagon', label: 'SUPPLY SLED', x: 80, y: 310, stickers: [], behavior: 'idle' },
+    { id: 'slick-snail', kind: 'snail', label: 'SLICK SNAIL', x: 72, y: 510, stickers: ['SLIPPERY'], behavior: 'idle' },
+    { id: 'magnet-bot', kind: 'robot', label: 'MAGNET BOT', x: 316, y: 510, stickers: ['MAGNETIC'], behavior: 'idle' }
+  ],
+  goals: [
+    { id: 'sled-lane', x: 300, y: 310, radius: 31, targetId: 'supply-sled', requires: ['SLIPPERY'], minSpeed: 100, label: 'ICE LANE' },
+    { id: 'gather-packs', x: 195, y: 520, radius: 38, targetId: 'player', requires: ['MAGNETIC'], minMagneticRadius: 100, label: 'FIND PACKS' }
+  ],
+  goalOrder: 'sequential',
+  fixtures: [
+    { kind: 'gate', x: 195, y: 405, w: 348, h: 16, opensAfter: 1 },
+    { kind: 'wall', x: 195, y: 245, w: 22, h: 72 },
+    { kind: 'gate', x: 195, y: 135, w: 348, h: 16, opensAfter: 2 }
+  ],
+  treasure: { x: 65, y: 551 },
+  gem: { x: 65, y: 195 },
+  exit: { x: 195, y: 70 },
+  par: 2,
+  solution: [
+    { source: 'slick-snail', target: 'supply-sled', sticker: 'SLIPPERY' },
+    { source: 'magnet-bot', target: 'player', sticker: 'MAGNETIC' }
+  ],
+  mission: {
+    kind: 'delivery',
+    items: [{ x: 65, y: 458 }, { x: 75, y: 263 }, { x: 303, y: 266 }],
+    itemName: 'winter supply pack',
+    stationLabel: 'COMMUNITY HOME',
+    station: { x: 310, y: 207 },
+    npc: { x: 350, y: 260, name: 'RIVKA', greeting: 'A gust scattered our winter supply packs. Could you guide the sled and bring all three packs to our community home?', thanks: 'The packs are all here. Everyone can stay warm. Thank you!' }
+  }
 })];
 
 export function getLevel(number: number): Level {

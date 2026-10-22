@@ -8,7 +8,7 @@ import { findTapRoute } from '../src/game/navigation';
 describe('The Runaway Pushka', () => {
   const level = LEVELS[0];
   it('has a valid original layout and a solvable sticker transfer', () => {
-    expect(LEVELS).toHaveLength(16);
+    expect(LEVELS).toHaveLength(17);
     expect(LevelSchema.safeParse(level).success).toBe(true);
     const engine = new StickerEngine(level.entities);
     for (const step of level.solution) expect(engine.transfer(step.source, step.target, step.sticker).ok).toBe(true);
@@ -90,6 +90,32 @@ describe('The Desert Delivery', () => {
     expect(missionComplete(level, mission)).toBe(false);
     mission = depositCoins(mission);
     expect(missionComplete(level, mission)).toBe(true);
+  });
+});
+
+describe('Snowy Shlichus', () => {
+  const level = LEVELS[16];
+  it('slides a supply sled before turning the hero magnetic', () => {
+    expect(LevelSchema.safeParse(level).success).toBe(true);
+    const engine = new StickerEngine(level.entities);
+    const initialDrag = effectiveStats(engine.get('supply-sled')!).drag;
+    for (const step of level.solution) expect(engine.transfer(step.source, step.target, step.sticker).ok).toBe(true);
+    expect(effectiveStats(engine.get('supply-sled')!).drag).toBeLessThan(initialDrag / 5);
+    expect(effectiveStats(engine.get('player')!).magneticRadius).toBeGreaterThanOrEqual(100);
+  });
+  it('opens the village and exit gates in sequence for three supply packs', () => {
+    const start = level.entities[0];
+    const station = level.mission?.kind === 'delivery' ? level.mission.station : null;
+    expect(station).not.toBeNull();
+    expect(findTapRoute(start, station!, 18, level.fixtures, 0, [], false)).toBeNull();
+    expect(findTapRoute(start, level.exit, 18, level.fixtures, 1, [], false)).toBeNull();
+    for (const destination of [...missionItems(level), station!, level.treasure, level.exit]) {
+      expect(findTapRoute(start, destination, 18, level.fixtures, 2, [], false)).not.toBeNull();
+    }
+    let mission = startMission(level);
+    for (let index = 0; index < 3; index++) mission = collectCoin(mission, index);
+    expect(missionComplete(level, mission)).toBe(false);
+    expect(missionComplete(level, depositCoins(mission))).toBe(true);
   });
 });
 

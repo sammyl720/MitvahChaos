@@ -22,19 +22,20 @@
 - Added **Matzah Mountain**: a BIG supply box, TINY passage clearance, and delivery of clean table coverings to Rachel’s Pesach preparation room.
 - Completed the Yom Tov world with **The Great Sukkah Scramble**: three ordered sticker transfers, supply collection, and a visible walls-then-roof construction sequence.
 - Started the worldwide shlichus world with **The Desert Delivery**: a FLOATING crossing over a dry wadi, a HEAVY far-bank anchor, and community supplies for Ezra’s welcome tent.
+- Added **Snowy Shlichus**: a SLIPPERY sled crossing, MAGNETIC recovery of three winter supply packs, and a community home delivery.
 - Generalized mission inventory and station handling for both tzedakah deposits and supply deliveries; completing level 2 unlocks an outfit and achievement.
 - Made unreleased worlds visible as previews rather than showing the original StickerChaos levels under new names.
 
 ## Next milestones
 
 1. **Reusable action system:** Extend item delivery and neighbor assistance into richer cooperation, preparation sequences, and story event triggers. Keep inventory independent from stickers.
-2. **Worlds 3–4:** Implement four more original solvable levels, distinct scenery, and progression. Validate each documented solution and its physical route.
+2. **Worlds 3–4:** Implement three more original solvable levels, distinct scenery, and progression. Validate each documented solution and its physical route.
 3. **Art, audio, and rewards:** Expand original environment and character animation, create suitably licensed or original Chassidic-inspired music and effects, achievements, and cosmetic unlocks.
 4. **Release QA:** Run all automated gates, mobile screenshots, offline PWA checks, actual iPhone/iPod Safari performance checks, and religious content review. Prepare a separate deployment.
 
 ## Known issues and limits
 
-- Only levels 1–16 are playable. The original engine includes code for unreleased features and worlds that will be adapted during later milestones.
+- Only levels 1–17 are playable. The original engine includes code for unreleased features and worlds that will be adapted during later milestones.
 - Mission actions support coin collection, item delivery, staged neighbor assistance, and simple display assembly, and separate gifts for multiple recipients. Preparation sequences and richer cooperation remain to be built.
 - Current music comes from the inherited procedural audio system and needs a new music direction.
 - Community review of dialogue and cultural detail is pending.

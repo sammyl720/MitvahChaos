@@ -142,7 +142,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private drawBackground(): void {
-    const p = this.level.number === 16 ? { sky: 0xf7d7a0, ground: 0xf2c980, accent: 0xc58c60, dark: '#704d45' } : palette[this.level.world - 1];
+    const p = this.level.number === 16 ? { sky: 0xf7d7a0, ground: 0xf2c980, accent: 0xc58c60, dark: '#704d45' } : this.level.number === 17 ? { sky: 0xbad7e7, ground: 0xe0eff5, accent: 0x83b7d0, dark: '#446c83' } : palette[this.level.world - 1];
     const g = this.add.graphics();
     g.fillStyle(p.sky).fillRect(0, 0, W, H);
     g.fillStyle(p.ground).fillRoundedRect(8, 33, W - 16, H - 44, 36);
@@ -167,6 +167,12 @@ export class GameScene extends Phaser.Scene {
         g.fillStyle(0xffe3a7, .62).fillEllipse(x - 8, y - 7, radius * 1.5, radius * .45);
       }
       g.fillStyle(0xb67b5b, .37).fillRoundedRect(15, 310, 360, 86, 9);
+    } else if (this.level.number === 17) {
+      for (const [x, y, width] of [[72, 232, 112], [312, 222, 109], [70, 477, 120], [308, 471, 116]] as const) {
+        g.fillStyle(0xffffff, .66).fillEllipse(x, y, width, 36);
+        g.fillStyle(0xc7e1ef, .5).fillEllipse(x + 10, y + 8, width * .7, 20);
+      }
+      g.fillStyle(0xa7d6e6, .65).fillRoundedRect(21, 294, 348, 40, 18);
     } else {
       for (let i = 0; i < 7; i++) { g.lineStyle(7, 0xe891ec, .25).strokeCircle(33 + i * 57, 168 + (i % 3) * 148, 24); g.fillStyle(0x7fe1ed, .2).fillCircle(33 + i * 57, 168 + (i % 3) * 148, 10); }
       g.lineStyle(8, 0x7ed7df, .3).lineBetween(20, 350, 369, 350);
@@ -332,6 +338,16 @@ export class GameScene extends Phaser.Scene {
       g.lineStyle(3, 0x966845).strokeRoundedRect(131, 172, 128, 72, 7);
       g.fillStyle(0xf7e0b3, .9).fillTriangle(122, 174, 195, 145, 268, 174);
       this.add.text(195, 163, 'DESERT WELCOME TENT', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '11px', color: '#694a3b', backgroundColor: '#fff0c9', padding: { x: 7, y: 4 } }).setOrigin(.5).setDepth(1);
+    } else if (this.level.number === 17) {
+      for (const [x, y] of [[42, 176], [345, 182], [40, 450], [347, 468]] as const) {
+        g.fillStyle(0x7b8f96).fillRoundedRect(x - 5, y, 10, 54, 3);
+        g.fillStyle(0x6e9da1, .91).fillTriangle(x - 27, y + 25, x + 27, y + 25, x, y - 28);
+        g.fillStyle(0xeff8f8, .8).fillTriangle(x - 18, y + 4, x + 18, y + 4, x, y - 28);
+      }
+      g.fillStyle(0xb19c8d, .82).fillRoundedRect(138, 174, 114, 73, 6);
+      g.fillStyle(0x718c9e).fillTriangle(129, 175, 195, 140, 261, 175);
+      g.fillStyle(0xf0f8f8, .9).fillTriangle(151, 161, 195, 139, 239, 161);
+      this.add.text(195, 160, 'WINTER COMMUNITY HOME', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '11px', color: '#3c617a', backgroundColor: '#eff9fc', padding: { x: 7, y: 4 } }).setOrigin(.5).setDepth(1);
     } else {
       for (const [x, bend, color] of [[25, 127, 0x67dce6], [365, 261, 0xe599f5]] as const) {
         g.lineStyle(9, color, .5).lineBetween(x, 101, x, 525);
@@ -668,14 +684,14 @@ export class GameScene extends Phaser.Scene {
     const texture = entity.id === 'player' && this.character === 'girl' ? 'character-bandit-girl' : this.level.number === 20 && entity.id === this.level.bossId ? 'boss-robot' : `character-${entity.kind}`;
     const sprite = this.physics.add.image(entity.x, entity.y, texture).setDepth(5);
     if (entity.id === 'player') {
-      const tints: Record<string, number> = { rainbow: 0xffc4ee, robot: 0xb5eaff, knight: 0xd4d9ff, golden: 0xffd765, chicken: 0xffeed1, 'tiny-crown': 0xebc7ff, shabbos: 0xfff4e2, courier: 0xd8f6ff, 'kindness-pin': 0xffd7e2, 'village-scarf': 0xffdfce, 'rescue-badge': 0xffedbf, 'festival-cap': 0xe9d8ff, 'blue-sash': 0xc6efff, 'purim-ribbon': 0xffd8ee, 'prep-apron': 0xffeed2, 'festival-scarf': 0xdcf3c4, 'desert-wrap': 0xffddb0 };
+      const tints: Record<string, number> = { rainbow: 0xffc4ee, robot: 0xb5eaff, knight: 0xd4d9ff, golden: 0xffd765, chicken: 0xffeed1, 'tiny-crown': 0xebc7ff, shabbos: 0xfff4e2, courier: 0xd8f6ff, 'kindness-pin': 0xffd7e2, 'village-scarf': 0xffdfce, 'rescue-badge': 0xffedbf, 'festival-cap': 0xe9d8ff, 'blue-sash': 0xc6efff, 'purim-ribbon': 0xffd8ee, 'prep-apron': 0xffeed2, 'festival-scarf': 0xdcf3c4, 'desert-wrap': 0xffddb0, 'winter-scarf': 0xd9f3ff };
       if (tints[this.cosmetic]) sprite.setTint(tints[this.cosmetic]);
     }
     sprite.setInteractive({ useHandCursor: true });
     sprite.on('pointerdown', () => this.onEntityTap(entity.id));
     const name = this.add.text(entity.x, entity.y + stats.radius + 13, entity.label ?? entity.kind.toUpperCase(), { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '10px', fontStyle: 'bold', color: '#453465', backgroundColor: '#fff9e6', padding: { x: 5, y: 2 } }).setOrigin(.5).setDepth(10);
     if (entity.id === 'player' && this.cosmetic !== 'classic') {
-      const icons: Record<string,string> = { rainbow:'🌈', robot:'🤖', knight:'🛡️', golden:'👑', chicken:'🐔', 'tiny-crown':'✨', backpack:'🎒', shabbos:'✦', courier:'🧢', 'kindness-pin':'♥', 'village-scarf':'🧣', 'rescue-badge':'🪢', 'festival-cap':'🎉', 'blue-sash':'🩵', 'purim-ribbon':'🎀', 'prep-apron':'🧺', 'festival-scarf':'🌿', 'desert-wrap':'☀️' };
+      const icons: Record<string,string> = { rainbow:'🌈', robot:'🤖', knight:'🛡️', golden:'👑', chicken:'🐔', 'tiny-crown':'✨', backpack:'🎒', shabbos:'✦', courier:'🧢', 'kindness-pin':'♥', 'village-scarf':'🧣', 'rescue-badge':'🪢', 'festival-cap':'🎉', 'blue-sash':'🩵', 'purim-ribbon':'🎀', 'prep-apron':'🧺', 'festival-scarf':'🌿', 'desert-wrap':'☀️', 'winter-scarf':'❄️' };
       this.costumeMark = this.add.text(entity.x,entity.y - stats.radius - 15,icons[this.cosmetic] ?? '',{fontSize:'23px'}).setOrigin(.5).setDepth(11);
     }
     const piece = { sprite, name, badges: [] as Phaser.GameObjects.Text[], shadow };
@@ -1107,7 +1123,7 @@ export class GameScene extends Phaser.Scene {
         this.say('Oops, the supplies spilled! Pick them up again and go around the puddle.');
       }
     }
-    const radius = mission.kind === 'tzedakah' ? effectiveStats(player).magneticRadius : 0;
+    const radius = effectiveStats(player).magneticRadius;
     this.coinSprites.forEach((coin, index) => {
       if (this.mission.collected[index]) return;
       const dx = player.x - coin.x, dy = player.y - coin.y;
