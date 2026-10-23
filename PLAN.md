@@ -28,15 +28,19 @@
 - Completed the worldwide shlichus world with **The Grand Mitzvah Celebration**: FAST, BOUNCY, and HEAVY stages, two welcome-kit deliveries, a golden outfit reward, dancing, confetti, and an original synthesized finale melody.
 - Generalized mission inventory and station handling for both tzedakah deposits and supply deliveries; completing level 2 unlocks an outfit and achievement.
 - Made unreleased worlds visible as previews rather than showing the original StickerChaos levels under new names.
+- Passed all 88 browser playthrough and layout checks across desktop Chromium, mobile Chromium, mobile WebKit, and compact WebKit. Verified a production build reloads offline and can open Level 1. Checked compact mobile screenshots, including the finale.
+- Kept the mission hint above the playfield and made long hint text scrollable; removed the mobile browser zoom restriction.
 
 ## Next milestones
 
 1. **Mission polish:** Extend delivery and neighbor assistance into richer cooperation, preparation sequences, and story events. Keep inventory independent from stickers.
 2. **Art and audio:** Expand original environment and character animation, and develop a broader original music direction for all four worlds.
-3. **Release QA:** Run the automated gates and mobile screenshots, verify offline PWA behavior, test on an actual iPhone or iPod touch, and obtain community review of religious content.
+3. **Release QA:** Test on an actual iPhone or iPod touch, including tap targets on compact screens, and obtain community review of religious content.
 
 ## Known issues and limits
 
 - Mission actions support coin collection, item delivery, staged neighbor assistance, and simple display assembly, and separate gifts for multiple recipients. Preparation sequences and richer cooperation remain to be built.
 - Most world music comes from the inherited procedural audio system; the finale now has an original synthesized melody.
+- On a 320×568 viewport, the 390×620 playfield scales to about 174 px wide while controls remain visible. Tap-target usability needs actual-device review.
+- Isolated Level 1 tap-route browser reruns intermittently timed out after the full suite passed; the same runs passed on retry. Recheck the route on a physical device.
 - Community review of dialogue and cultural detail is pending.

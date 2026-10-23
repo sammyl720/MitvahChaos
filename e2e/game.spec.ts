@@ -40,6 +40,15 @@ test('keeps the mission hint outside the playfield', async ({page}) => {
   expect(updatedStageBox).not.toBeNull();
   expect(Math.abs(updatedStageBox!.y - stageBox!.y)).toBeLessThanOrEqual(1);
   expect(Math.abs(updatedStageBox!.height - stageBox!.height)).toBeLessThanOrEqual(1);
+  const longHint = await hint.evaluate((element) => {
+    element.textContent = 'Read this long mission instruction. '.repeat(20);
+    const firstLetter = document.createRange();
+    firstLetter.setStart(element.firstChild!, 0);
+    firstLetter.setEnd(element.firstChild!, 1);
+    return { firstLineTop:firstLetter.getBoundingClientRect().top, boxTop:element.getBoundingClientRect().top, scrollHeight:element.scrollHeight, clientHeight:element.clientHeight };
+  });
+  expect(longHint.scrollHeight).toBeGreaterThan(longHint.clientHeight);
+  expect(longHint.firstLineTop).toBeGreaterThanOrEqual(longHint.boxTop - 1);
 });
 
 test('transfers MAGNETIC and completes the pushka mission', async ({page}) => {

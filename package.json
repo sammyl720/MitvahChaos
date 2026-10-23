@@ -10,6 +10,7 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:e2e": "playwright test",
+    "test:offline": "npm run build && node scripts/verify-offline.mjs",
     "preview": "vite preview --host 0.0.0.0"
   },
   "dependencies": {
