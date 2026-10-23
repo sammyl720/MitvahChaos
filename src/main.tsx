@@ -80,8 +80,10 @@ function GameScreen({ number, onBack, onNext }: { number:number; onBack:()=>void
   const [paused,setPaused] = useState(false);
   const [pauseSettings,setPauseSettings] = useState(false);
   const [result,setResult] = useState<{stars:number;gem:boolean}|null>(null);
+  const [expandedBoard,setExpandedBoard] = useState(false);
   const achievementsSeen = useRef(progress.achievements.length);
   const host = useRef<HTMLDivElement>(null);
+  const stage = useRef<HTMLElement>(null);
   const scene = useRef<GameScene|null>(null);
   useEffect(() => {
     if (!host.current) return;
@@ -109,7 +111,21 @@ function GameScreen({ number, onBack, onNext }: { number:number; onBack:()=>void
     return () => { document.removeEventListener('visibilitychange',visibility); scene.current=null; stopMusic(); game.destroy(true); canvasHost.replaceChildren(); };
     // A level's game is intentionally mounted once; settings can be changed from the menu.
   },[number]);
-  useEffect(() => { scene.current?.updateSettings(progress.settings); setMusicVolume(progress.settings.musicVolume); },[progress.settings]);
+  useEffect(() => {
+    scene.current?.updateSettings({...progress.settings,controlMode:expandedBoard?'tap':progress.settings.controlMode});
+    scene.current?.setJoystick(0,0);
+    setMusicVolume(progress.settings.musicVolume);
+  },[progress.settings,expandedBoard]);
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      const scale = scene.current?.game.scale;
+      scale?.getParentBounds();
+      scale?.refresh();
+      if (expandedBoard && stage.current) stage.current.scrollTop = stage.current.scrollHeight;
+      scale?.updateBounds();
+    });
+    return () => cancelAnimationFrame(frame);
+  },[expandedBoard,number]);
   useEffect(() => {
     if (progress.achievements.length > achievementsSeen.current) playSound('achievement',progress.settings.effectsVolume);
     achievementsSeen.current = progress.achievements.length;
@@ -117,12 +133,12 @@ function GameScreen({ number, onBack, onNext }: { number:number; onBack:()=>void
   const resume = () => {setPaused(false);setPauseSettings(false);setMusicPaused(false);scene.current?.setPaused(false);};
   const restart = () => {setResult(null);setPaused(false);setPauseSettings(false);setMusicPaused(false);if(number===20) startMusic(level.world,progress.settings.musicVolume);scene.current?.setPaused(false);scene.current?.restart();};
   const helpedName = level.mission?.kind === 'neighbors' || level.mission?.kind === 'deliveries' ? 'your neighbors' : level.mission ? level.mission.npc.name[0] + level.mission.npc.name.slice(1).toLowerCase() : 'someone';
-  return <main className="game-screen">
+  return <main className={`game-screen ${expandedBoard?'expanded-board':''}`}>
     <header className="game-top"><button className="icon-button" onClick={() => {setPaused(true);setMusicPaused(true);scene.current?.setPaused(true);}} aria-label="Pause">Ⅱ</button><div className="game-title"><small>{WORLD_NAMES[level.world-1]} · Level {number}</small><strong>{level.name}</strong></div><div className="game-progress"><span>🎁 {status.treasure?'✓':'0/1'}</span><span>💎 {status.gem?'✓':'0/1'}</span></div></header>
     <div className="stage-hint" role="status" aria-live="polite">{status.message || level.hint}</div>
-    <section className={`stage-shell world-${level.world}`} aria-label={`${level.name} game area`}><div ref={host} className="game-canvas"/></section>
-    <div className="game-bottom">{level.mission && <div className="mission-strip"><span><b className="coin-symbol">●</b> {level.mission.kind === 'neighbors' ? `Neighbors helped: ${status.deposited}/${status.required}` : `Bag: ${status.carried} · ${level.mission.kind === 'delivery' && level.mission.assembly ? 'Assembled' : level.mission.kind === 'delivery' || level.mission.kind === 'deliveries' ? 'Delivered' : 'Pushka'}: ${status.deposited}/${status.required}`}</span><button onClick={()=>scene.current?.deposit()} disabled={!status.nearStation || (level.mission.kind !== 'neighbors' && (!status.carried || (level.mission.kind === 'delivery' && level.mission.fragileZone && status.carried < status.required)))}>{level.mission.kind === 'neighbors' ? 'HELP NEIGHBOR' : level.mission.kind === 'deliveries' ? 'DELIVER GIFT' : level.mission.kind === 'delivery' ? level.mission.assembly ? 'ASSEMBLE PIECE' : 'DELIVER ITEM' : 'DEPOSIT COINS'}</button></div>}<div className="tool-row"><button className="tool-button" onClick={() => scene.current?.undo()} disabled={!status.canUndo}>↶ <span>UNDO</span></button><button className="tool-button" onClick={restart}>↻ <span>RESTART</span></button><div className="goal-count">⚡ {status.goals}/{status.totalGoals} switches</div></div>
-      <div className="control-row">{progress.settings.controlMode==='joystick'?<Joystick onMove={(x,y)=>scene.current?.setJoystick(x,y)}/>:<div className="tap-tip">👆 Tap the ground<br/>to move</div>}
+    <section ref={stage} className={`stage-shell world-${level.world}`} aria-label={`${level.name} game area`} onScroll={()=>scene.current?.game.scale.updateBounds()}><div ref={host} className="game-canvas"/></section>
+    <div className="game-bottom">{level.mission && <div className="mission-strip"><span><b className="coin-symbol">●</b> {level.mission.kind === 'neighbors' ? `Neighbors helped: ${status.deposited}/${status.required}` : `Bag: ${status.carried} · ${level.mission.kind === 'delivery' && level.mission.assembly ? 'Assembled' : level.mission.kind === 'delivery' || level.mission.kind === 'deliveries' ? 'Delivered' : 'Pushka'}: ${status.deposited}/${status.required}`}</span><button onClick={()=>scene.current?.deposit()} disabled={!status.nearStation || (level.mission.kind !== 'neighbors' && (!status.carried || (level.mission.kind === 'delivery' && level.mission.fragileZone && status.carried < status.required)))}>{level.mission.kind === 'neighbors' ? 'HELP NEIGHBOR' : level.mission.kind === 'deliveries' ? 'DELIVER GIFT' : level.mission.kind === 'delivery' ? level.mission.assembly ? 'ASSEMBLE PIECE' : 'DELIVER ITEM' : 'DEPOSIT COINS'}</button></div>}<div className="tool-row"><button className="tool-button" onClick={() => scene.current?.undo()} disabled={!status.canUndo}>↶ <span>UNDO</span></button><button className="tool-button" onClick={restart}>↻ <span>RESTART</span></button><button className="tool-button view-toggle" onClick={()=>setExpandedBoard((value)=>!value)} aria-pressed={expandedBoard} aria-label={expandedBoard?'Fit playfield':'Enlarge playfield'} title={expandedBoard?'Fit the whole playfield':'Enlarge the playfield and move the view up or down'}>{expandedBoard?'⤡':'⤢'}<span>VIEW</span></button><div className="goal-count">⚡ {status.goals}/{status.totalGoals} switches</div></div>
+      <div className="control-row">{expandedBoard?<div className="view-controls" aria-label="Move playfield view"><button onClick={()=>stage.current?.scrollBy({top:-170,behavior:'auto'})} aria-label="Move view up">↑ VIEW</button><button onClick={()=>stage.current?.scrollBy({top:170,behavior:'auto'})} aria-label="Move view down">↓ VIEW</button></div>:progress.settings.controlMode==='joystick'?<Joystick onMove={(x,y)=>scene.current?.setJoystick(x,y)}/>:<div className="tap-tip">👆 Tap the ground<br/>to move</div>}
       <div className="sticker-tray">{status.selected?<><span className="tray-title">{status.selected.kind.toUpperCase()} STICKERS</span><div className="tray-stickers">{status.selected.stickers.length?status.selected.stickers.map((sticker)=><button key={sticker} className={`sticker-pill ${status.armed===sticker?'armed':''}`} style={{'--sticker':STICKER_INFO[sticker].color} as React.CSSProperties} onClick={()=>scene.current?.selectSticker(sticker)}>{STICKER_INFO[sticker].icon} {sticker}</button>):<span className="tray-empty">Tap a stickered object</span>}</div></>:<><span className="tray-title">HOW TO PLAY</span><span className="tray-empty">Tap an object, choose a sticker, then tap a new home. Or drag a sticker!</span></>}</div></div>
     </div>
     {paused && <div className="modal-backdrop"><div className="modal-card">{pauseSettings ? <><h2>Settings</h2><div className="pause-settings"><label>🎵 Music volume<input aria-label="Music volume" type="range" min="0" max="1" step="0.05" value={progress.settings.musicVolume} onChange={(event)=>setSettings({musicVolume:Number(event.target.value)})}/></label><label>🔊 Sound effects<input aria-label="Sound effects volume" type="range" min="0" max="1" step="0.05" value={progress.settings.effectsVolume} onChange={(event)=>setSettings({effectsVolume:Number(event.target.value)})}/></label><label className="pause-toggle">✨ Reduced motion<input type="checkbox" checked={progress.settings.reducedMotion} onChange={(event)=>setSettings({reducedMotion:event.target.checked})}/></label><label className="pause-toggle">🪶 Low graphics<input type="checkbox" checked={progress.settings.graphicsQuality==='low'} onChange={(event)=>setSettings({graphicsQuality:event.target.checked?'low':'standard'})}/></label><p>Graphics quality changes when you reopen a level.</p><div className="segmented"><button className={progress.settings.controlMode==='joystick'?'active':''} onClick={()=>setSettings({controlMode:'joystick'})}>Joystick</button><button className={progress.settings.controlMode==='tap'?'active':''} onClick={()=>setSettings({controlMode:'tap'})}>Tap to move</button></div></div><button className="secondary-button" onClick={()=>setPauseSettings(false)}>BACK TO PAUSE</button></> : <><div className="modal-icon">⏸️</div><h2>Taking a breather?</h2><p>Your sticker puzzle is right where you left it.</p><button className="primary-button" onClick={resume}>RESUME</button><button className="secondary-button" onClick={restart}>RESTART LEVEL</button><button className="secondary-button" onClick={()=>setPauseSettings(true)}>SETTINGS</button><button className="text-button" onClick={onBack}>WORLD MAP</button></>}</div></div>}

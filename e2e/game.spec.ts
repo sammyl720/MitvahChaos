@@ -8,6 +8,15 @@ async function tapWorld(page: import('@playwright/test').Page, x: number, y: num
   await canvas.click({position:{x:x*bounds.width/390,y:y*bounds.height/620}});
 }
 
+async function tapWorldOnDevice(page: import('@playwright/test').Page, x: number, y: number) {
+  const canvas = page.locator('canvas');
+  const bounds = await canvas.boundingBox();
+  if (!bounds) throw new Error('Canvas has no bounds');
+  const position = {x:x*bounds.width/390,y:y*bounds.height/620};
+  if (await page.evaluate(() => navigator.maxTouchPoints > 0)) await canvas.tap({position});
+  else await canvas.click({position});
+}
+
 test('has distinct identity, character choice, and isolated storage', async ({page}) => {
   await page.goto('/');
   await expect(page.locator('.logo')).toContainText('MITZVAH');
@@ -49,6 +58,35 @@ test('keeps the mission hint outside the playfield', async ({page}) => {
   });
   expect(longHint.scrollHeight).toBeGreaterThan(longHint.clientHeight);
   expect(longHint.firstLineTop).toBeGreaterThanOrEqual(longHint.boxTop - 1);
+});
+
+test('enlarges the playfield on a short screen and keeps sticker controls usable', async ({page}) => {
+  test.setTimeout(90000);
+  await page.setViewportSize({width:320,height:568});
+  await page.goto('/');
+  await page.getByRole('button', {name:/PLAY/}).first().click();
+  await page.getByRole('button', {name:/Level 1: The Runaway Pushka/}).click();
+  const canvas = page.locator('canvas');
+  const stage = page.locator('.stage-shell');
+  await expect(canvas).toBeVisible();
+  const fittedWidth = (await canvas.boundingBox())!.width;
+  await page.getByRole('button', {name:'Enlarge playfield'}).click();
+  await expect(page.getByRole('button', {name:'Fit playfield'})).toBeVisible();
+  await expect.poll(async () => (await canvas.boundingBox())?.width ?? 0).toBeGreaterThan(fittedWidth * 1.5);
+  const bottom = await stage.evaluate((element) => ({scrollTop:element.scrollTop,scrollHeight:element.scrollHeight,clientHeight:element.clientHeight}));
+  expect(bottom.scrollHeight).toBeGreaterThan(bottom.clientHeight + 100);
+  expect(bottom.scrollTop).toBeGreaterThan(0);
+  await page.getByRole('button', {name:'Move view up'}).click();
+  await expect.poll(() => stage.evaluate((element) => element.scrollTop)).toBeLessThan(bottom.scrollTop - 100);
+  await tapWorldOnDevice(page, 86, 280);
+  await expect(page.locator('.sticker-tray')).toContainText('MAGNETIC');
+  await page.getByRole('button', {name:/MAGNETIC/}).click();
+  await page.getByRole('button', {name:'Move view down'}).click();
+  await expect.poll(() => stage.evaluate((element) => element.scrollTop)).toBeGreaterThan(bottom.scrollTop - 10);
+  await tapWorldOnDevice(page, 193, 495);
+  await expect(page.getByText('1/1 switches')).toBeVisible();
+  await page.getByRole('button', {name:'Fit playfield'}).click();
+  await expect.poll(async () => (await canvas.boundingBox())?.width ?? 0).toBeLessThan(fittedWidth * 1.1);
 });
 
 test('transfers MAGNETIC and completes the pushka mission', async ({page}) => {

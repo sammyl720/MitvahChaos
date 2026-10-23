@@ -8,6 +8,8 @@ The five original Crown Heights missions, all five Shtetl missions, all five Yom
 
 All 20 original levels described in [SPEC.md](SPEC.md) are playable. [PLAN.md](PLAN.md) tracks polish and release verification work.
 
+On a short screen, use the **VIEW** button beside Restart to enlarge the board. Swipe the board or use the up and down VIEW buttons to reach objects while the mission and sticker controls stay visible. Tap **VIEW** again to fit the whole board on screen.
+
 ## Run locally
 
 Use Node.js 22.13+ or 24+ and npm 10+.
