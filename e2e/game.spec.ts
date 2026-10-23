@@ -73,6 +73,10 @@ test('enlarges the playfield on a short screen and keeps sticker controls usable
   await page.getByRole('button', {name:'Enlarge playfield'}).click();
   await expect(page.getByRole('button', {name:'Fit playfield'})).toBeVisible();
   await expect.poll(async () => (await canvas.boundingBox())?.width ?? 0).toBeGreaterThan(fittedWidth * 1.5);
+  const hintBounds = await page.locator('.stage-hint').boundingBox();
+  const stageBounds = await stage.boundingBox();
+  expect(hintBounds!.y + hintBounds!.height).toBeLessThanOrEqual(stageBounds!.y + 1);
+  await expect(page.locator('.game-bottom')).toBeInViewport();
   const bottom = await stage.evaluate((element) => ({scrollTop:element.scrollTop,scrollHeight:element.scrollHeight,clientHeight:element.clientHeight}));
   expect(bottom.scrollHeight).toBeGreaterThan(bottom.clientHeight + 100);
   expect(bottom.scrollTop).toBeGreaterThan(0);
