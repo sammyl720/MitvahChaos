@@ -32,6 +32,7 @@
 - Kept the mission hint above the playfield and made long hint text scrollable; removed the mobile browser zoom restriction.
 - Added a full-width, pannable playfield option for short screens, with fixed mission and sticker controls. Verified touch sticker transfers and returning to the fitted view in desktop Chromium and three mobile browser profiles.
 - Replaced the short inherited world music loops with four original four-bar themes, each with its own melody, tempo, bass, and harmony. Pause, volume, and theme switching have automated coverage.
+- Added a mission/status switch in the fixed hint strip so players can reread the goal after interaction feedback, including on compact screens.
 
 ## Next milestones
 

@@ -45,11 +45,15 @@ test('keeps the mission hint outside the playfield', async ({page}) => {
   expect(hintBox!.y + hintBox!.height).toBeLessThanOrEqual(stageBox!.y + 1);
   await tapWorld(page, 86, 280);
   await expect(hint).toContainText('selected');
+  await page.getByRole('button', {name:'Show mission instructions'}).click();
+  await expect(hint).toContainText('Give yourself MAGNETIC');
+  await page.getByRole('button', {name:'Show latest status'}).click();
+  await expect(hint).toContainText('selected');
   const updatedStageBox = await stage.boundingBox();
   expect(updatedStageBox).not.toBeNull();
   expect(Math.abs(updatedStageBox!.y - stageBox!.y)).toBeLessThanOrEqual(1);
   expect(Math.abs(updatedStageBox!.height - stageBox!.height)).toBeLessThanOrEqual(1);
-  const longHint = await hint.evaluate((element) => {
+  const longHint = await hint.locator('.stage-hint-text').evaluate((element) => {
     element.textContent = 'Read this long mission instruction. '.repeat(20);
     const firstLetter = document.createRange();
     firstLetter.setStart(element.firstChild!, 0);

@@ -10,6 +10,8 @@ All 20 original levels described in [SPEC.md](SPEC.md) are playable. [PLAN.md](P
 
 On a short screen, use the **VIEW** button beside Restart to enlarge the board. Swipe the board or use the up and down VIEW buttons to reach objects while the mission and sticker controls stay visible. Tap **VIEW** again to fit the whole board on screen.
 
+When an action replaces the mission hint with feedback, tap **MISSION** in the hint strip to reread the goal. Tap **STATUS** to return to the latest feedback.
+
 Each world has its own original synthesized four-bar music theme, with distinct melody, tempo, bass, and harmony. The finale plays a separate celebration melody.
 
 ## Run locally
