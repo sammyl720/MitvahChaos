@@ -12,6 +12,8 @@ On a short screen, use the **VIEW** button beside Restart to enlarge the board. 
 
 When an action replaces the mission hint with feedback, tap **MISSION** in the hint strip to reread the goal. Tap **STATUS** to return to the latest feedback.
 
+The Sticker Book has an offline **Words in our adventure** guide for Hebrew and Yiddish terms used in levels and dialogue. Its short explanations draw on [Chabad.org's Jewish knowledge base](https://www.chabad.org/therebbe/article_cdo/aid/149857/jewish/Glossary.htm) and related articles. [Community content review](CONTENT_REVIEW.md) of the final wording and art is still pending.
+
 Each world has its own original synthesized four-bar music theme, with distinct melody, tempo, bass, and harmony. The finale plays a separate celebration melody.
 
 ## Run locally

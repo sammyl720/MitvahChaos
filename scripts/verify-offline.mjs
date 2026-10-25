@@ -30,10 +30,14 @@ try {
   if (!await page.evaluate(() => Boolean(navigator.serviceWorker.controller))) throw new Error('The service worker did not take control');
   await context.setOffline(true);
   await page.reload({ waitUntil: 'domcontentloaded' });
+  await page.getByRole('button', { name: /STICKER BOOK/ }).click();
+  await page.locator('.word-guide summary').click();
+  await page.getByText('A small box for collecting money to give as tzedakah.').waitFor();
+  await page.getByRole('button', { name: 'Back' }).click();
   await page.getByRole('button', { name: /PLAY/ }).first().click();
   await page.getByRole('button', { name: /Level 1: The Runaway Pushka/ }).click();
   await page.locator('canvas').waitFor({ state: 'visible' });
-  console.log('Offline reload and Level 1 launch passed');
+  console.log('Offline reload, glossary, and Level 1 launch passed');
 } finally {
   await browser?.close();
   preview.kill('SIGTERM');

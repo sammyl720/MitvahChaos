@@ -1,0 +1,12 @@
+# Community content review
+
+The game now includes short definitions in **Sticker Book → Words in our adventure**. They are a reading aid for children, not a substitute for review by a Chabad educator or family familiar with the traditions represented. Please review the glossary alongside the dialogue, objects, and actions in all 20 levels.
+
+## Decisions for a reviewer
+
+1. **World name:** “Yom Tov Mayhem” groups Chanukah and Purim with other holiday stories. Check whether that broad label is appropriate; [Chabad.org notes that Purim is not technically a Yom Tov](https://www.chabad.org/library/article_cdo/aid/7512536/jewish/10-Yom-Tov-Holiday-Myths-and-Misconceptions.htm). “Holiday Mayhem” is a possible replacement if needed.
+2. **Purim delivery:** Level 13 calls each gift a mishloach manos package. Check that the art and wording suggest a package of at least two ready-to-eat foods, as described in [Chabad.org's mishloach manot guide](https://www.chabad.org/holidays/purim/article_cdo/aid/1498/jewish/Mishloach-Manot-Sending-Food-Gifts-on-Purim.htm).
+3. **Sukkah construction:** Level 15 has walls and roof slats. Check the final art and wording against the [natural roof-covering description](https://www.chabad.org/library/article_cdo/aid/609535/jewish/What-Is-a-Sukkah.htm).
+4. **Chanukah display:** Level 12 assembles decorative pieces. Check that its depiction and language treat the menorah respectfully and do not imply that assembling a display fulfills lighting. See [Chabad.org's Chanukah menorah overview](https://www.chabad.org/holidays/chanukah/article_cdo/aid/1358679/jewish/What-is-a-Menorah-Chanukiah.htm).
+
+For glossary wording, useful primary references include [mitzvah](https://www.chabad.org/library/article_cdo/aid/1438516/jewish/Mitzvah.htm), [tzedakah and pushka](https://www.chabad.org/library/article_cdo/aid/4203668/jewish/15-Facts-About-Tzedakah-Every-Jew-Should-Know.htm), [Shabbos](https://www.chabad.org/library/article_cdo/aid/633659/jewish/What-is-Shabbat.htm), [shlichus](https://www.chabad.org/library/article_cdo/aid/4420888/jewish/What-Is-Shlichus.htm), [shtetl](https://www.chabad.org/library/article_cdo/aid/3025072/jewish/What-Is-a-Shtetl-The-Jewish-Town.htm), [Chanukah and dreidel](https://www.chabad.org/holidays/chanukah/article_cdo/aid/1678262/jewish/Hanukkah-Glossary.htm), and [Pesach and matzah](https://www.chabad.org/holidays/passover/pesach_cdo/aid/871715/jewish/What-Is-Passover.htm). Mark proposed copy or art changes with the level number so they can be tested in game.

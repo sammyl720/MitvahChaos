@@ -28,11 +28,13 @@
 - Completed the worldwide shlichus world with **The Grand Mitzvah Celebration**: FAST, BOUNCY, and HEAVY stages, two welcome-kit deliveries, a golden outfit reward, dancing, confetti, and an original synthesized finale melody.
 - Generalized mission inventory and station handling for both tzedakah deposits and supply deliveries; completing level 2 unlocks an outfit and achievement.
 - Made unreleased worlds visible as previews rather than showing the original StickerChaos levels under new names.
-- Passed all 88 browser playthrough and layout checks across desktop Chromium, mobile Chromium, mobile WebKit, and compact WebKit. Verified a production build reloads offline and can open Level 1. Checked compact mobile screenshots, including the finale.
+- Passed 92 browser playthrough and layout checks across desktop Chromium, mobile Chromium, mobile WebKit, and compact WebKit, plus four focused glossary checks on the same profiles. Verified a production build reloads offline and can open the glossary and Level 1. Checked compact mobile screenshots, including the finale.
 - Kept the mission hint above the playfield and made long hint text scrollable; removed the mobile browser zoom restriction.
 - Added a full-width, pannable playfield option for short screens, with fixed mission and sticker controls. Verified touch sticker transfers and returning to the fitted view in desktop Chromium and three mobile browser profiles.
 - Replaced the short inherited world music loops with four original four-bar themes, each with its own melody, tempo, bass, and harmony. Pause, volume, and theme switching have automated coverage.
 - Added a mission/status switch in the fixed hint strip so players can reread the goal after interaction feedback, including on compact screens.
+- Removed the Netlify badge from the hosted game after it blocked a sticker button on compact screens. Added a browser page-error check for level startup and resizing, and prepared a physical iPhone Safari checklist.
+- Added an offline glossary of Hebrew and Yiddish adventure words in the Sticker Book; short definitions were checked against Chabad.org articles before community review.
 
 ## Next milestones
 

@@ -1,0 +1,20 @@
+export const ADVENTURE_WORDS = [
+  { term: 'Challah', meaning: 'Bread, often braided, shared at Shabbos meals.' },
+  { term: 'Chanukah', meaning: 'An eight-day Jewish festival celebrated by lighting a menorah.' },
+  { term: 'Dreidel', meaning: 'A four-sided spinning top played with on Chanukah.' },
+  { term: 'Matzah', meaning: 'Flat, unleavened bread eaten during Pesach.' },
+  { term: 'Menorah', meaning: 'The Chanukah lamp with eight lights and one helper light.' },
+  { term: 'Mishloach manos', meaning: 'A Purim gift of at least two ready-to-eat foods sent to a friend.' },
+  { term: 'Mitzvah', meaning: 'A Jewish commandment. People also use the word for a good deed.' },
+  { term: 'Nu', meaning: 'A Yiddish nudge, like “Well?” or “Come on!”' },
+  { term: 'Oy vey', meaning: 'An exclamation like “Oh no!” when something has gone wrong.' },
+  { term: 'Pesach', meaning: 'Passover, the Jewish holiday that remembers the Exodus from Egypt.' },
+  { term: 'Purim', meaning: 'A joyful Jewish holiday about the story of Queen Esther, with food gifts for friends.' },
+  { term: 'Pushka', meaning: 'A small box for collecting money to give as tzedakah.' },
+  { term: 'Shabbos', meaning: 'The Jewish day of rest and celebration, from Friday evening to Saturday evening.' },
+  { term: 'Shliach / shlichus', meaning: 'A shliach helps a Jewish community as a Chabad emissary; shlichus is that mission.' },
+  { term: 'Shtetl', meaning: 'A small town in Eastern Europe where many Jewish families lived before World War II.' },
+  { term: 'Sukkah', meaning: 'A temporary outdoor hut used during the Jewish holiday of Sukkot.' },
+  { term: 'Tzedakah', meaning: 'Giving to people in need as a Jewish responsibility.' },
+  { term: 'Yom Tov', meaning: 'Hebrew for “good day,” used for a Jewish festival.' }
+] as const;

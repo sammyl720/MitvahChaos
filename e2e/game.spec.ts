@@ -30,6 +30,20 @@ test('has distinct identity, character choice, and isolated storage', async ({pa
   expect(await page.evaluate(() => localStorage.getItem('sticker-chaos-progress'))).toBeNull();
 });
 
+test('explains adventure words without crowding the sticker book on a small screen', async ({page}) => {
+  await page.setViewportSize({width:320,height:568});
+  await page.goto('/');
+  await page.getByRole('button', {name:/STICKER BOOK/}).click();
+  const guide = page.locator('.word-guide');
+  await expect(guide).toBeVisible();
+  await expect(guide).not.toHaveAttribute('open', '');
+  await guide.locator('summary').click();
+  await expect(guide).toHaveAttribute('open', '');
+  await expect(guide.getByText('A small box for collecting money to give as tzedakah.')).toBeVisible();
+  await expect(guide.getByText('A Purim gift of at least two ready-to-eat foods sent to a friend.')).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
+});
+
 test('keeps the mission hint outside the playfield', async ({page}) => {
   await page.goto('/');
   await page.getByRole('button', {name:/PLAY/}).first().click();
