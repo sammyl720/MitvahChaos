@@ -31,6 +31,7 @@
 - Passed all 88 browser playthrough and layout checks across desktop Chromium, mobile Chromium, mobile WebKit, and compact WebKit. Verified a production build reloads offline and can open Level 1. Checked compact mobile screenshots, including the finale.
 - Kept the mission hint above the playfield and made long hint text scrollable; removed the mobile browser zoom restriction.
 - Added a full-width, pannable playfield option for short screens, with fixed mission and sticker controls. Verified touch sticker transfers and returning to the fitted view in desktop Chromium and three mobile browser profiles.
+- Replaced the short inherited world music loops with four original four-bar themes, each with its own melody, tempo, bass, and harmony. Pause, volume, and theme switching have automated coverage.
 
 ## Next milestones
 
@@ -41,7 +42,7 @@
 ## Known issues and limits
 
 - Mission actions support coin collection, item delivery, staged neighbor assistance, and simple display assembly, and separate gifts for multiple recipients. Preparation sequences and richer cooperation remain to be built.
-- Most world music comes from the inherited procedural audio system; the finale now has an original synthesized melody.
+- Music is synthesized locally with original themes for all four worlds and the finale; the sound palette remains deliberately simple.
 - The fitted 390×620 playfield is about 174 px wide on a 320×568 viewport; the optional full-width view is 320 px wide and can be panned. Tap-target usability still needs actual-device review.
 - Isolated Level 1 tap-route browser reruns intermittently timed out after the full suite passed; the same runs passed on retry. Recheck the route on a physical device.
 - Community review of dialogue and cultural detail is pending.
