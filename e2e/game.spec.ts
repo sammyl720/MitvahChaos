@@ -138,6 +138,8 @@ test('transfers MAGNETIC and completes the pushka mission', async ({page}) => {
   await expect(page.getByText('🎁 ✓')).toBeVisible({timeout:12000});
   await tapWorld(page, 195, 70);
   await expect(page.getByRole('heading', {name:'Mitzvah accomplished!'})).toBeVisible({timeout:12000});
+  await expect(page.locator('.victory-story')).toContainText('Rivky: You found them! Every coin can help someone.');
+  await expect(page.getByRole('button', {name:'NEXT LEVEL →'})).toBeVisible();
 });
 
 test('unlocks Challahzilla and completes the tablecloth delivery', async ({page}) => {
@@ -220,6 +222,12 @@ test('clears Kingston Avenue and helps both neighbors', async ({page}) => {
   await expect(page.getByText('🎁 ✓')).toBeVisible({timeout:20000});
   await tapWorld(page, 195, 70);
   await expect(page.getByRole('heading', {name:'Mitzvah accomplished!'})).toBeVisible({timeout:20000});
+  await expect(page.locator('.victory-story')).toContainText('Leah: Ah, the sidewalk is clear. Thanks for helping!');
+  await expect(page.locator('.victory-story')).toContainText('Moshe: The cart is steady. Now we can bring everything inside!');
+  await expect(page.getByRole('button', {name:'NEXT LEVEL →'})).toBeInViewport();
+  await expect(page.getByRole('button', {name:'PLAY AGAIN'})).toBeInViewport();
+  await page.getByRole('button', {name:'NEXT LEVEL →'}).click();
+  await expect(page.locator('.game-title')).toContainText('The Great Challah Avalanche');
 });
 
 test('tames the challah avalanche and prepares the bakery table', async ({page}) => {

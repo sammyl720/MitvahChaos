@@ -51,6 +51,21 @@ body,.game-screen{touch-action:pan-y pinch-zoom}
 @keyframes finale-dance{to{transform:translateY(-9px) rotate(12deg)}}
 .reduced-motion .finale-confetti span,.reduced-motion .finale-dance span{animation:none}
 
+/* Each completed mission shows the neighbors' thanks without hiding the next step on short screens. */
+.victory{max-height:calc(100dvh - 44px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+.victory-story{margin:12px 0;border:2px solid #f2d5a8;border-radius:16px;background:#fffdf5;padding:7px 12px;text-align:left}
+.victory-story p{margin:6px 0;color:#604978}
+.victory-story strong{color:#59368f}
+.victory-gem{margin:10px 0 0}
+@media (max-height:600px){
+  .victory{padding:15px 17px}
+  .victory .modal-icon{font-size:2.6rem;margin-bottom:4px}
+  .victory h2{font-size:1.4rem;line-height:1.2;margin-bottom:4px}
+  .victory .big-stars{font-size:1.65rem;margin:7px 0}
+  .victory-story{margin:7px 0}
+  .victory .primary-button,.victory .secondary-button{margin-top:9px}
+}
+
 /* An offline word guide for unfamiliar terms in the levels and dialogue. */
 .word-guide{margin:0 0 17px;border:3px solid #fff;border-radius:20px;background:#fff9e9;box-shadow:0 4px 0 #dfc8e3;color:#503675}
 .word-guide summary{min-height:54px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;list-style:none;cursor:pointer;font-size:.94rem;font-weight:1000}

@@ -35,6 +35,7 @@
 - Added a mission/status switch in the fixed hint strip so players can reread the goal after interaction feedback, including on compact screens.
 - Removed the Netlify badge from the hosted game after it blocked a sticker button on compact screens. Added a browser page-error check for level startup and resizing, and prepared a physical iPhone Safari checklist.
 - Added an offline glossary of Hebrew and Yiddish adventure words in the Sticker Book; short definitions were checked against Chabad.org articles before community review.
+- Added each neighbor's existing thank-you line to the victory screen, with a compact layout that keeps both result actions visible on a short phone display.
 
 ## Next milestones
 
