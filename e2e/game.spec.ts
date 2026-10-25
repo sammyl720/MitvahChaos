@@ -66,6 +66,8 @@ test('keeps the mission hint outside the playfield', async ({page}) => {
 
 test('enlarges the playfield on a short screen and keeps sticker controls usable', async ({page}) => {
   test.setTimeout(90000);
+  const pageErrors: string[] = [];
+  page.on('pageerror', (error) => pageErrors.push(error.message));
   await page.setViewportSize({width:320,height:568});
   await page.goto('/');
   await page.getByRole('button', {name:/PLAY/}).first().click();
@@ -95,6 +97,7 @@ test('enlarges the playfield on a short screen and keeps sticker controls usable
   await expect(page.getByText('1/1 switches')).toBeVisible();
   await page.getByRole('button', {name:'Fit playfield'}).click();
   await expect.poll(async () => (await canvas.boundingBox())?.width ?? 0).toBeLessThan(fittedWidth * 1.1);
+  expect(pageErrors).toEqual([]);
 });
 
 test('transfers MAGNETIC and completes the pushka mission', async ({page}) => {

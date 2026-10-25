@@ -35,6 +35,8 @@ npm run test:e2e
 npm run test:offline
 ```
 
+Before public release, run the [physical iPhone Safari check](QA_DEVICE.md).
+
 The app saves under `mitvah-chaos-progress` in localStorage and IndexedDB. It does not read or overwrite StickerChaos progress. The PWA has its own name, icon, theme color, and manifest ID. It has no accounts, ads, purchases, or backend.
 
 ## Source and rights
