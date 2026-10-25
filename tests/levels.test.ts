@@ -480,7 +480,7 @@ describe('The Speedy Shliach', () => {
 
 describe('Kingston Avenue Mix-Up', () => {
   const level = LEVELS[3];
-  it('requires two physical sticker changes and two separate neighbor interactions', () => {
+  it('requires two sticker changes and a supply handoff between the neighbors', () => {
     expect(LevelSchema.safeParse(level).success).toBe(true);
     const engine = new StickerEngine(level.entities);
     const barrierBefore = effectiveStats(engine.get('street-barrier')!).radius;
@@ -489,11 +489,16 @@ describe('Kingston Avenue Mix-Up', () => {
     expect(effectiveStats(engine.get('street-barrier')!).radius).toBeLessThan(barrierBefore);
     expect(effectiveStats(engine.get('supply-cart')!).mass).toBeGreaterThan(cartBefore);
     expect(missionGoalCount(level)).toBe(2);
+    const handoff = level.mission?.kind === 'neighbors' ? level.mission.handoff : undefined;
+    expect(handoff).toMatchObject({ from: 0, to: 1, itemName: 'bundle' });
     let mission = startMission(level);
-    mission = helpNeighbor(mission, 0);
+    expect(helpNeighbor(mission, 1, handoff)).toBe(mission);
+    mission = helpNeighbor(mission, 0, handoff);
+    expect(mission).toMatchObject({ carried: 1, deposited: 1 });
     expect(missionComplete(level, mission)).toBe(false);
-    expect(helpNeighbor(mission, 0)).toBe(mission);
-    mission = helpNeighbor(mission, 1);
+    expect(helpNeighbor(mission, 0, handoff)).toBe(mission);
+    mission = helpNeighbor(mission, 1, handoff);
+    expect(mission).toMatchObject({ carried: 0, deposited: 2 });
     expect(missionComplete(level, mission)).toBe(true);
   });
   it('opens the two street gates in stages', () => {

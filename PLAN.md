@@ -36,6 +36,7 @@
 - Removed the Netlify badge from the hosted game after it blocked a sticker button on compact screens. Added a browser page-error check for level startup and resizing, and prepared a physical iPhone Safari checklist.
 - Added an offline glossary of Hebrew and Yiddish adventure words in the Sticker Book; short definitions were checked against Chabad.org articles before community review.
 - Added each neighbor's existing thank-you line to the victory screen, with a compact layout that keeps both result actions visible on a short phone display.
+- Connected Leah's and Moshe's tasks on Kingston Avenue: clearing Leah's path prepares a supply bundle, which the player carries to Moshe after steadying his cart.
 
 ## Next milestones
 
@@ -45,7 +46,7 @@
 
 ## Known issues and limits
 
-- Mission actions support coin collection, item delivery, staged neighbor assistance, and simple display assembly, and separate gifts for multiple recipients. Preparation sequences and richer cooperation remain to be built.
+- Mission actions support coin collection, item delivery, staged neighbor assistance, a neighbor-to-neighbor supply handoff, simple display assembly, and separate gifts for multiple recipients. More preparation sequences and cooperation remain to be built.
 - Music is synthesized locally with original themes for all four worlds and the finale; the sound palette remains deliberately simple.
 - The fitted 390×620 playfield is about 174 px wide on a 320×568 viewport; the optional full-width view is 320 px wide and can be panned. Tap-target usability still needs actual-device review.
 - Isolated Level 1 tap-route browser reruns intermittently timed out after the full suite passed; the same runs passed on retry. Recheck the route on a physical device.

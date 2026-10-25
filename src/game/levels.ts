@@ -93,7 +93,7 @@ export const LEVELS: Level[] = [LevelSchema.parse({
   number: 4,
   name: 'Kingston Avenue Mix-Up',
   world: 1,
-  hint: 'Make the barrier TINY, give the supply cart HEAVY, then check on both neighbors!',
+  hint: 'Make the barrier TINY and pick up Leah’s supply bundle. Give the cart HEAVY, then bring the bundle to Moshe!',
   entities: [
     { id: 'player', kind: 'bandit', label: 'YOU', x: 193, y: 510, stickers: [], behavior: 'idle' },
     { id: 'little-bot', kind: 'robot', label: 'LITTLE BOT', x: 75, y: 487, stickers: ['TINY'], behavior: 'idle' },
@@ -122,9 +122,10 @@ export const LEVELS: Level[] = [LevelSchema.parse({
   mission: {
     kind: 'neighbors',
     people: [
-      { x: 66, y: 322, name: 'LEAH', greeting: 'The barrier is in my way. Can you shrink it?', thanks: 'Ah, the sidewalk is clear. Thanks for helping!', needsGoal: 0 },
-      { x: 330, y: 139, name: 'MOSHE', greeting: 'That supply cart keeps sliding. It needs some weight!', thanks: 'The cart is steady. Now we can bring everything inside!', needsGoal: 1 }
-    ]
+      { x: 66, y: 322, name: 'LEAH', greeting: 'Please shrink the barrier so I can pass you a supply bundle for Moshe.', thanks: 'The sidewalk is clear, and the supply bundle is ready for Moshe. Thank you!', needsGoal: 0 },
+      { x: 330, y: 139, name: 'MOSHE', greeting: 'Please steady the cart and bring me Leah’s supply bundle.', thanks: 'Leah’s bundle reached the steady cart. Now we can bring everything inside!', needsGoal: 1 }
+    ],
+    handoff: { from: 0, to: 1, itemName: 'bundle' }
   }
 }), LevelSchema.parse({
   number: 5,

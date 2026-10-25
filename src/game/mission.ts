@@ -49,11 +49,13 @@ export function spillSupplies(state: MissionState): MissionState {
   return { collected: state.collected.map(() => false), served: [...state.served], carried: 0, deposited: 0 };
 }
 
-export function helpNeighbor(state: MissionState, index: number): MissionState {
+export function helpNeighbor(state: MissionState, index: number, handoff?: { from: number; to: number }): MissionState {
   if (index < 0 || index >= state.collected.length || state.collected[index]) return state;
+  if (handoff?.to === index && !state.carried) return state;
   const collected = [...state.collected];
   collected[index] = true;
-  return { ...state, collected, deposited: state.deposited + 1 };
+  const carried = state.carried + Number(handoff?.from === index) - Number(handoff?.to === index);
+  return { ...state, collected, carried, deposited: state.deposited + 1 };
 }
 
 export function missionComplete(level: Level, state: MissionState): boolean {

@@ -62,6 +62,7 @@ export class GameScene extends Phaser.Scene {
   private treasure = false;
   private mission: MissionState;
   private coinSprites: { x: number; y: number; sprite: Phaser.GameObjects.Container }[] = [];
+  private neighborBundle?: Phaser.GameObjects.Text;
   private assemblyDisplay?: Phaser.GameObjects.Text;
   private sukkahArt?: Phaser.GameObjects.Graphics;
   private machineArt?: Phaser.GameObjects.Graphics;
@@ -551,6 +552,7 @@ export class GameScene extends Phaser.Scene {
       friend.on('pointerdown', () => this.helpNeighbor(index));
       this.add.text(npc.x, npc.y + 29, npc.name, { fontSize: '10px', color: '#50366e', backgroundColor: '#fff7de', padding: { x: 4, y: 2 } }).setOrigin(.5).setDepth(13);
     });
+    if (mission.handoff) this.neighborBundle = this.add.text(0, 0, '📦', { fontSize: '23px' }).setOrigin(.5).setDepth(15).setVisible(false);
   }
   private addGiftMission(): void {
     const mission = this.level.mission;
@@ -600,10 +602,12 @@ export class GameScene extends Phaser.Scene {
     if (Math.hypot(player.x - npc.x, player.y - npc.y) > 72) { this.say(`Come closer to ${npc.name}.`); return; }
     if (this.mission.collected[index]) { this.say(npc.thanks); return; }
     if (!this.goalActive[npc.needsGoal]) { this.say(npc.greeting); return; }
-    this.mission = helpNeighbor(this.mission, index);
+    if (mission.handoff?.to === index && !this.mission.carried) { this.say(`Bring ${mission.people[mission.handoff.from].name}'s ${mission.handoff.itemName} first.`); return; }
+    this.mission = helpNeighbor(this.mission, index, mission.handoff);
+    this.neighborBundle?.setVisible(this.mission.carried > 0);
     this.burst(npc.x, npc.y, '#8ce0b1');
     playSound('goal', this.settings.effectsVolume);
-    this.say(npc.thanks);
+    this.say(mission.handoff?.from === index ? `${npc.thanks} Take the ${mission.handoff.itemName} to ${mission.people[mission.handoff.to].name}.` : npc.thanks);
   }
   deposit(): void {
     const mission = this.level.mission;
@@ -1081,6 +1085,7 @@ export class GameScene extends Phaser.Scene {
     this.completionTimer?.remove(); this.completionTimer = undefined;
     this.engine.resetLevel(); this.treasure = false; this.gem = false; this.transfers = 0; this.completed = false; this.armed = null; this.selectedId = null;
     this.mission = startMission(this.level);
+    this.neighborBundle?.setVisible(false);
     if (this.level.mission?.kind === 'delivery' && this.level.mission.assembly) this.assemblyDisplay?.setText('◇ '.repeat(missionGoalCount(this.level)).trim());
     if (this.level.number === 15) this.updateSukkahArt();
     if (this.level.number === 19) this.updateMachineArt();
@@ -1163,6 +1168,7 @@ export class GameScene extends Phaser.Scene {
       const updated = this.engine.get(entity.id)!;
       piece.name.setPosition(updated.x, updated.y + effectiveStats(updated).radius + 13);
       if (entity.id === 'player') this.costumeMark?.setPosition(updated.x,updated.y - effectiveStats(updated).radius - 14);
+      if (entity.id === 'player') this.neighborBundle?.setPosition(updated.x + 22,updated.y - effectiveStats(updated).radius - 12);
       piece.shadow.setPosition(updated.x, updated.y + effectiveStats(updated).radius * .7);
       piece.badges.forEach((badge,index) => this.positionBadge(updated,badge,index));
       this.animatePiece(updated,piece);

@@ -110,7 +110,8 @@ export const LevelSchema = z.object({
     }),
     z.object({
       kind: z.literal('neighbors'),
-      people: z.array(z.object({ x: z.number(), y: z.number(), name: z.string(), greeting: z.string(), thanks: z.string(), needsGoal: z.number().int().nonnegative() })).min(1)
+      people: z.array(z.object({ x: z.number(), y: z.number(), name: z.string(), greeting: z.string(), thanks: z.string(), needsGoal: z.number().int().nonnegative() })).min(1),
+      handoff: z.object({ from: z.number().int().nonnegative(), to: z.number().int().nonnegative(), itemName: z.string().min(1) }).optional()
     })
   ]).optional()
 });
