@@ -449,9 +449,12 @@ test('guides the giant dreidel and decorates Chaya’s game table', async ({page
   await tapWorld(page, 303, 456);
   await expect(page.locator('.mission-strip')).toContainText('Bag: 2', {timeout:20000});
   await tapWorld(page, 260, 208);
-  await expect(page.getByRole('button', {name:'DELIVER ITEM'})).toBeEnabled({timeout:20000});
-  await page.getByRole('button', {name:'DELIVER ITEM'}).click();
-  await expect(page.locator('.mission-strip')).toContainText('Delivered: 2/2');
+  await expect(page.getByRole('button', {name:'HANG DECORATION'})).toBeEnabled({timeout:20000});
+  await page.getByRole('button', {name:'HANG DECORATION'}).click();
+  await expect(page.locator('.mission-strip')).toContainText('Bag: 1 · Hung: 1/2');
+  await expect(page.locator('.stage-hint')).toContainText('Decoration 1/2 hung!');
+  await page.getByRole('button', {name:'HANG DECORATION'}).click();
+  await expect(page.locator('.mission-strip')).toContainText('Hung: 2/2');
   await tapWorld(page, 67, 550);
   await expect(page.getByText('🎁 ✓')).toBeVisible({timeout:20000});
   await tapWorld(page, 195, 70);

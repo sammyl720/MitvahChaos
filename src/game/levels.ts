@@ -388,6 +388,9 @@ export const LEVELS: Level[] = [LevelSchema.parse({
   ],
   mission: {
     kind: 'delivery',
+    assembly: true,
+    actionLabel: 'HANG DECORATION',
+    progressLabel: 'Hung',
     items: [{ x: 79, y: 453 }, { x: 303, y: 456 }],
     itemName: 'paper decorations',
     stationLabel: 'GAME TABLE',

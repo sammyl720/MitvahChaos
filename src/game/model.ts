@@ -98,6 +98,8 @@ export const LevelSchema = z.object({
       itemName: z.string(),
       stationLabel: z.string(),
       assembly: z.boolean().optional(),
+      actionLabel: z.string().optional(),
+      progressLabel: z.string().optional(),
       station: z.object({ x: z.number(), y: z.number() }),
       fragileZone: z.object({ x: z.number(), y: z.number(), w: z.number().positive(), h: z.number().positive() }).optional(),
       npc: z.object({ x: z.number(), y: z.number(), name: z.string(), greeting: z.string(), thanks: z.string() })

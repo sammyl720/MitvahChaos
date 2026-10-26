@@ -37,6 +37,7 @@
 - Added an offline glossary of Hebrew and Yiddish adventure words in the Sticker Book; short definitions were checked against Chabad.org articles before community review.
 - Added each neighbor's existing thank-you line to the victory screen, with a compact layout that keeps both result actions visible on a short phone display.
 - Connected Leah's and Moshe's tasks on Kingston Avenue: clearing Leah's path prepares a supply bundle, which the player carries to Moshe after steadying his cart.
+- Made Chaya's game table preparation a two-step task: each paper decoration is hung separately and appears on the table.
 
 ## Next milestones
 

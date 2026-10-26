@@ -264,7 +264,7 @@ describe('The Great Wagon Rescue', () => {
 
 describe('Dreidel Disaster', () => {
   const level = LEVELS[10];
-  it('gives the giant toy both properties and keeps decorations separate', () => {
+  it('gives the giant toy both properties and hangs decorations one at a time', () => {
     expect(LevelSchema.safeParse(level).success).toBe(true);
     const engine = new StickerEngine(level.entities);
     for (const step of level.solution) expect(engine.transfer(step.source, step.target, step.sticker).ok).toBe(true);
@@ -273,11 +273,18 @@ describe('Dreidel Disaster', () => {
     expect(effectiveStats(dreidel).radius).toBeGreaterThan(45);
     expect(effectiveStats(dreidel).restitution).toBeGreaterThanOrEqual(.85);
     expect(effectiveStats(dreidel).drag).toBeLessThan(100);
+    expect(level.mission?.kind === 'delivery' && level.mission.assembly).toBe(true);
     let mission = startMission(level);
     mission = collectCoin(mission, 0);
     mission = collectCoin(mission, 1);
+    expect(mission).toMatchObject({carried: 2, deposited: 0});
     expect(missionComplete(level, mission)).toBe(false);
-    expect(missionComplete(level, depositCoins(mission))).toBe(true);
+    mission = assemblePart(mission);
+    expect(mission).toMatchObject({carried: 1, deposited: 1});
+    expect(missionComplete(level, mission)).toBe(false);
+    mission = assemblePart(mission);
+    expect(mission).toMatchObject({carried: 0, deposited: 2});
+    expect(missionComplete(level, mission)).toBe(true);
   });
   it('opens the preparation area after the first switch and exit after the second', () => {
     const start = level.entities[0];
