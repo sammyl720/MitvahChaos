@@ -114,6 +114,9 @@ export class GameScene extends Phaser.Scene {
 
   create(): void {
     createArt(this);
+    const centerBoard = () => this.cameras.main.centerOn(W / 2, H / 2);
+    centerBoard();
+    this.scale.on(Phaser.Scale.Events.RESIZE, centerBoard);
     this.drawBackground();
     this.physics.world.setBounds(12, 34, W - 24, H - 46);
     for (const goal of this.level.goals) this.addGoal(goal);
@@ -153,6 +156,7 @@ export class GameScene extends Phaser.Scene {
 
   private drawBackground(): void {
     const p = this.level.number === 16 ? { sky: 0xf7d7a0, ground: 0xf2c980, accent: 0xc58c60, dark: '#704d45' } : this.level.number === 17 ? { sky: 0xbad7e7, ground: 0xe0eff5, accent: 0x83b7d0, dark: '#446c83' } : this.level.number === 18 ? { sky: 0x9ad7a8, ground: 0xb8dea3, accent: 0x66a27b, dark: '#38664c' } : this.level.number === 19 ? { sky: 0xa3dce0, ground: 0xd9e7cf, accent: 0x73b8ad, dark: '#3d6f70' } : this.level.number === 20 ? { sky: 0xfbd8ab, ground: 0xf1d5e5, accent: 0xc38bbd, dark: '#80557f' } : palette[this.level.world - 1];
+    this.cameras.main.setBackgroundColor(p.sky);
     const g = this.add.graphics();
     g.fillStyle(p.sky).fillRect(0, 0, W, H);
     g.fillStyle(p.ground).fillRoundedRect(8, 33, W - 16, H - 44, 36);
@@ -1201,6 +1205,7 @@ export class GameScene extends Phaser.Scene {
     if (this.paused) this.villageCartTween.pause();
   }
   private moveToTap(destination: Point): void {
+    if (destination.x < 0 || destination.x > W || destination.y < 0 || destination.y > H) return;
     const player = this.engine.get('player');
     if (!player) return;
     const obstacles = this.engine.all().filter((entity) => entity.id !== 'player').map((entity) => ({

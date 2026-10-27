@@ -107,7 +107,7 @@ function GameScreen({ number, onBack, onNext }: { number:number; onBack:()=>void
       parent: canvasHost,
       width:390,height:620,
       backgroundColor:'#fff0c8',
-      scale:{ mode:Phaser.Scale.FIT, autoCenter:Phaser.Scale.CENTER_BOTH, width:390, height:620 },
+      scale:{ mode:Phaser.Scale.EXPAND, autoCenter:Phaser.Scale.NO_CENTER, width:390, height:620 },
       physics:{ default:'arcade', arcade:{ debug:false, gravity:{x:0,y:0} } },
       render:{ antialias:progress.settings.graphicsQuality !== 'low', pixelArt:false },
       scene:[gameScene]

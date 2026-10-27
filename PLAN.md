@@ -46,6 +46,7 @@
 - Replaced the premature checkmark on shared drop-off boxes with item-by-item progress marks that fill after delivery and reset on restart.
 - Made Golda's kitchen crate show each delivered flour sack separately, including after partial delivery and restart.
 - Made Dovi's napkins and Rachel's clean table coverings appear one at a time on their tables as each item is delivered.
+- Centered the fixed-ratio puzzle inside a canvas that fills the stage, extending each level's sky into the former side gutters without stretching sprites or changing tap targets.
 
 ## Next milestones
 

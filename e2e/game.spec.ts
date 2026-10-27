@@ -5,14 +5,16 @@ async function tapWorld(page: import('@playwright/test').Page, x: number, y: num
   const canvas = page.locator('canvas');
   const bounds = await canvas.boundingBox();
   if (!bounds) throw new Error('Canvas has no bounds');
-  await canvas.click({position:{x:x*bounds.width/390,y:y*bounds.height/620}});
+  const scale = Math.min(bounds.width / 390, bounds.height / 620);
+  await canvas.click({position:{x:bounds.width / 2 + (x - 195) * scale,y:bounds.height / 2 + (y - 310) * scale}});
 }
 
 async function tapWorldOnDevice(page: import('@playwright/test').Page, x: number, y: number) {
   const canvas = page.locator('canvas');
   const bounds = await canvas.boundingBox();
   if (!bounds) throw new Error('Canvas has no bounds');
-  const position = {x:x*bounds.width/390,y:y*bounds.height/620};
+  const scale = Math.min(bounds.width / 390, bounds.height / 620);
+  const position = {x:bounds.width / 2 + (x - 195) * scale,y:bounds.height / 2 + (y - 310) * scale};
   if (await page.evaluate(() => navigator.maxTouchPoints > 0)) await canvas.tap({position});
   else await canvas.click({position});
 }
@@ -54,9 +56,15 @@ test('keeps the mission hint outside the playfield', async ({page}) => {
   await expect(hint).toContainText('MAGNETIC');
   const hintBox = await hint.boundingBox();
   const stageBox = await stage.boundingBox();
+  const canvasBox = await page.locator('canvas').boundingBox();
   expect(hintBox).not.toBeNull();
   expect(stageBox).not.toBeNull();
+  expect(canvasBox).not.toBeNull();
   expect(hintBox!.y + hintBox!.height).toBeLessThanOrEqual(stageBox!.y + 1);
+  expect(Math.abs(canvasBox!.x - stageBox!.x)).toBeLessThanOrEqual(1);
+  expect(Math.abs(canvasBox!.y - stageBox!.y)).toBeLessThanOrEqual(1);
+  expect(Math.abs(canvasBox!.width - stageBox!.width)).toBeLessThanOrEqual(1);
+  expect(Math.abs(canvasBox!.height - stageBox!.height)).toBeLessThanOrEqual(1);
   await tapWorld(page, 86, 280);
   await expect(hint).toContainText('selected');
   await page.getByRole('button', {name:'Show mission instructions'}).click();
@@ -89,10 +97,10 @@ test('enlarges the playfield on a short screen and keeps sticker controls usable
   const canvas = page.locator('canvas');
   const stage = page.locator('.stage-shell');
   await expect(canvas).toBeVisible();
-  const fittedWidth = (await canvas.boundingBox())!.width;
+  const fittedHeight = (await canvas.boundingBox())!.height;
   await page.getByRole('button', {name:'Enlarge playfield'}).click();
   await expect(page.getByRole('button', {name:'Fit playfield'})).toBeVisible();
-  await expect.poll(async () => (await canvas.boundingBox())?.width ?? 0).toBeGreaterThan(fittedWidth * 1.5);
+  await expect.poll(async () => (await canvas.boundingBox())?.height ?? 0).toBeGreaterThan(fittedHeight * 1.5);
   const hintBounds = await page.locator('.stage-hint').boundingBox();
   const stageBounds = await stage.boundingBox();
   expect(hintBounds!.y + hintBounds!.height).toBeLessThanOrEqual(stageBounds!.y + 1);
@@ -110,7 +118,7 @@ test('enlarges the playfield on a short screen and keeps sticker controls usable
   await tapWorldOnDevice(page, 193, 495);
   await expect(page.getByText('1/1 switches')).toBeVisible();
   await page.getByRole('button', {name:'Fit playfield'}).click();
-  await expect.poll(async () => (await canvas.boundingBox())?.width ?? 0).toBeLessThan(fittedWidth * 1.1);
+  await expect.poll(async () => (await canvas.boundingBox())?.height ?? 0).toBeLessThan(fittedHeight * 1.1);
   expect(pageErrors).toEqual([]);
 });
 
