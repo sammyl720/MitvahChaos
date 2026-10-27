@@ -38,6 +38,7 @@
 - Added each neighbor's existing thank-you line to the victory screen, with a compact layout that keeps both result actions visible on a short phone display.
 - Connected Leah's and Moshe's tasks on Kingston Avenue: clearing Leah's path prepares a supply bundle, which the player carries to Moshe after steadying his cart.
 - Made Chaya's game table preparation a two-step task: each paper decoration is hung separately and appears on the table.
+- Made the adventurer face the direction of travel and leave alternating, fading footsteps. Reduced-motion mode removes sway and footsteps, while low-graphics mode simplifies the shadow animation and uses fewer footsteps.
 
 ## Next milestones
 

@@ -81,6 +81,7 @@ export class GameScene extends Phaser.Scene {
   private lastCollisionSound = 0;
   private lastHazardNotice = -2000;
   private lastVisualTrail = new Map<string, number>();
+  private playerStride = 0;
   private lastMagnetVisual = 0;
   private reactUntil = new Map<string, number>();
   private stunnedUntil = new Map<string, number>();
@@ -919,16 +920,26 @@ export class GameScene extends Phaser.Scene {
     if (sticker === 'SLIPPERY') this.popText(sprite.x, sprite.y + 30, '✦', '#d6ffff');
   }
   private animatePiece(entity: EntityState, piece: SpritePiece): void {
-    if (this.settings.reducedMotion) return;
     const speed = Math.hypot(entity.vx, entity.vy);
+    if (entity.id === 'player' && Math.abs(entity.vx) > 25) piece.sprite.setFlipX(entity.vx < 0);
+    if (this.settings.reducedMotion) { piece.sprite.setAngle(0); piece.shadow.setScale(1); return; }
     const phase = this.tick * (speed > 35 ? .018 : .003) + entity.id.length;
     if (this.time.now > (this.reactUntil.get(entity.id) ?? 0) && (entity.id !== this.level.bossId || this.time.now > this.bossReactUntil)) piece.sprite.setAngle(Math.sin(phase) * (speed > 35 ? 5 : 2));
     piece.shadow.setAlpha(effectiveStats(entity).canFloat ? .07 + Math.sin(this.tick * .005) * .025 : .17 + Math.sin(this.tick * .003) * .025);
+    if (entity.id === 'player') piece.shadow.setScale(this.settings.graphicsQuality === 'low' || speed < 35 ? 1 : 1 + Math.sin(phase * 2) * .07, 1);
     if (this.tick - (this.lastVisualTrail.get(entity.id) ?? 0) < (this.settings.graphicsQuality === 'low' ? 350 : 150)) return;
     if (speed < 35 && !entity.stickers.includes('FLOATING')) return;
-    const mark = entity.stickers.includes('FAST') ? '⚡' : entity.stickers.includes('SLIPPERY') ? '✧' : entity.stickers.includes('FLOATING') ? '☁' : '·';
-    const trail = this.add.text(entity.x - entity.vx * .035, entity.y - entity.vy * .035, mark, { fontSize: '15px', color: '#ffffff' }).setOrigin(.5).setDepth(4).setAlpha(.65);
-    this.tweens.add({ targets: trail, alpha: 0, scale: .4, duration: 480, onComplete: () => trail.destroy() });
+    if (entity.id === 'player' && !entity.stickers.some((sticker) => sticker === 'FAST' || sticker === 'SLIPPERY' || sticker === 'FLOATING')) {
+      const stride = this.playerStride++ % 2 ? 1 : -1;
+      const dx = entity.vx / speed, dy = entity.vy / speed;
+      const trail = this.add.ellipse(entity.x - dx * 14 - dy * stride * 6, entity.y - dy * 14 + dx * stride * 6 + effectiveStats(entity).radius * .48, 5, 9, 0x5d4a79, .36).setDepth(4);
+      trail.setAngle(Math.atan2(dy, dx) * 180 / Math.PI - 90);
+      this.tweens.add({ targets: trail, alpha: 0, duration: 600, onComplete: () => trail.destroy() });
+    } else {
+      const mark = entity.stickers.includes('FAST') ? '⚡' : entity.stickers.includes('SLIPPERY') ? '✧' : entity.stickers.includes('FLOATING') ? '☁' : '·';
+      const trail = this.add.text(entity.x - entity.vx * .035, entity.y - entity.vy * .035, mark, { fontSize: '15px', color: '#ffffff' }).setOrigin(.5).setDepth(4).setAlpha(.65);
+      this.tweens.add({ targets: trail, alpha: 0, scale: .4, duration: 480, onComplete: () => trail.destroy() });
+    }
     this.lastVisualTrail.set(entity.id,this.tick);
   }
   private burst(x: number, y: number, color: string): void {
@@ -1119,6 +1130,8 @@ export class GameScene extends Phaser.Scene {
     this.tapRoute = [];
     this.stunnedUntil.clear();
     this.tick = 0;
+    this.playerStride = 0;
+    this.lastVisualTrail.clear();
     for (const platform of this.platforms) {
       platform.lastX = platform.definition.x;
       platform.object.x = platform.definition.x;
@@ -1126,7 +1139,7 @@ export class GameScene extends Phaser.Scene {
     }
     this.treasureIcon?.setVisible(true); this.gemIcon?.setVisible(true);
     this.tutorialFinger?.setVisible(true);
-    for (const entity of this.engine.all()) { const piece = this.pieces.get(entity.id); if (!piece) continue; piece.sprite.setPosition(entity.x,entity.y).setVelocity(0,0); this.applyStats(entity.id); this.updateBadges(entity.id); }
+    for (const entity of this.engine.all()) { const piece = this.pieces.get(entity.id); if (!piece) continue; piece.sprite.setPosition(entity.x,entity.y).setVelocity(0,0); if (entity.id === 'player') { piece.sprite.setFlipX(false); piece.shadow.setScale(1); } this.applyStats(entity.id); this.updateBadges(entity.id); }
     this.goalActive = this.level.goals.map(() => false);
     this.goalMarks.forEach((mark) => mark.setFillStyle(0xffe186,.64));
     this.checkGoals(); this.say('Fresh start! Try a new sticker trick.');
