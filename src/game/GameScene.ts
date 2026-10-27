@@ -65,6 +65,7 @@ export class GameScene extends Phaser.Scene {
   private neighborBundle?: Phaser.GameObjects.Text;
   private assemblyDisplay?: Phaser.GameObjects.Text;
   private soupPotArt?: Phaser.GameObjects.Graphics;
+  private preparedTableArt?: Phaser.GameObjects.Graphics;
   private villageCart?: Phaser.GameObjects.Container;
   private villageCartTween?: Phaser.Tweens.Tween;
   private dreidelTableArt?: Phaser.GameObjects.Graphics;
@@ -463,7 +464,7 @@ export class GameScene extends Phaser.Scene {
     const delivery = this.level.mission.kind === 'delivery';
     const assembly = this.level.mission.kind === 'delivery' && Boolean(this.level.mission.assembly);
     const paperDecorations = this.level.number === 11;
-    const tablecloth = this.level.mission.kind === 'delivery' && ['tablecloth', 'napkins'].includes(this.level.mission.itemName);
+    const tableSupplies = this.level.mission.kind === 'delivery' && ['tablecloth', 'napkins'].includes(this.level.mission.itemName);
     const flourSacks = this.level.mission.kind === 'delivery' && this.level.mission.itemName === 'flour sacks';
     const soupSupplies = this.level.mission.kind === 'delivery' && this.level.mission.itemName === 'soup supplies';
     if (this.level.mission.kind === 'delivery' && this.level.mission.fragileZone) {
@@ -484,7 +485,7 @@ export class GameScene extends Phaser.Scene {
       ] : soupSupplies ? [
         this.add.circle(0, 0, 16, index ? 0xe2aa63 : 0xe98063).setStrokeStyle(2, 0x855b59),
         this.add.text(0, 0, index ? '🥕' : '🥔', { fontSize: '20px' }).setOrigin(.5)
-      ] : tablecloth ? [
+      ] : tableSupplies ? [
         this.add.rectangle(0, 0, 31, 24, 0xf7efdb).setStrokeStyle(2, 0x8b5760),
         this.add.rectangle(0, -7, 28, 4, 0x77bfd0),
         this.add.rectangle(0, 3, 28, 3, 0x77bfd0),
@@ -522,12 +523,11 @@ export class GameScene extends Phaser.Scene {
       this.add.rectangle(0, -22, 61, 10, 0xf0cf94).setStrokeStyle(3, 0x654b69),
       this.add.ellipse(0, -17, 21, 9, 0xfff0d0).setStrokeStyle(2, 0x987a66),
       this.add.rectangle(0, 4, 34, 17, 0xf2deac).setStrokeStyle(2, 0x987a66)
-    ] : tablecloth ? [
+    ] : tableSupplies ? [
       this.add.rectangle(0, 10, 58, 24, 0xb68165).setStrokeStyle(3, 0x654b69),
       this.add.rectangle(-21, 30, 5, 27, 0x654b69),
       this.add.rectangle(21, 30, 5, 27, 0x654b69),
-      this.add.rectangle(0, -3, 56, 9, 0xf7efdb).setStrokeStyle(2, 0x77bfd0),
-      this.add.circle(0, -10, 8, 0xffd274).setStrokeStyle(2, 0xffffff)
+      this.add.rectangle(0, -3, 56, 9, 0xd7a477).setStrokeStyle(2, 0x654b69)
     ] : delivery ? [
       this.add.rectangle(0, 4, 48, 53, 0x6cb7c7).setStrokeStyle(3, 0x594a79),
       this.add.rectangle(0, -25, 55, 10, 0xffca64).setStrokeStyle(3, 0x594a79),
@@ -543,6 +543,7 @@ export class GameScene extends Phaser.Scene {
     ]).setDepth(13).setSize(54, 61).setInteractive({ useHandCursor: true });
     stationSprite.on('pointerdown', () => this.deposit());
     if (assembly && this.level.number !== 11) this.assemblyDisplay = this.add.text(station.x, station.y - 43, '◇ '.repeat(missionGoalCount(this.level)).trim(), { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '13px', color: '#604c83', backgroundColor: '#fff6dc', padding: { x: 3, y: 1 } }).setOrigin(.5).setDepth(15);
+    if (tableSupplies) { this.preparedTableArt = this.add.graphics().setDepth(14); this.updatePreparedTableArt(); }
     if (soupSupplies) { this.soupPotArt = this.add.graphics().setDepth(14); this.updateSoupPotArt(); }
     if (this.level.number === 11) { this.dreidelTableArt = this.add.graphics().setDepth(14); this.updateDreidelTableArt(); }
     if (this.level.number === 15) { this.sukkahArt = this.add.graphics().setDepth(1); this.updateSukkahArt(); }
@@ -658,6 +659,7 @@ export class GameScene extends Phaser.Scene {
     const count = mission?.kind === 'delivery' && mission.assembly ? 1 : this.mission.carried;
     this.mission = mission?.kind === 'delivery' && mission.assembly ? assemblePart(this.mission) : depositCoins(this.mission);
     if (mission?.kind === 'delivery' && mission.assembly) this.assemblyDisplay?.setText(`${'◆ '.repeat(this.mission.deposited)}${'◇ '.repeat(missionGoalCount(this.level) - this.mission.deposited)}`.trim());
+    this.updatePreparedTableArt();
     if (this.level.number === 7) this.updateSoupPotArt();
     if (this.level.number === 11) this.updateDreidelTableArt();
     if (this.level.number === 15) this.updateSukkahArt();
@@ -665,6 +667,28 @@ export class GameScene extends Phaser.Scene {
     this.burst(station.x, station.y, '#ffd66e');
     playSound('treasure', this.settings.effectsVolume);
     this.say(missionComplete(this.level, this.mission) ? mission!.npc.thanks : this.level.number === 7 ? `Ingredient ${this.mission.deposited}/${missionGoalCount(this.level)} added to the soup!` : this.level.number === 11 ? `Decoration ${this.mission.deposited}/${missionGoalCount(this.level)} hung!` : mission?.kind === 'delivery' && mission.assembly ? `${this.level.number === 15 ? 'Sukkah section' : this.level.number === 19 ? 'Machine part' : 'Display piece'} ${this.mission.deposited}/${missionGoalCount(this.level)} assembled!` : mission?.kind === 'delivery' ? `${count} item${count === 1 ? '' : 's'} delivered! Find the rest.` : `${count} coin${count === 1 ? '' : 's'} in the pushka! Find the rest.`);
+  }
+  private updatePreparedTableArt(): void {
+    const g = this.preparedTableArt;
+    const mission = this.level.mission;
+    if (!g || mission?.kind !== 'delivery') return;
+    g.clear();
+    if (!this.mission.deposited) return;
+    const { x, y } = mission.station;
+    if (mission.itemName === 'tablecloth') {
+      g.fillStyle(0xf8f1df).fillRoundedRect(x - 29, y - 9, 58, 13, 3);
+      g.lineStyle(2, 0x77bfd0).strokeRoundedRect(x - 29, y - 9, 58, 13, 3);
+      g.fillStyle(0xf8f1df).fillRoundedRect(x - 23, y + 2, 46, 16, 3);
+      g.lineStyle(2, 0x77bfd0).lineBetween(x - 22, y + 12, x + 22, y + 12);
+      g.fillStyle(0xffd274).fillCircle(x, y - 10, 8);
+      g.lineStyle(2, 0xffffff).strokeCircle(x, y - 10, 8);
+    } else {
+      for (const [offset, color] of [[-18, 0x88c8d4], [0, 0xf5d4ab], [18, 0x88c8d4]] as const) {
+        g.fillStyle(0xfbf4df).fillRoundedRect(x + offset - 10, y - 13, 20, 15, 3);
+        g.lineStyle(2, color).strokeRoundedRect(x + offset - 10, y - 13, 20, 15, 3);
+        g.lineStyle(1, color).lineBetween(x + offset - 8, y - 11, x + offset + 8, y);
+      }
+    }
   }
   private updateSoupPotArt(): void {
     const g = this.soupPotArt;
@@ -1168,6 +1192,7 @@ export class GameScene extends Phaser.Scene {
     this.mission = startMission(this.level);
     this.neighborBundle?.setVisible(false);
     if (this.level.mission?.kind === 'delivery' && this.level.mission.assembly) this.assemblyDisplay?.setText('◇ '.repeat(missionGoalCount(this.level)).trim());
+    this.updatePreparedTableArt();
     if (this.level.number === 7) this.updateSoupPotArt();
     if (this.level.number === 11) this.updateDreidelTableArt();
     if (this.level.number === 15) this.updateSukkahArt();
