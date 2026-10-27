@@ -45,8 +45,8 @@ export function deliverGift(state: MissionState, person: number): MissionState {
 }
 
 export function spillSupplies(state: MissionState): MissionState {
-  if (!state.carried || state.deposited) return state;
-  return { collected: state.collected.map(() => false), served: [...state.served], carried: 0, deposited: 0 };
+  if (!state.carried) return state;
+  return { ...state, collected: state.collected.map((_, index) => index < state.deposited), carried: 0 };
 }
 
 export function helpNeighbor(state: MissionState, index: number, handoff?: { from: number; to: number }): MissionState {

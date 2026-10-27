@@ -323,9 +323,12 @@ test('clears the kitchen and carries soup supplies around the spill', async ({pa
   await tapWorld(page, 316, 425);
   await expect(page.locator('.mission-strip')).toContainText('Bag: 2', {timeout:20000});
   await tapWorld(page, 314, 260);
-  await expect(page.getByRole('button', {name:'DELIVER ITEM'})).toBeEnabled({timeout:20000});
-  await page.getByRole('button', {name:'DELIVER ITEM'}).click();
-  await expect(page.locator('.mission-strip')).toContainText('Delivered: 2/2');
+  await expect(page.getByRole('button', {name:'ADD INGREDIENT'})).toBeEnabled({timeout:20000});
+  await page.getByRole('button', {name:'ADD INGREDIENT'}).click();
+  await expect(page.locator('.mission-strip')).toContainText('In pot: 1/2');
+  await expect(page.getByRole('button', {name:'ADD INGREDIENT'})).toBeEnabled();
+  await page.getByRole('button', {name:'ADD INGREDIENT'}).click();
+  await expect(page.locator('.mission-strip')).toContainText('In pot: 2/2');
   await tapWorld(page, 66, 546);
   await expect(page.getByText('🎁 ✓')).toBeVisible({timeout:20000});
   await tapWorld(page, 195, 70);

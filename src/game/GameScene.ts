@@ -64,6 +64,7 @@ export class GameScene extends Phaser.Scene {
   private coinSprites: { x: number; y: number; sprite: Phaser.GameObjects.Container }[] = [];
   private neighborBundle?: Phaser.GameObjects.Text;
   private assemblyDisplay?: Phaser.GameObjects.Text;
+  private soupPotArt?: Phaser.GameObjects.Graphics;
   private dreidelTableArt?: Phaser.GameObjects.Graphics;
   private sukkahArt?: Phaser.GameObjects.Graphics;
   private machineArt?: Phaser.GameObjects.Graphics;
@@ -465,7 +466,7 @@ export class GameScene extends Phaser.Scene {
         this.add.rectangle(-7, -1, 4, 22, 0xffe7a8),
         this.add.rectangle(6, 1, 4, 18, 0xffe7a8),
         this.add.circle(0, -10, 4, 0xffd06e)
-      ] : assembly ? [
+      ] : assembly && !soupSupplies ? [
         this.add.rectangle(0, 0, 26, 29, 0xe6cf92).setStrokeStyle(3, 0x80628e),
         this.add.circle(0, -2, 7, 0x8acbd2).setStrokeStyle(2, 0xffffff),
         this.add.text(0, 1, String(index + 1), { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '11px', color: '#564275', fontStyle: 'bold' }).setOrigin(.5)
@@ -495,7 +496,7 @@ export class GameScene extends Phaser.Scene {
       return { x, y, sprite };
     });
     const station = this.level.mission.station;
-    const stationSprite = this.add.container(station.x, station.y, assembly ? [
+    const stationSprite = this.add.container(station.x, station.y, assembly && !soupSupplies ? [
       this.add.rectangle(0, 15, 64, 30, 0xa87961).setStrokeStyle(3, 0x624b73),
       this.add.rectangle(0, -7, 62, 15, 0xf4dcad).setStrokeStyle(2, 0x97769b),
       this.add.circle(-20, -16, 4, 0x84c9d7), this.add.circle(0, -16, 4, 0x84c9d7), this.add.circle(20, -16, 4, 0x84c9d7)
@@ -531,6 +532,7 @@ export class GameScene extends Phaser.Scene {
     ]).setDepth(13).setSize(54, 61).setInteractive({ useHandCursor: true });
     stationSprite.on('pointerdown', () => this.deposit());
     if (assembly && this.level.number !== 11) this.assemblyDisplay = this.add.text(station.x, station.y - 43, '◇ '.repeat(missionGoalCount(this.level)).trim(), { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '13px', color: '#604c83', backgroundColor: '#fff6dc', padding: { x: 3, y: 1 } }).setOrigin(.5).setDepth(15);
+    if (soupSupplies) { this.soupPotArt = this.add.graphics().setDepth(14); this.updateSoupPotArt(); }
     if (this.level.number === 11) { this.dreidelTableArt = this.add.graphics().setDepth(14); this.updateDreidelTableArt(); }
     if (this.level.number === 15) { this.sukkahArt = this.add.graphics().setDepth(1); this.updateSukkahArt(); }
     if (this.level.number === 19) { this.machineArt = this.add.graphics().setDepth(1); this.updateMachineArt(); }
@@ -641,16 +643,33 @@ export class GameScene extends Phaser.Scene {
     if (!station || !player || this.paused || this.completed) return;
     if (Math.hypot(player.x - station.x, player.y - station.y) > 64) { this.say(mission?.kind === 'delivery' ? `Come closer to the ${mission.stationLabel.toLowerCase()}.` : 'Come closer to the pushka.'); return; }
     if (!this.mission.carried) { this.say(mission?.kind === 'delivery' ? `Find the ${mission.itemName} first!` : 'Find the runaway coins first!'); return; }
-    if (mission?.kind === 'delivery' && mission.fragileZone && this.mission.carried < missionGoalCount(this.level)) { this.say('Bring all the soup supplies together, and keep them clear of the spill!'); return; }
+    if (mission?.kind === 'delivery' && mission.fragileZone && !this.mission.deposited && this.mission.carried < missionGoalCount(this.level)) { this.say('Bring all the soup supplies together, and keep them clear of the spill!'); return; }
     const count = mission?.kind === 'delivery' && mission.assembly ? 1 : this.mission.carried;
     this.mission = mission?.kind === 'delivery' && mission.assembly ? assemblePart(this.mission) : depositCoins(this.mission);
     if (mission?.kind === 'delivery' && mission.assembly) this.assemblyDisplay?.setText(`${'◆ '.repeat(this.mission.deposited)}${'◇ '.repeat(missionGoalCount(this.level) - this.mission.deposited)}`.trim());
+    if (this.level.number === 7) this.updateSoupPotArt();
     if (this.level.number === 11) this.updateDreidelTableArt();
     if (this.level.number === 15) this.updateSukkahArt();
     if (this.level.number === 19) this.updateMachineArt();
     this.burst(station.x, station.y, '#ffd66e');
     playSound('treasure', this.settings.effectsVolume);
-    this.say(missionComplete(this.level, this.mission) ? mission!.npc.thanks : this.level.number === 11 ? `Decoration ${this.mission.deposited}/${missionGoalCount(this.level)} hung!` : mission?.kind === 'delivery' && mission.assembly ? `${this.level.number === 15 ? 'Sukkah section' : this.level.number === 19 ? 'Machine part' : 'Display piece'} ${this.mission.deposited}/${missionGoalCount(this.level)} assembled!` : mission?.kind === 'delivery' ? `${count} item${count === 1 ? '' : 's'} delivered! Find the rest.` : `${count} coin${count === 1 ? '' : 's'} in the pushka! Find the rest.`);
+    this.say(missionComplete(this.level, this.mission) ? mission!.npc.thanks : this.level.number === 7 ? `Ingredient ${this.mission.deposited}/${missionGoalCount(this.level)} added to the soup!` : this.level.number === 11 ? `Decoration ${this.mission.deposited}/${missionGoalCount(this.level)} hung!` : mission?.kind === 'delivery' && mission.assembly ? `${this.level.number === 15 ? 'Sukkah section' : this.level.number === 19 ? 'Machine part' : 'Display piece'} ${this.mission.deposited}/${missionGoalCount(this.level)} assembled!` : mission?.kind === 'delivery' ? `${count} item${count === 1 ? '' : 's'} delivered! Find the rest.` : `${count} coin${count === 1 ? '' : 's'} in the pushka! Find the rest.`);
+  }
+  private updateSoupPotArt(): void {
+    const g = this.soupPotArt;
+    const mission = this.level.mission;
+    if (!g || mission?.kind !== 'delivery') return;
+    const { x, y } = mission.station;
+    g.clear();
+    if (this.mission.deposited >= 1) {
+      g.fillStyle(0xe7c68f).fillEllipse(x - 10, y - 18, 13, 8);
+      g.lineStyle(1, 0x946d55).strokeEllipse(x - 10, y - 18, 13, 8);
+    }
+    if (this.mission.deposited >= 2) {
+      g.fillStyle(0xe6854a).fillTriangle(x + 4, y - 22, x + 19, y - 17, x + 5, y - 13);
+      g.lineStyle(2, 0x6c9e62).lineBetween(x + 5, y - 21, x + 2, y - 25);
+      g.fillStyle(0xffe1a7, .9).fillCircle(x - 1, y - 19, 2).fillCircle(x + 16, y - 21, 2);
+    }
   }
   private updateDreidelTableArt(): void {
     const g = this.dreidelTableArt;
@@ -1122,6 +1141,7 @@ export class GameScene extends Phaser.Scene {
     this.mission = startMission(this.level);
     this.neighborBundle?.setVisible(false);
     if (this.level.mission?.kind === 'delivery' && this.level.mission.assembly) this.assemblyDisplay?.setText('◇ '.repeat(missionGoalCount(this.level)).trim());
+    if (this.level.number === 7) this.updateSoupPotArt();
     if (this.level.number === 11) this.updateDreidelTableArt();
     if (this.level.number === 15) this.updateSukkahArt();
     if (this.level.number === 19) this.updateMachineArt();
@@ -1239,7 +1259,7 @@ export class GameScene extends Phaser.Scene {
       const zone = mission.fragileZone;
       if (Math.abs(player.x - zone.x) < zone.w / 2 + 10 && Math.abs(player.y - zone.y) < zone.h / 2 + 10) {
         this.mission = spillSupplies(this.mission);
-        this.coinSprites.forEach((coin, index) => { coin.x = mission.items[index].x; coin.y = mission.items[index].y; coin.sprite.setPosition(coin.x, coin.y).setVisible(true); });
+        this.coinSprites.forEach((coin, index) => { coin.x = mission.items[index].x; coin.y = mission.items[index].y; coin.sprite.setPosition(coin.x, coin.y).setVisible(!this.mission.collected[index]); });
         this.burst(player.x, player.y, '#e8a45e');
         this.say('Oops, the supplies spilled! Pick them up again and go around the puddle.');
       }

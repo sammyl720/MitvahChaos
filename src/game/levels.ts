@@ -212,7 +212,7 @@ export const LEVELS: Level[] = [LevelSchema.parse({
   number: 7,
   name: 'Chicken Soup Catastrophe',
   world: 2,
-  hint: 'Shrink the crate blocking the kitchen, steady the soup shelf, then carry both supplies around the spill to the pot!',
+  hint: 'Shrink the crate blocking the kitchen, steady the soup shelf, then carry both supplies around the spill and add them to the pot one at a time!',
   entities: [
     { id: 'player', kind: 'bandit', label: 'YOU', x: 194, y: 517, stickers: [], behavior: 'idle' },
     { id: 'tiny-chick', kind: 'chicken', label: 'TINY CHICK', x: 73, y: 496, stickers: ['TINY'], behavior: 'idle' },
@@ -243,6 +243,9 @@ export const LEVELS: Level[] = [LevelSchema.parse({
     items: [{ x: 68, y: 464 }, { x: 316, y: 425 }],
     itemName: 'soup supplies',
     stationLabel: 'SOUP POT',
+    assembly: true,
+    actionLabel: 'ADD INGREDIENT',
+    progressLabel: 'In pot',
     station: { x: 314, y: 213 },
     fragileZone: { x: 195, y: 363, w: 74, h: 43 },
     npc: { x: 350, y: 263, name: 'BASYA', greeting: 'The kitchen is blocked and the soup supplies could spill. Can you clear a safe path?', thanks: 'The supplies made it safely! Now everyone can share warm soup.' }

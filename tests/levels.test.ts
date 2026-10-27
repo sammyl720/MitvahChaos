@@ -419,7 +419,14 @@ describe('Chicken Soup Catastrophe', () => {
     expect(spillSupplies(mission).carried).toBe(0);
     expect(spillSupplies(mission).collected).toEqual([false, false]);
     mission = collectCoin(mission, 1);
-    mission = depositCoins(mission);
+    expect(level.mission?.kind === 'delivery' && level.mission.assembly).toBe(true);
+    mission = assemblePart(mission);
+    expect(mission).toMatchObject({ carried: 1, deposited: 1 });
+    expect(missionComplete(level, mission)).toBe(false);
+    const spilledAfterFirstIngredient = spillSupplies(mission);
+    expect(spilledAfterFirstIngredient).toMatchObject({ collected: [true, false], carried: 0, deposited: 1 });
+    expect(missionComplete(level, spilledAfterFirstIngredient)).toBe(false);
+    mission = assemblePart(mission);
     expect(missionComplete(level, mission)).toBe(true);
   });
   it('has a route around the spill to the kitchen after its gates open', () => {
