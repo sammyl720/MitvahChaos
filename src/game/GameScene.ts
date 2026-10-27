@@ -66,6 +66,7 @@ export class GameScene extends Phaser.Scene {
   private assemblyDisplay?: Phaser.GameObjects.Text;
   private soupPotArt?: Phaser.GameObjects.Graphics;
   private preparedTableArt?: Phaser.GameObjects.Graphics;
+  private flourStationArt?: Phaser.GameObjects.Graphics;
   private deliveryStationArt?: Phaser.GameObjects.Graphics;
   private villageCart?: Phaser.GameObjects.Container;
   private villageCartTween?: Phaser.Tweens.Tween;
@@ -546,6 +547,7 @@ export class GameScene extends Phaser.Scene {
     if (assembly && this.level.number !== 11) this.assemblyDisplay = this.add.text(station.x, station.y - 43, '◇ '.repeat(missionGoalCount(this.level)).trim(), { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '13px', color: '#604c83', backgroundColor: '#fff6dc', padding: { x: 3, y: 1 } }).setOrigin(.5).setDepth(15);
     if (tableSupplies) { this.preparedTableArt = this.add.graphics().setDepth(14); this.updatePreparedTableArt(); }
     if (soupSupplies) { this.soupPotArt = this.add.graphics().setDepth(14); this.updateSoupPotArt(); }
+    if (flourSacks) { this.flourStationArt = this.add.graphics().setDepth(14); this.updateFlourStationArt(); }
     if (genericDelivery) { this.deliveryStationArt = this.add.graphics().setDepth(14); this.updateDeliveryStationArt(); }
     if (this.level.number === 11) { this.dreidelTableArt = this.add.graphics().setDepth(14); this.updateDreidelTableArt(); }
     if (this.level.number === 15) { this.sukkahArt = this.add.graphics().setDepth(1); this.updateSukkahArt(); }
@@ -662,6 +664,7 @@ export class GameScene extends Phaser.Scene {
     this.mission = mission?.kind === 'delivery' && mission.assembly ? assemblePart(this.mission) : depositCoins(this.mission);
     if (mission?.kind === 'delivery' && mission.assembly) this.assemblyDisplay?.setText(`${'◆ '.repeat(this.mission.deposited)}${'◇ '.repeat(missionGoalCount(this.level) - this.mission.deposited)}`.trim());
     this.updatePreparedTableArt();
+    this.updateFlourStationArt();
     this.updateDeliveryStationArt();
     if (this.level.number === 7) this.updateSoupPotArt();
     if (this.level.number === 11) this.updateDreidelTableArt();
@@ -709,6 +712,20 @@ export class GameScene extends Phaser.Scene {
       g.fillStyle(delivered ? 0x65bd95 : 0xd8d3cf).fillRoundedRect(markX, y + 7, width, 10, 2);
       g.lineStyle(1, 0x665b72).strokeRoundedRect(markX, y + 7, width, 10, 2);
       if (delivered) g.lineStyle(1.5, 0xffffff).lineBetween(markX + 2, y + 12, markX + width - 2, y + 12);
+    }
+  }
+  private updateFlourStationArt(): void {
+    const g = this.flourStationArt;
+    const mission = this.level.mission;
+    if (!g || mission?.kind !== 'delivery' || mission.itemName !== 'flour sacks') return;
+    const { x, y } = mission.station;
+    g.clear();
+    for (let index = 0; index < this.mission.deposited; index++) {
+      const sackX = x + (index ? 11 : -11);
+      g.fillStyle(0xf2e1ba).fillEllipse(sackX, y + 8, 18, 23);
+      g.lineStyle(2, 0x8b6c59).strokeEllipse(sackX, y + 8, 18, 23);
+      g.fillStyle(0xb98d65).fillRoundedRect(sackX - 5, y - 5, 10, 4, 1);
+      g.lineStyle(1, 0xb98d65).lineBetween(sackX - 5, y + 7, sackX + 5, y + 7);
     }
   }
   private updateSoupPotArt(): void {
@@ -1214,6 +1231,7 @@ export class GameScene extends Phaser.Scene {
     this.neighborBundle?.setVisible(false);
     if (this.level.mission?.kind === 'delivery' && this.level.mission.assembly) this.assemblyDisplay?.setText('◇ '.repeat(missionGoalCount(this.level)).trim());
     this.updatePreparedTableArt();
+    this.updateFlourStationArt();
     this.updateDeliveryStationArt();
     if (this.level.number === 7) this.updateSoupPotArt();
     if (this.level.number === 11) this.updateDreidelTableArt();

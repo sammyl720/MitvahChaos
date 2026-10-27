@@ -44,6 +44,7 @@
 - Added a miniature cart that runs through Tova's village model when its mechanism activates. Pause stops the cart; reduced-motion and low-graphics modes show a still active cart.
 - Made Miriam's table and Dovi's bakery table start bare, then show their cloth or napkins when the player delivers them.
 - Replaced the premature checkmark on shared drop-off boxes with item-by-item progress marks that fill after delivery and reset on restart.
+- Made Golda's kitchen crate show each delivered flour sack separately, including after partial delivery and restart.
 
 ## Next milestones
 

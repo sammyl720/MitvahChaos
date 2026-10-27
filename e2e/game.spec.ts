@@ -285,9 +285,13 @@ test('slides the heavy wagon into the catch switch and delivers flour', async ({
   await expect(page.getByText('2/2 switches')).toBeVisible({timeout:12000});
   await tapWorld(page, 65, 206);
   await expect(page.locator('.mission-strip')).toContainText('Bag: 1', {timeout:20000});
+  await tapWorld(page, 65, 160);
+  await tapWorld(page, 312, 160);
+  await expect(page.getByRole('button', {name:'DELIVER ITEM'})).toBeEnabled({timeout:12000});
+  await page.getByRole('button', {name:'DELIVER ITEM'}).click();
+  await expect(page.locator('.mission-strip')).toContainText('Delivered: 1/2');
   await tapWorld(page, 260, 205);
-  await expect(page.locator('.mission-strip')).toContainText('Bag: 2', {timeout:20000});
-  await tapWorld(page, 267, 207);
+  await expect(page.locator('.mission-strip')).toContainText('Bag: 1', {timeout:20000});
   await expect(page.getByRole('button', {name:'DELIVER ITEM'})).toBeEnabled({timeout:12000});
   await page.getByRole('button', {name:'DELIVER ITEM'}).click();
   await expect(page.locator('.mission-strip')).toContainText('Delivered: 2/2');
