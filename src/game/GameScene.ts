@@ -65,6 +65,8 @@ export class GameScene extends Phaser.Scene {
   private neighborBundle?: Phaser.GameObjects.Text;
   private assemblyDisplay?: Phaser.GameObjects.Text;
   private soupPotArt?: Phaser.GameObjects.Graphics;
+  private villageCart?: Phaser.GameObjects.Container;
+  private villageCartTween?: Phaser.Tweens.Tween;
   private dreidelTableArt?: Phaser.GameObjects.Graphics;
   private sukkahArt?: Phaser.GameObjects.Graphics;
   private machineArt?: Phaser.GameObjects.Graphics;
@@ -267,6 +269,15 @@ export class GameScene extends Phaser.Scene {
           g.fillStyle(roof).fillTriangle(x - 3, 226, x + 15, 207, x + 34, 226);
           g.fillStyle(0xffedba).fillRoundedRect(x + 11, 234, 9, 12, 2);
         }
+        g.fillStyle(0xe0c295, .9).fillRoundedRect(125, 278, 138, 18, 4);
+        g.lineStyle(2, 0x806975).lineBetween(134, 288, 253, 288);
+        g.lineStyle(2, 0x9c7870).lineBetween(134, 292, 253, 292);
+        this.villageCart = this.add.container(140, 285, [
+          this.add.rectangle(0, -5, 28, 12, 0x60aab6).setStrokeStyle(2, 0x5b6779),
+          this.add.rectangle(0, -13, 22, 5, 0xffd389),
+          this.add.circle(-9, 3, 3, 0x4d526a),
+          this.add.circle(9, 3, 3, 0x4d526a)
+        ]).setAlpha(.65).setDepth(2);
         this.add.text(195, 178, 'LITTLE VILLAGE MODEL', { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '11px', color: '#654f61', backgroundColor: '#fff5d9', padding: { x: 7, y: 4 } }).setOrigin(.5).setDepth(1);
       }
       if (this.level.number === 9) {
@@ -1099,9 +1110,25 @@ export class GameScene extends Phaser.Scene {
     });
     const open = this.goalActive.every(Boolean);
     this.exitGlow?.setFillStyle(open ? 0x85ecb4 : 0xffcf85, .85);
+    this.syncVillageModel();
     this.updateFixtures();
     this.updateBoss();
     this.emitStatus();
+  }
+  private syncVillageModel(): void {
+    const cart = this.villageCart;
+    if (!cart) return;
+    const active = Boolean(this.goalActive[1]);
+    const still = this.settings.reducedMotion || this.settings.graphicsQuality === 'low';
+    if (!active || still) {
+      if (this.villageCartTween) { this.tweens.killTweensOf(cart); this.villageCartTween = undefined; }
+      cart.setPosition(active ? 244 : 140, 285).setAlpha(active ? 1 : .65);
+      return;
+    }
+    if (this.villageCartTween) return;
+    cart.setPosition(140, 285).setAlpha(1);
+    this.villageCartTween = this.tweens.add({ targets: cart, x: 244, duration: 1750, ease: 'Sine.easeInOut', yoyo: true, repeat: -1 });
+    if (this.paused) this.villageCartTween.pause();
   }
   private moveToTap(destination: Point): void {
     const player = this.engine.get('player');
@@ -1117,8 +1144,8 @@ export class GameScene extends Phaser.Scene {
     if (!route) this.say('That way is blocked. Try a switch first!');
   }
   setJoystick(x: number, y: number): void { this.moveVector = { x, y }; if (x || y) this.tapRoute = []; }
-  updateSettings(settings: GameSettings): void { this.settings = settings; }
-  setPaused(value: boolean): void { this.paused = value; if (value) this.physics.pause(); else this.physics.resume(); }
+  updateSettings(settings: GameSettings): void { this.settings = settings; this.syncVillageModel(); }
+  setPaused(value: boolean): void { this.paused = value; if (value) { this.physics.pause(); this.villageCartTween?.pause(); } else { this.physics.resume(); this.villageCartTween?.resume(); } }
   undo(): void {
     this.completionTimer?.remove(); this.completionTimer = undefined; this.completed = false;
     if (!this.engine.undo()) { this.say('Nothing to undo yet.'); return; }
