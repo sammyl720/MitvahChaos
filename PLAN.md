@@ -43,6 +43,7 @@
 - Made Basya's soup preparation a two-step station task: bring both supplies around the spill, then add the ingredients separately and see each one appear in the pot.
 - Added a miniature cart that runs through Tova's village model when its mechanism activates. Pause stops the cart; reduced-motion and low-graphics modes show a still active cart.
 - Made Miriam's table and Dovi's bakery table start bare, then show their cloth or napkins when the player delivers them.
+- Replaced the premature checkmark on shared drop-off boxes with item-by-item progress marks that fill after delivery and reset on restart.
 
 ## Next milestones
 

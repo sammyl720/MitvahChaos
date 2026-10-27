@@ -66,6 +66,7 @@ export class GameScene extends Phaser.Scene {
   private assemblyDisplay?: Phaser.GameObjects.Text;
   private soupPotArt?: Phaser.GameObjects.Graphics;
   private preparedTableArt?: Phaser.GameObjects.Graphics;
+  private deliveryStationArt?: Phaser.GameObjects.Graphics;
   private villageCart?: Phaser.GameObjects.Container;
   private villageCartTween?: Phaser.Tweens.Tween;
   private dreidelTableArt?: Phaser.GameObjects.Graphics;
@@ -467,6 +468,7 @@ export class GameScene extends Phaser.Scene {
     const tableSupplies = this.level.mission.kind === 'delivery' && ['tablecloth', 'napkins'].includes(this.level.mission.itemName);
     const flourSacks = this.level.mission.kind === 'delivery' && this.level.mission.itemName === 'flour sacks';
     const soupSupplies = this.level.mission.kind === 'delivery' && this.level.mission.itemName === 'soup supplies';
+    const genericDelivery = delivery && !assembly && !tableSupplies && !flourSacks && !soupSupplies;
     if (this.level.mission.kind === 'delivery' && this.level.mission.fragileZone) {
       const zone = this.level.mission.fragileZone;
       this.add.ellipse(zone.x, zone.y, zone.w, zone.h, 0xe8a45e, .85).setStrokeStyle(3, 0xffe5a8).setDepth(2);
@@ -532,8 +534,7 @@ export class GameScene extends Phaser.Scene {
       this.add.rectangle(0, 4, 48, 53, 0x6cb7c7).setStrokeStyle(3, 0x594a79),
       this.add.rectangle(0, -25, 55, 10, 0xffca64).setStrokeStyle(3, 0x594a79),
       this.add.rectangle(0, -5, 28, 5, 0x594a79),
-      this.add.rectangle(0, 12, 30, 17, 0xf7efdb).setStrokeStyle(2, 0x594a79),
-      this.add.text(0, 12, '✓', { fontSize: '15px', color: '#4b7792' }).setOrigin(.5)
+      this.add.rectangle(0, 12, 30, 17, 0xf7efdb).setStrokeStyle(2, 0x594a79)
     ] : [
       this.add.rectangle(0, 5, 47, 47, 0x6cb7c7).setStrokeStyle(4, 0x594a79),
       this.add.rectangle(0, -22, 52, 13, 0xffca64).setStrokeStyle(3, 0x594a79),
@@ -545,6 +546,7 @@ export class GameScene extends Phaser.Scene {
     if (assembly && this.level.number !== 11) this.assemblyDisplay = this.add.text(station.x, station.y - 43, '◇ '.repeat(missionGoalCount(this.level)).trim(), { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '13px', color: '#604c83', backgroundColor: '#fff6dc', padding: { x: 3, y: 1 } }).setOrigin(.5).setDepth(15);
     if (tableSupplies) { this.preparedTableArt = this.add.graphics().setDepth(14); this.updatePreparedTableArt(); }
     if (soupSupplies) { this.soupPotArt = this.add.graphics().setDepth(14); this.updateSoupPotArt(); }
+    if (genericDelivery) { this.deliveryStationArt = this.add.graphics().setDepth(14); this.updateDeliveryStationArt(); }
     if (this.level.number === 11) { this.dreidelTableArt = this.add.graphics().setDepth(14); this.updateDreidelTableArt(); }
     if (this.level.number === 15) { this.sukkahArt = this.add.graphics().setDepth(1); this.updateSukkahArt(); }
     if (this.level.number === 19) { this.machineArt = this.add.graphics().setDepth(1); this.updateMachineArt(); }
@@ -660,6 +662,7 @@ export class GameScene extends Phaser.Scene {
     this.mission = mission?.kind === 'delivery' && mission.assembly ? assemblePart(this.mission) : depositCoins(this.mission);
     if (mission?.kind === 'delivery' && mission.assembly) this.assemblyDisplay?.setText(`${'◆ '.repeat(this.mission.deposited)}${'◇ '.repeat(missionGoalCount(this.level) - this.mission.deposited)}`.trim());
     this.updatePreparedTableArt();
+    this.updateDeliveryStationArt();
     if (this.level.number === 7) this.updateSoupPotArt();
     if (this.level.number === 11) this.updateDreidelTableArt();
     if (this.level.number === 15) this.updateSukkahArt();
@@ -688,6 +691,24 @@ export class GameScene extends Phaser.Scene {
         g.lineStyle(2, color).strokeRoundedRect(x + offset - 10, y - 13, 20, 15, 3);
         g.lineStyle(1, color).lineBetween(x + offset - 8, y - 11, x + offset + 8, y);
       }
+    }
+  }
+  private updateDeliveryStationArt(): void {
+    const g = this.deliveryStationArt;
+    const mission = this.level.mission;
+    if (!g || mission?.kind !== 'delivery') return;
+    const { x, y } = mission.station;
+    const goal = missionGoalCount(this.level);
+    const width = goal === 1 ? 18 : goal === 2 ? 10 : 7;
+    const gap = goal === 1 ? 0 : 2;
+    const left = x - (goal * width + (goal - 1) * gap) / 2;
+    g.clear();
+    for (let index = 0; index < goal; index++) {
+      const markX = left + index * (width + gap);
+      const delivered = index < this.mission.deposited;
+      g.fillStyle(delivered ? 0x65bd95 : 0xd8d3cf).fillRoundedRect(markX, y + 7, width, 10, 2);
+      g.lineStyle(1, 0x665b72).strokeRoundedRect(markX, y + 7, width, 10, 2);
+      if (delivered) g.lineStyle(1.5, 0xffffff).lineBetween(markX + 2, y + 12, markX + width - 2, y + 12);
     }
   }
   private updateSoupPotArt(): void {
@@ -1193,6 +1214,7 @@ export class GameScene extends Phaser.Scene {
     this.neighborBundle?.setVisible(false);
     if (this.level.mission?.kind === 'delivery' && this.level.mission.assembly) this.assemblyDisplay?.setText('◇ '.repeat(missionGoalCount(this.level)).trim());
     this.updatePreparedTableArt();
+    this.updateDeliveryStationArt();
     if (this.level.number === 7) this.updateSoupPotArt();
     if (this.level.number === 11) this.updateDreidelTableArt();
     if (this.level.number === 15) this.updateSukkahArt();
