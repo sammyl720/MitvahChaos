@@ -466,7 +466,7 @@ export class GameScene extends Phaser.Scene {
     const delivery = this.level.mission.kind === 'delivery';
     const assembly = this.level.mission.kind === 'delivery' && Boolean(this.level.mission.assembly);
     const paperDecorations = this.level.number === 11;
-    const tableSupplies = this.level.mission.kind === 'delivery' && ['tablecloth', 'napkins'].includes(this.level.mission.itemName);
+    const tableSupplies = this.level.mission.kind === 'delivery' && ['tablecloth', 'napkins', 'clean table coverings'].includes(this.level.mission.itemName);
     const flourSacks = this.level.mission.kind === 'delivery' && this.level.mission.itemName === 'flour sacks';
     const soupSupplies = this.level.mission.kind === 'delivery' && this.level.mission.itemName === 'soup supplies';
     const genericDelivery = delivery && !assembly && !tableSupplies && !flourSacks && !soupSupplies;
@@ -688,11 +688,19 @@ export class GameScene extends Phaser.Scene {
       g.lineStyle(2, 0x77bfd0).lineBetween(x - 22, y + 12, x + 22, y + 12);
       g.fillStyle(0xffd274).fillCircle(x, y - 10, 8);
       g.lineStyle(2, 0xffffff).strokeCircle(x, y - 10, 8);
-    } else {
-      for (const [offset, color] of [[-18, 0x88c8d4], [0, 0xf5d4ab], [18, 0x88c8d4]] as const) {
-        g.fillStyle(0xfbf4df).fillRoundedRect(x + offset - 10, y - 13, 20, 15, 3);
-        g.lineStyle(2, color).strokeRoundedRect(x + offset - 10, y - 13, 20, 15, 3);
-        g.lineStyle(1, color).lineBetween(x + offset - 8, y - 11, x + offset + 8, y);
+    } else if (mission.itemName === 'napkins') {
+      for (let index = 0; index < this.mission.deposited; index++) {
+        const napkinX = x + (index ? 14 : -14);
+        g.fillStyle(0xfbf4df).fillRoundedRect(napkinX - 10, y - 13, 20, 15, 3);
+        g.lineStyle(2, 0x88c8d4).strokeRoundedRect(napkinX - 10, y - 13, 20, 15, 3);
+        g.lineStyle(1, 0x88c8d4).lineBetween(napkinX - 8, y - 11, napkinX + 8, y);
+      }
+    } else if (mission.itemName === 'clean table coverings') {
+      for (let index = 0; index < this.mission.deposited; index++) {
+        const coveringX = x + (index ? 14 : -14);
+        g.fillStyle(0xf8f1df).fillRoundedRect(coveringX - 14, y - 10, 28, 20, 2);
+        g.lineStyle(2, 0x77bfd0).strokeRoundedRect(coveringX - 14, y - 10, 28, 20, 2);
+        g.lineStyle(1, 0x77bfd0).lineBetween(coveringX - 10, y + 5, coveringX + 10, y + 5);
       }
     }
   }

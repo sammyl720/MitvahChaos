@@ -45,6 +45,7 @@
 - Made Miriam's table and Dovi's bakery table start bare, then show their cloth or napkins when the player delivers them.
 - Replaced the premature checkmark on shared drop-off boxes with item-by-item progress marks that fill after delivery and reset on restart.
 - Made Golda's kitchen crate show each delivered flour sack separately, including after partial delivery and restart.
+- Made Dovi's napkins and Rachel's clean table coverings appear one at a time on their tables as each item is delivered.
 
 ## Next milestones
 
