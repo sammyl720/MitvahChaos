@@ -40,6 +40,9 @@ interface WorldTheme {
   melody: (number | null)[];
   bass: number[];
   harmony: [number, number][];
+  responseVoice: OscillatorType;
+  responseGate: number;
+  response: Readonly<Record<number, number>>;
 }
 
 // Four original four-bar themes. Notes are MIDI pitches; nulls leave room for the accompaniment.
@@ -48,25 +51,33 @@ const worldThemes: WorldTheme[] = [
     stepMs: 270, lead: 'triangle', gate: .83,
     melody: [72,76,79,null,76,74,72,null,74,77,81,79,77,76,74,null,76,79,84,null,81,79,77,null,76,74,72,74,76,79,72,null],
     bass: [48,55,53,55,48,57,53,55],
-    harmony: [[60,64],[59,62],[60,65],[59,62]]
+    harmony: [[60,64],[59,62],[60,65],[59,62]],
+    responseVoice: 'sine', responseGate: .56,
+    response: {3:67,7:64,11:74,15:67,19:72,23:69,27:67,31:74}
   },
   {
     stepMs: 310, lead: 'sine', gate: .94,
     melody: [74,null,77,76,74,72,69,null,72,74,77,81,79,77,76,null,74,77,81,84,81,79,77,null,76,74,72,69,72,74,69,null],
     bass: [50,45,46,48,50,53,46,45],
-    harmony: [[62,65],[60,65],[58,62],[61,64]]
+    harmony: [[62,65],[60,65],[58,62],[61,64]],
+    responseVoice: 'triangle', responseGate: .72,
+    response: {1:69,7:65,15:65,19:65,23:62,27:68,31:64}
   },
   {
     stepMs: 235, lead: 'triangle', gate: .68,
     melody: [79,81,83,86,83,81,79,null,81,83,86,88,86,83,81,null,79,83,86,91,88,86,83,null,81,79,76,79,81,83,79,null],
     bass: [55,50,48,50,55,52,48,50],
-    harmony: [[67,71],[66,69],[64,67],[66,69]]
+    harmony: [[67,71],[66,69],[64,67],[66,69]],
+    responseVoice: 'square', responseGate: .42,
+    response: {3:74,7:71,11:74,15:69,19:76,23:72,27:74,31:69}
   },
   {
     stepMs: 250, lead: 'sine', gate: .78,
     melody: [81,83,85,88,85,83,81,null,78,81,83,85,83,81,78,null,81,85,88,90,88,85,83,null,81,78,76,78,81,83,85,null],
     bass: [57,52,54,50,57,54,50,52],
-    harmony: [[69,73],[68,71],[66,69],[68,71]]
+    harmony: [[69,73],[68,71],[66,69],[68,71]],
+    responseVoice: 'sine', responseGate: .9,
+    response: {3:76,7:73,11:71,15:71,19:76,23:69,27:71,31:68}
   }
 ];
 
@@ -90,6 +101,8 @@ export function startMusic(world: number, volume: number): void {
     const step = musicStep % theme.melody.length;
     const note = theme.melody[step];
     if (note !== null) musicNote(pitch(note),musicVolume,theme.lead,theme.stepMs * theme.gate / 1000,.03);
+    const response = theme.response[step];
+    if (response !== undefined) musicNote(pitch(response),musicVolume,theme.responseVoice,theme.stepMs * theme.responseGate / 1000,theme.responseVoice === 'square' ? .007 : .012);
     if (step % 4 === 0) musicNote(pitch(theme.bass[step / 4]),musicVolume,'triangle',theme.stepMs * 3.4 / 1000,.018);
     if (step % 8 === 0) {
       const chord = theme.harmony[step / 8];

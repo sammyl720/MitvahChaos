@@ -4,6 +4,7 @@ afterEach(() => { vi.unstubAllGlobals(); vi.resetModules(); });
 
 test('world music has distinct voices and obeys pause, volume, and stop', async () => {
   const frequencies: number[] = [];
+  const voices: string[] = [];
   let tick = () => {};
   const clearInterval = vi.fn();
   vi.stubGlobal('window', {
@@ -18,7 +19,7 @@ test('world music has distinct voices and obeys pause, volume, and stop', async 
       const oscillator = {
         type: 'sine', frequency: {value:0},
         connect: () => oscillator,
-        start: () => { frequencies.push(oscillator.frequency.value); },
+        start: () => { frequencies.push(oscillator.frequency.value); voices.push(oscillator.type); },
         stop: () => {}
       };
       return oscillator;
@@ -33,9 +34,9 @@ test('world music has distinct voices and obeys pause, volume, and stop', async 
   });
   const audio = await import('../src/game/audio');
   audio.startMusic(1, .5);
-  tick();
+  for (let step = 0; step < 8; step++) tick();
   const firstWorld = [...frequencies];
-  expect(firstWorld.length).toBeGreaterThan(1);
+  expect(firstWorld.length).toBeGreaterThan(8);
   audio.setMusicPaused(true);
   tick();
   expect(frequencies).toEqual(firstWorld);
@@ -43,9 +44,15 @@ test('world music has distinct voices and obeys pause, volume, and stop', async 
   audio.setMusicVolume(0);
   tick();
   expect(frequencies).toEqual(firstWorld);
-  audio.startMusic(2, .5);
-  tick();
-  expect(frequencies.slice(firstWorld.length,firstWorld.length * 2)).not.toEqual(firstWorld);
+  const worldPhrases = [firstWorld];
+  for (const world of [2,3,4]) {
+    const start = frequencies.length;
+    audio.startMusic(world, .5);
+    for (let step = 0; step < 8; step++) tick();
+    worldPhrases.push(frequencies.slice(start));
+  }
+  expect(new Set(worldPhrases.map((phrase) => phrase.join(','))).size).toBe(4);
+  expect(voices).toContain('square');
   audio.stopMusic();
   expect(clearInterval).toHaveBeenCalled();
 });
