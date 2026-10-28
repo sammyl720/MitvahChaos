@@ -48,6 +48,7 @@
 - Made Dovi's napkins and Rachel's clean table coverings appear one at a time on their tables as each item is delivered.
 - Centered the fixed-ratio puzzle inside a canvas that fills the stage, then extended each level's board floor and border across the whole canvas without stretching sprites or changing tap targets.
 - Added muted, world-specific scenery in the new side areas: neighboring buildings, village cottages, festival columns, and climate-specific world details.
+- Made the three community-home windows in Snowy Shlichus light up as each recovered winter pack is delivered.
 
 ## Next milestones
 

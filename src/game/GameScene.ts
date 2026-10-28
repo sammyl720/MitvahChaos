@@ -793,6 +793,18 @@ export class GameScene extends Phaser.Scene {
       g.lineStyle(1, 0x665b72).strokeRoundedRect(markX, y + 7, width, 10, 2);
       if (delivered) g.lineStyle(1.5, 0xffffff).lineBetween(markX + 2, y + 12, markX + width - 2, y + 12);
     }
+    if (this.level.number === 17) {
+      // Each recovered winter pack lights a window in Rivka's community home.
+      for (let index = 0; index < goal; index++) {
+        const windowX = 158 + index * 37;
+        const delivered = index < this.mission.deposited;
+        g.fillStyle(delivered ? 0xffe1a1 : 0x91a9b4, .95).fillRoundedRect(windowX - 12, 184, 24, 27, 3);
+        g.lineStyle(2, 0x647f92).strokeRoundedRect(windowX - 12, 184, 24, 27, 3);
+        if (!delivered) continue;
+        g.fillStyle([0xb68ad5, 0x80b8cb, 0xe6a577][index]).fillRoundedRect(windowX - 8, 195, 16, 10, 2);
+        g.lineStyle(2, 0xfff6e3).lineBetween(windowX, 195, windowX, 205);
+      }
+    }
   }
   private updateFlourStationArt(): void {
     const g = this.flourStationArt;
