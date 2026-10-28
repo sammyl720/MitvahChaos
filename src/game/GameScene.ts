@@ -214,8 +214,72 @@ export class GameScene extends Phaser.Scene {
       g.lineStyle(8, 0x7ed7df, .3).lineBetween(20, 350, 369, 350);
     }
     g.fillStyle(0xffffff, .18).fillRect(stageLeft, 42, stageWidth, H - 60);
+    this.drawSideScenery(g);
     this.drawWorldDetails();
     this.add.text(195, 42, `WORLD ${this.level.world}  •  ${this.level.number.toString().padStart(2, '0')}`, { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '12px', color: p.dark, fontStyle: 'bold' }).setOrigin(.5).setDepth(2);
+  }
+
+  private drawSideScenery(g: Phaser.GameObjects.Graphics): void {
+    // These pieces sit outside the puzzle's physics bounds. They give the
+    // expanded board a setting without suggesting new interactive routes.
+    for (const x of [-105, 495]) {
+      if (this.level.world === 1) {
+        g.fillStyle(0xc98976, .48).fillRoundedRect(x - 37, 195, 74, 257, 5);
+        g.fillStyle(0x76566e, .52).fillTriangle(x - 44, 196, x, 158, x + 44, 196);
+        for (const y of [221, 289, 357]) for (const dx of [-19, 15]) {
+          g.fillStyle(0xffeed0, .67).fillRoundedRect(x + dx - 9, y, 18, 30, 3);
+          g.lineStyle(2, 0x83677b, .44).strokeRoundedRect(x + dx - 9, y, 18, 30, 3);
+        }
+        g.fillStyle(0x7a7896, .52).fillRoundedRect(x - 12, 402, 24, 50, 3);
+      } else if (this.level.world === 2) {
+        g.fillStyle(0xe7c99f, .6).fillRoundedRect(x - 43, 218, 86, 220, 5);
+        g.fillStyle(0x937382, .62).fillTriangle(x - 50, 220, x, 164, x + 50, 220);
+        for (const y of [244, 310, 376]) for (const dx of [-23, 20]) {
+          g.fillStyle(0xffefd3, .72).fillRoundedRect(x + dx - 10, y, 20, 27, 3);
+          g.lineStyle(2, 0x927a85, .45).strokeRoundedRect(x + dx - 10, y, 20, 27, 3);
+        }
+        g.fillStyle(0x8e797e, .5).fillRoundedRect(x - 12, 401, 24, 37, 3);
+      } else if (this.level.world === 3) {
+        g.fillStyle(0x8292b6, .42).fillRoundedRect(x - 28, 176, 56, 333, 6);
+        for (let y = 194; y < 505; y += 46) g.lineStyle(3, 0xecedf8, .45).lineBetween(x - 27, y, x + 27, y);
+        g.lineStyle(3, 0xb47eb9, .55).lineBetween(x - 40, 204, x + 40, 204);
+        for (const dx of [-26, 0, 26]) {
+          g.fillStyle(dx ? 0xf5c877 : 0x9ddbe0, .65).fillTriangle(x + dx - 11, 205, x + dx + 11, 205, x + dx, 225);
+        }
+        g.fillStyle(0xffdf9a, .45).fillCircle(x, 442, 24);
+      } else if (this.level.number === 16) {
+        g.fillStyle(0xa87551, .64).fillRoundedRect(x - 7, 268, 14, 205, 6);
+        for (const y of [278, 318, 357]) {
+          g.fillStyle(0x73a77b, .69).fillEllipse(x, y, 91, 23);
+          g.fillStyle(0x8abb8d, .57).fillEllipse(x - 20, y - 13, 39, 46);
+        }
+      } else if (this.level.number === 17) {
+        g.fillStyle(0x819ba5, .58).fillRoundedRect(x - 7, 258, 14, 232, 5);
+        for (const [y, width] of [[205, 96], [260, 115], [323, 134], [391, 155]] as const) {
+          g.fillStyle(0x6e9ca0, .65).fillTriangle(x - width / 2, y + 86, x, y, x + width / 2, y + 86);
+          g.fillStyle(0xf1f8f9, .52).fillTriangle(x - width / 3, y + 30, x, y, x + width / 3, y + 30);
+        }
+      } else if (this.level.number === 18) {
+        g.fillStyle(0x785e49, .63).fillRoundedRect(x - 10, 264, 20, 212, 6);
+        for (const [dx, y, radius] of [[0, 232, 61], [-39, 264, 42], [41, 267, 43]] as const) {
+          g.fillStyle(0x59956d, .63).fillCircle(x + dx, y, radius);
+          g.fillStyle(0x8fbc79, .38).fillCircle(x + dx - 13, y - 16, radius * .55);
+        }
+      } else if (this.level.number === 19) {
+        g.fillStyle(0x69a49b, .52).fillRoundedRect(x - 38, 194, 76, 283, 10);
+        g.lineStyle(4, 0xd7eecb, .48).strokeRoundedRect(x - 38, 194, 76, 283, 10);
+        for (const y of [233, 301, 369, 437]) {
+          g.fillStyle(0xffdf9b, .6).fillCircle(x, y, 15);
+          g.fillStyle(0xf6f5df, .52).fillCircle(x, y, 6);
+        }
+      } else {
+        for (const [dx, y, color] of [[-26, 246, 0xf9c477], [23, 275, 0xa9dace], [0, 206, 0xd8b2e4]] as const) {
+          g.lineStyle(2, 0x9b769a, .47).lineBetween(x + dx, y + 27, x + dx, 502);
+          g.fillStyle(color, .63).fillCircle(x + dx, y, 26);
+          g.lineStyle(2, 0xfff6e8, .56).strokeCircle(x + dx, y, 26);
+        }
+      }
+    }
   }
 
   private drawWorldDetails(): void {
