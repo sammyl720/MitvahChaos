@@ -157,10 +157,14 @@ export class GameScene extends Phaser.Scene {
   private drawBackground(): void {
     const p = this.level.number === 16 ? { sky: 0xf7d7a0, ground: 0xf2c980, accent: 0xc58c60, dark: '#704d45' } : this.level.number === 17 ? { sky: 0xbad7e7, ground: 0xe0eff5, accent: 0x83b7d0, dark: '#446c83' } : this.level.number === 18 ? { sky: 0x9ad7a8, ground: 0xb8dea3, accent: 0x66a27b, dark: '#38664c' } : this.level.number === 19 ? { sky: 0xa3dce0, ground: 0xd9e7cf, accent: 0x73b8ad, dark: '#3d6f70' } : this.level.number === 20 ? { sky: 0xfbd8ab, ground: 0xf1d5e5, accent: 0xc38bbd, dark: '#80557f' } : palette[this.level.world - 1];
     this.cameras.main.setBackgroundColor(p.sky);
-    const g = this.add.graphics();
-    g.fillStyle(p.sky).fillRect(0, 0, W, H);
-    g.fillStyle(p.ground).fillRoundedRect(8, 33, W - 16, H - 44, 36);
-    g.lineStyle(5, p.accent, 0.75).strokeRoundedRect(8, 33, W - 16, H - 44, 36);
+    // The camera can be wider than the 390-unit puzzle. Paint the whole visible
+    // stage as one board so wide screens never expose empty side gutters.
+    const stageWidth = W * 8;
+    const stageLeft = (W - stageWidth) / 2;
+    const g = this.add.graphics().setDepth(-1);
+    g.fillStyle(p.sky).fillRect(stageLeft, 0, stageWidth, H);
+    g.fillStyle(p.ground).fillRect(stageLeft, 33, stageWidth, H - 44);
+    g.lineStyle(5, p.accent, 0.75).lineBetween(stageLeft, 33, stageLeft + stageWidth, 33).lineBetween(stageLeft, H - 11, stageLeft + stageWidth, H - 11);
     if (this.level.world === 1) {
       for (let i = 0; i < 7; i++) { const x = 24 + i * 56; g.fillStyle(0x80c881, .45).fillCircle(x, 151 + (i % 3) * 149, 23); g.fillStyle(0xfff2bc, .75).fillCircle(x + 10, 145 + (i % 3) * 149, 6); }
       if (this.level.number === 4) {
@@ -209,7 +213,7 @@ export class GameScene extends Phaser.Scene {
       for (let i = 0; i < 7; i++) { g.lineStyle(7, 0xe891ec, .25).strokeCircle(33 + i * 57, 168 + (i % 3) * 148, 24); g.fillStyle(0x7fe1ed, .2).fillCircle(33 + i * 57, 168 + (i % 3) * 148, 10); }
       g.lineStyle(8, 0x7ed7df, .3).lineBetween(20, 350, 369, 350);
     }
-    g.fillStyle(0xffffff, .18).fillRoundedRect(18, 42, 354, 560, 30);
+    g.fillStyle(0xffffff, .18).fillRect(stageLeft, 42, stageWidth, H - 60);
     this.drawWorldDetails();
     this.add.text(195, 42, `WORLD ${this.level.world}  •  ${this.level.number.toString().padStart(2, '0')}`, { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '12px', color: p.dark, fontStyle: 'bold' }).setOrigin(.5).setDepth(2);
   }
