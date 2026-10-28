@@ -638,7 +638,7 @@ export const LEVELS: Level[] = [LevelSchema.parse({
   number: 18,
   name: 'Jungle Mitzvah Mission',
   world: 4,
-  hint: 'Make the bridge crate BIG, bounce the vine ball across the path, then give the counterweight HEAVY. Help both neighbors reach the gathering!',
+  hint: 'Make the bridge crate BIG, bounce the vine ball, then steady the counterweight with HEAVY. Bring Avi’s gathering supplies to Maya!',
   entities: [
     { id: 'player', kind: 'bandit', label: 'YOU', x: 195, y: 520, stickers: [], behavior: 'idle' },
     { id: 'big-fruit', kind: 'apple', label: 'BIG FRUIT', x: 70, y: 510, stickers: ['BIG'], behavior: 'idle' },
@@ -671,9 +671,10 @@ export const LEVELS: Level[] = [LevelSchema.parse({
   mission: {
     kind: 'neighbors',
     people: [
-      { x: 75, y: 224, name: 'AVI', greeting: 'Can you make the bridge sturdy so I can reach the gathering?', thanks: 'The bridge is ready. Thank you for helping me!', needsGoal: 0 },
-      { x: 316, y: 224, name: 'MAYA', greeting: 'Please clear the vine path and steady the crossing too.', thanks: 'Now everyone can meet safely. Thank you!', needsGoal: 2 }
-    ]
+      { x: 75, y: 224, name: 'AVI', greeting: 'Once the bridge is sturdy, I can pack supplies for the gathering. Please take them to Maya!', thanks: 'The supplies are packed for Maya. Thank you!', needsGoal: 0 },
+      { x: 316, y: 224, name: 'MAYA', greeting: 'Please clear the vines, steady the crossing, and bring Avi’s supplies so we can set up together.', thanks: 'Avi’s supplies are here. Now we can welcome everyone together!', needsGoal: 2 }
+    ],
+    handoff: { from: 0, to: 1, itemName: 'gathering supplies' }
   }
 }), LevelSchema.parse({
   number: 19,

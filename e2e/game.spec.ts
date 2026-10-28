@@ -226,7 +226,7 @@ test('clears Kingston Avenue and helps both neighbors', async ({page}) => {
   await tapWorld(page, 276, 139);
   await expect(page.getByRole('button', {name:'HELP NEIGHBOR'})).toBeEnabled({timeout:20000});
   await page.getByRole('button', {name:'HELP NEIGHBOR'}).click();
-  await expect(page.locator('.mission-strip')).toContainText('Helped: 2/2 · 📦 0/1');
+  await expect(page.locator('.mission-strip')).toContainText('Helped: 2/2 · 📦 delivered');
   await tapWorld(page, 66, 548);
   await expect(page.getByText('🎁 ✓')).toBeVisible({timeout:20000});
   await tapWorld(page, 195, 70);
@@ -721,11 +721,13 @@ test('opens the jungle path and helps both neighbors', async ({page}) => {
   await tapWorld(page, 65, 170);
   await expect(page.getByRole('button', {name:'HELP NEIGHBOR'})).toBeEnabled({timeout:20000});
   await page.getByRole('button', {name:'HELP NEIGHBOR'}).click();
-  await expect(page.locator('.mission-strip')).toContainText('Neighbors helped: 1/2');
+  await expect(page.locator('.mission-strip')).toContainText('Helped: 1/2 · 📦 1/1');
+  await expect(page.locator('.stage-hint')).toContainText('Take the gathering supplies to MAYA');
   await tapWorld(page, 266, 224);
   await expect(page.getByRole('button', {name:'HELP NEIGHBOR'})).toBeEnabled({timeout:20000});
   await page.getByRole('button', {name:'HELP NEIGHBOR'}).click();
-  await expect(page.locator('.mission-strip')).toContainText('Neighbors helped: 2/2');
+  await expect(page.locator('.mission-strip')).toContainText('Helped: 2/2 · 📦 delivered');
+  await expect(page.locator('.stage-hint')).toContainText('Avi and Maya hung the welcome bunting together!');
   await tapWorld(page, 135, 550);
   await expect(page.getByText('🎁 ✓')).toBeVisible({timeout:20000});
   await tapWorld(page, 195, 70);

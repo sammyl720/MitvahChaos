@@ -63,6 +63,9 @@ export class GameScene extends Phaser.Scene {
   private mission: MissionState;
   private coinSprites: { x: number; y: number; sprite: Phaser.GameObjects.Container }[] = [];
   private neighborBundle?: Phaser.GameObjects.Text;
+  private neighborActors: { sprite: Phaser.GameObjects.Container; label: Phaser.GameObjects.Text; x: number; y: number }[] = [];
+  private jungleGarland?: Phaser.GameObjects.Graphics;
+  private jungleTweens: Phaser.Tweens.Tween[] = [];
   private assemblyDisplay?: Phaser.GameObjects.Text;
   private soupPotArt?: Phaser.GameObjects.Graphics;
   private preparedTableArt?: Phaser.GameObjects.Graphics;
@@ -649,9 +652,19 @@ export class GameScene extends Phaser.Scene {
         this.add.arc(0, 0, 5, 15, 165, false, 0x000000, 0).setStrokeStyle(2, 0x94546b)
       ]).setDepth(12).setSize(44, 53).setInteractive({ useHandCursor: true });
       friend.on('pointerdown', () => this.helpNeighbor(index));
-      this.add.text(npc.x, npc.y + 29, npc.name, { fontSize: '10px', color: '#50366e', backgroundColor: '#fff7de', padding: { x: 4, y: 2 } }).setOrigin(.5).setDepth(13);
+      const label = this.add.text(npc.x, npc.y + 29, npc.name, { fontSize: '10px', color: '#50366e', backgroundColor: '#fff7de', padding: { x: 4, y: 2 } }).setOrigin(.5).setDepth(13);
+      this.neighborActors.push({ sprite: friend, label, x: npc.x, y: npc.y });
     });
     if (mission.handoff) this.neighborBundle = this.add.text(0, 0, '📦', { fontSize: '23px' }).setOrigin(.5).setDepth(15).setVisible(false);
+    if (this.level.number === 18) {
+      const g = this.add.graphics().setDepth(11).setVisible(false);
+      g.lineStyle(3, 0xffe5a4).lineBetween(145, 199, 245, 199);
+      for (const [x, color] of [[161, 0xf8c276], [184, 0xa7d9c1], [207, 0xd4afe7], [230, 0xf4a9b8]] as const) {
+        g.fillStyle(color).fillTriangle(x - 11, 200, x + 11, 200, x, 219);
+        g.lineStyle(1, 0xfff8de).lineBetween(x - 11, 200, x + 11, 200);
+      }
+      this.jungleGarland = g;
+    }
   }
   private addGiftMission(): void {
     const mission = this.level.mission;
@@ -698,7 +711,8 @@ export class GameScene extends Phaser.Scene {
     if (mission?.kind !== 'neighbors' || !player || this.paused || this.completed) return;
     const npc = mission.people[index];
     if (!npc) return;
-    if (Math.hypot(player.x - npc.x, player.y - npc.y) > 72) { this.say(`Come closer to ${npc.name}.`); return; }
+    const actor = this.neighborActors[index]?.sprite;
+    if (Math.hypot(player.x - (actor?.x ?? npc.x), player.y - (actor?.y ?? npc.y)) > 72) { this.say(`Come closer to ${npc.name}.`); return; }
     if (this.mission.collected[index]) { this.say(npc.thanks); return; }
     if (!this.goalActive[npc.needsGoal]) { this.say(npc.greeting); return; }
     if (mission.handoff?.to === index && !this.mission.carried) { this.say(`Bring ${mission.people[mission.handoff.from].name}'s ${mission.handoff.itemName} first.`); return; }
@@ -706,7 +720,28 @@ export class GameScene extends Phaser.Scene {
     this.neighborBundle?.setVisible(this.mission.carried > 0);
     this.burst(npc.x, npc.y, '#8ce0b1');
     playSound('goal', this.settings.effectsVolume);
-    this.say(mission.handoff?.from === index ? `${npc.thanks} Take the ${mission.handoff.itemName} to ${mission.people[mission.handoff.to].name}.` : npc.thanks);
+    if (this.level.number === 18 && actor) {
+      const destination = index ? 245 : 145;
+      const label = this.neighborActors[index].label;
+      if (this.settings.reducedMotion || this.settings.graphicsQuality === 'low') {
+        actor.x = destination;
+        label.x = destination;
+      } else {
+        const tween = this.tweens.add({ targets: [actor, label], x: destination, duration: 550, ease: 'Sine.easeInOut' });
+        this.jungleTweens.push(tween);
+        if (this.paused) tween.pause();
+      }
+      if (missionComplete(this.level, this.mission) && this.jungleGarland) {
+        this.jungleGarland.setVisible(true);
+        if (!this.settings.reducedMotion && this.settings.graphicsQuality !== 'low') {
+          this.jungleGarland.setAlpha(0);
+          const tween = this.tweens.add({ targets: this.jungleGarland, alpha: 1, duration: 500, delay: 300 });
+          this.jungleTweens.push(tween);
+          if (this.paused) tween.pause();
+        }
+      }
+    }
+    this.say(this.level.number === 18 && missionComplete(this.level, this.mission) ? 'Avi and Maya hung the welcome bunting together!' : mission.handoff?.from === index ? `${npc.thanks} Take the ${mission.handoff.itemName} to ${mission.people[mission.handoff.to].name}.` : npc.thanks);
   }
   deposit(): void {
     const mission = this.level.mission;
@@ -1299,8 +1334,21 @@ export class GameScene extends Phaser.Scene {
     if (!route) this.say('That way is blocked. Try a switch first!');
   }
   setJoystick(x: number, y: number): void { this.moveVector = { x, y }; if (x || y) this.tapRoute = []; }
-  updateSettings(settings: GameSettings): void { this.settings = settings; this.syncVillageModel(); }
-  setPaused(value: boolean): void { this.paused = value; if (value) { this.physics.pause(); this.villageCartTween?.pause(); } else { this.physics.resume(); this.villageCartTween?.resume(); } }
+  updateSettings(settings: GameSettings): void {
+    this.settings = settings;
+    this.syncVillageModel();
+    if (this.level.number !== 18 || !(settings.reducedMotion || settings.graphicsQuality === 'low')) return;
+    this.jungleTweens.forEach((tween) => tween.stop());
+    this.jungleTweens = [];
+    this.neighborActors.forEach(({ sprite, label }, index) => {
+      if (!this.mission.collected[index]) return;
+      const destination = index ? 245 : 145;
+      sprite.x = destination;
+      label.x = destination;
+    });
+    if (missionComplete(this.level, this.mission)) this.jungleGarland?.setVisible(true).setAlpha(1);
+  }
+  setPaused(value: boolean): void { this.paused = value; if (value) { this.physics.pause(); this.villageCartTween?.pause(); this.jungleTweens.forEach((tween) => tween.pause()); } else { this.physics.resume(); this.villageCartTween?.resume(); this.jungleTweens.forEach((tween) => tween.resume()); } }
   undo(): void {
     this.completionTimer?.remove(); this.completionTimer = undefined; this.completed = false;
     if (!this.engine.undo()) { this.say('Nothing to undo yet.'); return; }
@@ -1322,6 +1370,10 @@ export class GameScene extends Phaser.Scene {
     this.engine.resetLevel(); this.treasure = false; this.gem = false; this.transfers = 0; this.completed = false; this.armed = null; this.selectedId = null;
     this.mission = startMission(this.level);
     this.neighborBundle?.setVisible(false);
+    this.jungleTweens.forEach((tween) => tween.stop());
+    this.jungleTweens = [];
+    this.neighborActors.forEach(({ sprite, label, x, y }) => { sprite.setPosition(x, y); label.setPosition(x, y + 29); });
+    this.jungleGarland?.setVisible(false).setAlpha(1);
     if (this.level.mission?.kind === 'delivery' && this.level.mission.assembly) this.assemblyDisplay?.setText('◇ '.repeat(missionGoalCount(this.level)).trim());
     this.updatePreparedTableArt();
     this.updateFlourStationArt();
