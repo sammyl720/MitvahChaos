@@ -50,6 +50,7 @@
 - Added muted, world-specific scenery in the new side areas: neighboring buildings, village cottages, festival columns, and climate-specific world details.
 - Made the three community-home windows in Snowy Shlichus light up as each recovered winter pack is delivered.
 - Made Ezra's desert supply packs unpack one at a time: water and blankets appear inside the welcome tent as each pack is opened.
+- Made Reizel receive parcels individually across the Floating Bridge; each parcel appears on her far-bank shelf.
 - Made Avi pass gathering supplies to Maya in Jungle Mitzvah Mission; both neighbors move toward the gathering and raise a welcome garland when they finish together. Completed neighbor handoffs now show the bundle as delivered.
 
 ## Next milestones
@@ -63,5 +64,5 @@
 - Mission actions support coin collection, item delivery, staged neighbor assistance, a neighbor-to-neighbor supply handoff, simple display assembly, and separate gifts for multiple recipients. More preparation sequences and cooperation remain to be built.
 - Music is synthesized locally with original themes for all four worlds and the finale; the sound palette remains deliberately simple.
 - The fitted 390×620 playfield is about 174 px wide on a 320×568 viewport; the optional full-width view is 320 px wide and can be panned. Tap-target usability still needs actual-device review.
-- Isolated Level 1 tap-route browser reruns intermittently timed out after the full suite passed; the same runs passed on retry. Recheck the route on a physical device.
+- Isolated browser reruns of Levels 1 and 9 have intermittently failed to mount the canvas after route suites passed; the same runs passed on retry. Recheck on a physical device.
 - Community review of dialogue and cultural detail is pending.

@@ -88,7 +88,11 @@ describe('The Desert Delivery', () => {
     mission = collectCoin(mission, 0);
     mission = collectCoin(mission, 1);
     expect(missionComplete(level, mission)).toBe(false);
-    mission = depositCoins(mission);
+    expect(level.mission?.kind === 'delivery' && level.mission.oneAtATime).toBe(true);
+    mission = assemblePart(mission);
+    expect(mission).toMatchObject({ carried: 1, deposited: 1 });
+    expect(missionComplete(level, mission)).toBe(false);
+    mission = assemblePart(mission);
     expect(missionComplete(level, mission)).toBe(true);
   });
 });
@@ -221,7 +225,11 @@ describe('The Floating Bridge', () => {
     mission = collectCoin(mission, 0);
     mission = collectCoin(mission, 1);
     expect(missionComplete(level, mission)).toBe(false);
-    mission = depositCoins(mission);
+    expect(level.mission?.kind === 'delivery' && level.mission.oneAtATime).toBe(true);
+    mission = assemblePart(mission);
+    expect(mission).toMatchObject({ carried: 1, deposited: 1 });
+    expect(missionComplete(level, mission)).toBe(false);
+    mission = assemblePart(mission);
     expect(missionComplete(level, mission)).toBe(true);
   });
   it('makes the water a true route barrier until the player floats', () => {

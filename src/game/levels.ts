@@ -313,11 +313,14 @@ export const LEVELS: Level[] = [LevelSchema.parse({
   ],
   mission: {
     kind: 'delivery',
+    oneAtATime: true,
+    actionLabel: 'HAND OVER PARCEL',
+    progressLabel: 'Received',
     items: [{ x: 65, y: 445 }, { x: 318, y: 443 }],
     itemName: 'village supplies',
     stationLabel: 'FAR BANK',
     station: { x: 309, y: 212 },
-    npc: { x: 350, y: 261, name: 'REIZEL', greeting: 'The stream is up! Can you float the supplies to our side?', thanks: 'You crossed safely with everything we needed. Thank you!' }
+    npc: { x: 350, y: 261, name: 'REIZEL', greeting: 'The stream is up! Can you float both parcels over and hand each one to me?', thanks: 'Both parcels are safely on our shelf. Thank you for crossing the stream!' }
   }
 }), LevelSchema.parse({
   number: 10,
