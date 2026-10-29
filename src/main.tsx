@@ -100,21 +100,27 @@ function GameScreen({ number, onBack, onNext }: { number:number; onBack:()=>void
       onBounce: () => recordBounce(),
       onComplete: (stars,gem,tiny) => { completeLevel(number,stars,gem,tiny); if (number === 20) startCelebrationMusic(progress.settings.musicVolume); setResult({stars,gem}); }
     }, progress.settings, progress.selectedCosmetic, progress.selectedCharacter);
-    startMusic(level.world, progress.settings.musicVolume);
-    scene.current = gameScene;
-    const game = new Phaser.Game({
-      type: progress.settings.graphicsQuality === 'low' ? Phaser.CANVAS : Phaser.AUTO,
-      parent: canvasHost,
-      width:390,height:620,
-      backgroundColor:'#fff0c8',
-      scale:{ mode:Phaser.Scale.EXPAND, autoCenter:Phaser.Scale.NO_CENTER, width:390, height:620 },
-      physics:{ default:'arcade', arcade:{ debug:false, gravity:{x:0,y:0} } },
-      render:{ antialias:progress.settings.graphicsQuality !== 'low', pixelArt:false },
-      scene:[gameScene]
-    });
+    let game: Phaser.Game | null = null;
     const visibility = () => { if(document.hidden){gameScene.setPaused(true);setMusicPaused(true);setPaused(true);} };
-    document.addEventListener('visibilitychange',visibility);
-    return () => { document.removeEventListener('visibilitychange',visibility); scene.current=null; stopMusic(); game.destroy(true); canvasHost.replaceChildren(); };
+    // Strict Mode immediately cleans up its first effect run. Let that run
+    // cancel before Phaser creates a canvas or starts its render loop.
+    const mountFrame = requestAnimationFrame(() => {
+      if (!canvasHost.isConnected) return;
+      startMusic(level.world, progress.settings.musicVolume);
+      scene.current = gameScene;
+      game = new Phaser.Game({
+        type: progress.settings.graphicsQuality === 'low' ? Phaser.CANVAS : Phaser.AUTO,
+        parent: canvasHost,
+        width:390,height:620,
+        backgroundColor:'#fff0c8',
+        scale:{ mode:Phaser.Scale.EXPAND, autoCenter:Phaser.Scale.NO_CENTER, width:390, height:620 },
+        physics:{ default:'arcade', arcade:{ debug:false, gravity:{x:0,y:0} } },
+        render:{ antialias:progress.settings.graphicsQuality !== 'low', pixelArt:false },
+        scene:[gameScene]
+      });
+      document.addEventListener('visibilitychange',visibility);
+    });
+    return () => { cancelAnimationFrame(mountFrame); document.removeEventListener('visibilitychange',visibility); if (scene.current === gameScene) scene.current=null; stopMusic(); game?.destroy(true); canvasHost.replaceChildren(); };
     // A level's game is intentionally mounted once; settings can be changed from the menu.
   },[number]);
   useEffect(() => {

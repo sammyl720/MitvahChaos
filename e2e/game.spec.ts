@@ -46,6 +46,26 @@ test('explains adventure words without crowding the sticker book on a small scre
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
 });
 
+test('mounts one canvas when entering and leaving levels repeatedly', async ({page}) => {
+  const pageErrors: string[] = [];
+  page.on('pageerror', (error) => pageErrors.push(error.message));
+  await page.addInitScript(({key, progress}) => {
+    localStorage.setItem(key, JSON.stringify(progress));
+  }, {key:PROGRESS_KEY, progress:{...DEFAULT_PROGRESS, completedLevels:[1,2,3,4,5,6,7,8]}});
+  await page.goto('/');
+  await page.getByRole('button', {name:/PLAY/}).first().click();
+  for (let index = 0; index < 6; index++) {
+    const level = index % 2 ? 'Level 9: The Floating Bridge' : 'Level 1: The Runaway Pushka';
+    await page.getByRole('button', {name:level}).click();
+    await expect(page.locator('canvas')).toHaveCount(1);
+    await expect(page.locator('canvas')).toBeVisible();
+    await page.getByRole('button', {name:'Pause'}).click();
+    await page.getByRole('button', {name:'WORLD MAP'}).click();
+    await expect(page.locator('canvas')).toHaveCount(0);
+  }
+  expect(pageErrors).toEqual([]);
+});
+
 test('keeps the mission hint outside the playfield', async ({page}) => {
   await page.goto('/');
   await page.getByRole('button', {name:/PLAY/}).first().click();
