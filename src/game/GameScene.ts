@@ -767,8 +767,9 @@ export class GameScene extends Phaser.Scene {
     if (Math.hypot(player.x - station.x, player.y - station.y) > 64) { this.say(mission?.kind === 'delivery' ? `Come closer to the ${mission.stationLabel.toLowerCase()}.` : 'Come closer to the pushka.'); return; }
     if (!this.mission.carried) { this.say(mission?.kind === 'delivery' ? `Find the ${mission.itemName} first!` : 'Find the runaway coins first!'); return; }
     if (mission?.kind === 'delivery' && mission.fragileZone && !this.mission.deposited && this.mission.carried < missionGoalCount(this.level)) { this.say('Bring all the soup supplies together, and keep them clear of the spill!'); return; }
-    const count = mission?.kind === 'delivery' && mission.assembly ? 1 : this.mission.carried;
-    this.mission = mission?.kind === 'delivery' && mission.assembly ? assemblePart(this.mission) : depositCoins(this.mission);
+    const oneAtATime = mission?.kind === 'delivery' && (mission.assembly || mission.oneAtATime);
+    const count = oneAtATime ? 1 : this.mission.carried;
+    this.mission = oneAtATime ? assemblePart(this.mission) : depositCoins(this.mission);
     if (mission?.kind === 'delivery' && mission.assembly) this.assemblyDisplay?.setText(`${'◆ '.repeat(this.mission.deposited)}${'◇ '.repeat(missionGoalCount(this.level) - this.mission.deposited)}`.trim());
     this.updatePreparedTableArt();
     this.updateFlourStationArt();
@@ -779,7 +780,7 @@ export class GameScene extends Phaser.Scene {
     if (this.level.number === 19) this.updateMachineArt();
     this.burst(station.x, station.y, '#ffd66e');
     playSound('treasure', this.settings.effectsVolume);
-    this.say(missionComplete(this.level, this.mission) ? mission!.npc.thanks : this.level.number === 7 ? `Ingredient ${this.mission.deposited}/${missionGoalCount(this.level)} added to the soup!` : this.level.number === 11 ? `Decoration ${this.mission.deposited}/${missionGoalCount(this.level)} hung!` : mission?.kind === 'delivery' && mission.assembly ? `${this.level.number === 15 ? 'Sukkah section' : this.level.number === 19 ? 'Machine part' : 'Display piece'} ${this.mission.deposited}/${missionGoalCount(this.level)} assembled!` : mission?.kind === 'delivery' ? `${count} item${count === 1 ? '' : 's'} delivered! Find the rest.` : `${count} coin${count === 1 ? '' : 's'} in the pushka! Find the rest.`);
+    this.say(missionComplete(this.level, this.mission) ? mission!.npc.thanks : this.level.number === 16 ? `Supply pack ${this.mission.deposited}/${missionGoalCount(this.level)} unpacked at the welcome tent!` : this.level.number === 7 ? `Ingredient ${this.mission.deposited}/${missionGoalCount(this.level)} added to the soup!` : this.level.number === 11 ? `Decoration ${this.mission.deposited}/${missionGoalCount(this.level)} hung!` : mission?.kind === 'delivery' && mission.assembly ? `${this.level.number === 15 ? 'Sukkah section' : this.level.number === 19 ? 'Machine part' : 'Display piece'} ${this.mission.deposited}/${missionGoalCount(this.level)} assembled!` : mission?.kind === 'delivery' ? `${count} item${count === 1 ? '' : 's'} delivered! Find the rest.` : `${count} coin${count === 1 ? '' : 's'} in the pushka! Find the rest.`);
   }
   private updatePreparedTableArt(): void {
     const g = this.preparedTableArt;
@@ -827,6 +828,26 @@ export class GameScene extends Phaser.Scene {
       g.fillStyle(delivered ? 0x65bd95 : 0xd8d3cf).fillRoundedRect(markX, y + 7, width, 10, 2);
       g.lineStyle(1, 0x665b72).strokeRoundedRect(markX, y + 7, width, 10, 2);
       if (delivered) g.lineStyle(1.5, 0xffffff).lineBetween(markX + 2, y + 12, markX + width - 2, y + 12);
+    }
+    if (this.level.number === 16) {
+      // Each pack adds something ready for visitors inside Ezra's welcome tent.
+      if (this.mission.deposited >= 1) {
+        g.fillStyle(0x9d7959, .42).fillEllipse(166, 225, 34, 8);
+        g.fillStyle(0x9d6d51).fillEllipse(166, 210, 23, 30);
+        g.lineStyle(2, 0x704e41).strokeEllipse(166, 210, 23, 30);
+        g.fillStyle(0xc78d61).fillRoundedRect(157, 189, 18, 8, 3);
+        g.lineStyle(2, 0x704e41).strokeRoundedRect(157, 189, 18, 8, 3);
+        g.lineStyle(3, 0x704e41).strokeCircle(181, 205, 7);
+        g.fillStyle(0x86c9d0).fillCircle(166, 211, 4);
+      }
+      if (this.mission.deposited >= 2) {
+        g.fillStyle(0x9d7959, .42).fillEllipse(219, 225, 47, 8);
+        g.fillStyle(0x8b70a9).fillRoundedRect(199, 211, 41, 12, 4);
+        g.lineStyle(2, 0x674f80).strokeRoundedRect(199, 211, 41, 12, 4);
+        g.fillStyle(0x7cbbad).fillRoundedRect(202, 200, 35, 12, 4);
+        g.lineStyle(2, 0x527f7d).strokeRoundedRect(202, 200, 35, 12, 4);
+        g.lineStyle(2, 0xe5dfc8).lineBetween(213, 201, 213, 221);
+      }
     }
     if (this.level.number === 17) {
       // Each recovered winter pack lights a window in Rivka's community home.

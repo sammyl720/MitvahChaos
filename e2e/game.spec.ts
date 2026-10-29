@@ -651,9 +651,11 @@ test('floats across the dry wadi with community supplies', async ({page}) => {
   await tapWorld(page, 305, 275);
   await expect(page.locator('.mission-strip')).toContainText('Bag: 2', {timeout:20000});
   await tapWorld(page, 265, 209);
-  await expect(page.getByRole('button', {name:'DELIVER ITEM'})).toBeEnabled({timeout:20000});
-  await page.getByRole('button', {name:'DELIVER ITEM'}).click();
-  await expect(page.locator('.mission-strip')).toContainText('Delivered: 2/2');
+  await expect(page.getByRole('button', {name:'UNPACK SUPPLY'})).toBeEnabled({timeout:20000});
+  await page.getByRole('button', {name:'UNPACK SUPPLY'}).click();
+  await expect(page.locator('.mission-strip')).toContainText('Bag: 1 · Unpacked: 1/2');
+  await page.getByRole('button', {name:'UNPACK SUPPLY'}).click();
+  await expect(page.locator('.mission-strip')).toContainText('Bag: 0 · Unpacked: 2/2');
   await tapWorld(page, 140, 551);
   await expect(page.getByText('🎁 ✓')).toBeVisible({timeout:20000});
   await tapWorld(page, 195, 70);

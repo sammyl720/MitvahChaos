@@ -98,6 +98,7 @@ export const LevelSchema = z.object({
       itemName: z.string(),
       stationLabel: z.string(),
       assembly: z.boolean().optional(),
+      oneAtATime: z.boolean().optional(),
       actionLabel: z.string().optional(),
       progressLabel: z.string().optional(),
       station: z.object({ x: z.number(), y: z.number() }),

@@ -49,6 +49,7 @@
 - Centered the fixed-ratio puzzle inside a canvas that fills the stage, then extended each level's board floor and border across the whole canvas without stretching sprites or changing tap targets.
 - Added muted, world-specific scenery in the new side areas: neighboring buildings, village cottages, festival columns, and climate-specific world details.
 - Made the three community-home windows in Snowy Shlichus light up as each recovered winter pack is delivered.
+- Made Ezra's desert supply packs unpack one at a time: water and blankets appear inside the welcome tent as each pack is opened.
 - Made Avi pass gathering supplies to Maya in Jungle Mitzvah Mission; both neighbors move toward the gathering and raise a welcome garland when they finish together. Completed neighbor handoffs now show the bundle as delivered.
 
 ## Next milestones

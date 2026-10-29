@@ -561,7 +561,7 @@ export const LEVELS: Level[] = [LevelSchema.parse({
   number: 16,
   name: 'The Desert Delivery',
   world: 4,
-  hint: 'Give the cargo glider FLOATING, borrow FLOATING for yourself, and make the far-bank anchor HEAVY. Carry the supplies across the dry wadi to Ezra!',
+  hint: 'Give the cargo glider FLOATING, borrow FLOATING for yourself, and make the far-bank anchor HEAVY. Carry both supply packs across the dry wadi and unpack them at Ezra’s tent!',
   entities: [
     { id: 'player', kind: 'bandit', label: 'YOU', x: 195, y: 520, stickers: [], behavior: 'idle' },
     { id: 'cargo-glider', kind: 'wagon', label: 'CARGO GLIDER', x: 195, y: 449, stickers: [], behavior: 'idle' },
@@ -591,11 +591,14 @@ export const LEVELS: Level[] = [LevelSchema.parse({
   ],
   mission: {
     kind: 'delivery',
+    oneAtATime: true,
+    actionLabel: 'UNPACK SUPPLY',
+    progressLabel: 'Unpacked',
     items: [{ x: 65, y: 455 }, { x: 305, y: 275 }],
     itemName: 'community supply pack',
     stationLabel: 'WELCOME TENT',
     station: { x: 311, y: 207 },
-    npc: { x: 350, y: 265, name: 'EZRA', greeting: 'Our community supplies are on both sides of the dry wadi. Can you float across and bring them to the welcome tent?', thanks: 'Everything arrived safely. Now our visitors have what they need!' }
+    npc: { x: 350, y: 265, name: 'EZRA', greeting: 'Our community supplies are on both sides of the dry wadi. Can you float across and unpack each pack at the welcome tent?', thanks: 'The water and blankets are ready for our visitors. Thank you!' }
   }
 }), LevelSchema.parse({
   number: 17,
