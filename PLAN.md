@@ -40,6 +40,7 @@
 - Made Chaya's game table preparation a two-step task: each paper decoration is hung separately and appears on the table.
 - Made the adventurer face the direction of travel and leave alternating, fading footsteps. Reduced-motion mode removes sway and footsteps, while low-graphics mode simplifies the shadow animation and uses fewer footsteps.
 - Gave each world theme a quiet response phrase with its own notes and timbre, adding variation to the original synthesized soundtrack while preserving music volume and pause controls.
+- Added a soft mission chime for deliveries and neighbor help, with a longer rising phrase when the task is complete; switch and treasure sounds remain distinct.
 - Made Basya's soup preparation a two-step station task: bring both supplies around the spill, then add the ingredients separately and see each one appear in the pot.
 - Added a miniature cart that runs through Tova's village model when its mechanism activates. Pause stops the cart; reduced-motion and low-graphics modes show a still active cart.
 - Made Miriam's table and Dovi's bakery table start bare, then show their cloth or napkins when the player delivers them.

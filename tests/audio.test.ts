@@ -56,3 +56,41 @@ test('world music has distinct voices and obeys pause, volume, and stop', async 
   audio.stopMusic();
   expect(clearInterval).toHaveBeenCalled();
 });
+
+test('mission chime distinguishes a handoff from completing the task and respects mute', async () => {
+  const notes: number[] = [];
+  const peaks: number[] = [];
+  vi.stubGlobal('AudioContext', class {
+    state = 'running';
+    currentTime = 0;
+    destination = {};
+    createOscillator() {
+      const oscillator = {
+        type: 'sine',
+        frequency: { setValueAtTime: (frequency: number) => notes.push(frequency) },
+        connect: () => oscillator,
+        start: () => {},
+        stop: () => {}
+      };
+      return oscillator;
+    }
+    createGain() {
+      const gain = {
+        gain: {
+          setValueAtTime: () => {},
+          exponentialRampToValueAtTime: (value: number) => peaks.push(value)
+        },
+        connect: () => gain
+      };
+      return gain;
+    }
+  });
+  const audio = await import('../src/game/audio');
+  audio.playMissionSound(0, true);
+  expect(notes).toEqual([]);
+  audio.playMissionSound(.5, false);
+  expect(notes).toEqual([659, 880]);
+  audio.playMissionSound(.5, true);
+  expect(notes.slice(2)).toEqual([659, 784, 1047]);
+  expect(Math.max(...peaks)).toBeLessThanOrEqual(.09);
+});

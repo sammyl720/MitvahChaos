@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { createArt } from './art';
-import { playSound } from './audio';
+import { playMissionSound, playSound } from './audio';
 import { creatureVelocity } from './behavior';
 import { effectiveStats, STICKER_INFO, type EntityState, type GameSettings, type Goal, type Level, type StickerType } from './sceneTypes';
 import type { Fixture } from './model';
@@ -705,7 +705,7 @@ export class GameScene extends Phaser.Scene {
     if (!this.mission.carried) { this.say(`Find a ${mission.itemName} first!`); return; }
     this.mission = deliverGift(this.mission, index);
     this.burst(npc.x, npc.y, '#f3a6d2');
-    playSound('goal', this.settings.effectsVolume);
+    playMissionSound(this.settings.effectsVolume, missionComplete(this.level, this.mission));
     this.say(npc.thanks);
     this.emitStatus();
   }
@@ -723,7 +723,7 @@ export class GameScene extends Phaser.Scene {
     this.mission = helpNeighbor(this.mission, index, mission.handoff);
     this.neighborBundle?.setVisible(this.mission.carried > 0);
     this.burst(npc.x, npc.y, '#8ce0b1');
-    playSound('goal', this.settings.effectsVolume);
+    playMissionSound(this.settings.effectsVolume, missionComplete(this.level, this.mission));
     if (this.level.number === 18 && actor) {
       const destination = index ? 245 : 145;
       const label = this.neighborActors[index].label;
@@ -783,7 +783,7 @@ export class GameScene extends Phaser.Scene {
     if (this.level.number === 15) this.updateSukkahArt();
     if (this.level.number === 19) this.updateMachineArt();
     this.burst(station.x, station.y, '#ffd66e');
-    playSound('treasure', this.settings.effectsVolume);
+    playMissionSound(this.settings.effectsVolume, missionComplete(this.level, this.mission));
     this.say(missionComplete(this.level, this.mission) ? mission!.npc.thanks : this.level.number === 16 ? `Supply pack ${this.mission.deposited}/${missionGoalCount(this.level)} unpacked at the welcome tent!` : this.level.number === 10 ? `Parcel ${this.mission.deposited}/${missionGoalCount(this.level)} unloaded for Shmuel!` : this.level.number === 9 ? `Reizel placed parcel ${this.mission.deposited}/${missionGoalCount(this.level)} on the shelf!` : this.level.number === 7 ? `Ingredient ${this.mission.deposited}/${missionGoalCount(this.level)} added to the soup!` : this.level.number === 11 ? `Decoration ${this.mission.deposited}/${missionGoalCount(this.level)} hung!` : mission?.kind === 'delivery' && mission.assembly ? `${this.level.number === 15 ? 'Sukkah section' : this.level.number === 19 ? 'Machine part' : 'Display piece'} ${this.mission.deposited}/${missionGoalCount(this.level)} assembled!` : mission?.kind === 'delivery' ? `${count} item${count === 1 ? '' : 's'} delivered! Find the rest.` : `${count} coin${count === 1 ? '' : 's'} in the pushka! Find the rest.`);
   }
   private updatePreparedTableArt(): void {

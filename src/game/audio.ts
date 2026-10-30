@@ -33,6 +33,25 @@ export function playSound(name: SoundName, volume: number): void {
   oscillator.start(); oscillator.stop(ctx.currentTime + duration);
 }
 
+// A gentle rising cue for helping someone, distinct from switch and treasure sounds.
+export function playMissionSound(volume: number, complete: boolean): void {
+  if (volume <= 0) return;
+  const ctx = getContext(); if (!ctx) return;
+  const melody = complete ? [659, 784, 1047] : [659, 880];
+  melody.forEach((frequency, index) => {
+    const start = ctx.currentTime + index * .105;
+    const oscillator = ctx.createOscillator();
+    const gain = ctx.createGain();
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(frequency, start);
+    gain.gain.setValueAtTime(.001, start);
+    gain.gain.exponentialRampToValueAtTime(Math.min(.09, volume * .11), start + .02);
+    gain.gain.exponentialRampToValueAtTime(.001, start + .19);
+    oscillator.connect(gain).connect(ctx.destination);
+    oscillator.start(start); oscillator.stop(start + .2);
+  });
+}
+
 interface WorldTheme {
   stepMs: number;
   lead: OscillatorType;
