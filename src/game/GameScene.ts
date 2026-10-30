@@ -784,7 +784,7 @@ export class GameScene extends Phaser.Scene {
     if (this.level.number === 19) this.updateMachineArt();
     this.burst(station.x, station.y, '#ffd66e');
     playSound('treasure', this.settings.effectsVolume);
-    this.say(missionComplete(this.level, this.mission) ? mission!.npc.thanks : this.level.number === 16 ? `Supply pack ${this.mission.deposited}/${missionGoalCount(this.level)} unpacked at the welcome tent!` : this.level.number === 9 ? `Reizel placed parcel ${this.mission.deposited}/${missionGoalCount(this.level)} on the shelf!` : this.level.number === 7 ? `Ingredient ${this.mission.deposited}/${missionGoalCount(this.level)} added to the soup!` : this.level.number === 11 ? `Decoration ${this.mission.deposited}/${missionGoalCount(this.level)} hung!` : mission?.kind === 'delivery' && mission.assembly ? `${this.level.number === 15 ? 'Sukkah section' : this.level.number === 19 ? 'Machine part' : 'Display piece'} ${this.mission.deposited}/${missionGoalCount(this.level)} assembled!` : mission?.kind === 'delivery' ? `${count} item${count === 1 ? '' : 's'} delivered! Find the rest.` : `${count} coin${count === 1 ? '' : 's'} in the pushka! Find the rest.`);
+    this.say(missionComplete(this.level, this.mission) ? mission!.npc.thanks : this.level.number === 16 ? `Supply pack ${this.mission.deposited}/${missionGoalCount(this.level)} unpacked at the welcome tent!` : this.level.number === 10 ? `Parcel ${this.mission.deposited}/${missionGoalCount(this.level)} unloaded for Shmuel!` : this.level.number === 9 ? `Reizel placed parcel ${this.mission.deposited}/${missionGoalCount(this.level)} on the shelf!` : this.level.number === 7 ? `Ingredient ${this.mission.deposited}/${missionGoalCount(this.level)} added to the soup!` : this.level.number === 11 ? `Decoration ${this.mission.deposited}/${missionGoalCount(this.level)} hung!` : mission?.kind === 'delivery' && mission.assembly ? `${this.level.number === 15 ? 'Sukkah section' : this.level.number === 19 ? 'Machine part' : 'Display piece'} ${this.mission.deposited}/${missionGoalCount(this.level)} assembled!` : mission?.kind === 'delivery' ? `${count} item${count === 1 ? '' : 's'} delivered! Find the rest.` : `${count} coin${count === 1 ? '' : 's'} in the pushka! Find the rest.`);
   }
   private updatePreparedTableArt(): void {
     const g = this.preparedTableArt;
@@ -841,6 +841,18 @@ export class GameScene extends Phaser.Scene {
         g.lineStyle(2, 0x725b67).strokeRoundedRect(parcelX - 15, 201, 30, 22, 3);
         g.fillStyle(0xf4dfad).fillRoundedRect(parcelX - 3, 202, 6, 20, 1);
         g.lineStyle(2, 0xf4dfad).lineBetween(parcelX - 13, 208, parcelX + 13, 208);
+      }
+    }
+    if (this.level.number === 10) {
+      // Parcels arrive on the family's unloading platform one by one.
+      g.fillStyle(0xa77a5b).fillRoundedRect(188, 224, 58, 8, 2);
+      g.lineStyle(2, 0x755366).strokeRoundedRect(188, 224, 58, 8, 2);
+      for (let index = 0; index < this.mission.deposited; index++) {
+        const parcelX = index ? 229 : 205;
+        g.fillStyle(index ? 0xd5a16b : 0x89b8bd).fillRoundedRect(parcelX - 8, 203, 16, 21, 2);
+        g.lineStyle(2, 0x76596a).strokeRoundedRect(parcelX - 8, 203, 16, 21, 2);
+        g.fillStyle(0xf9e4ae).fillRoundedRect(parcelX - 2, 204, 4, 19, 1);
+        g.lineStyle(2, 0xf9e4ae).lineBetween(parcelX - 7, 209, parcelX + 7, 209);
       }
     }
     if (this.level.number === 16) {

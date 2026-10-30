@@ -257,7 +257,12 @@ describe('The Great Wagon Rescue', () => {
     mission = collectCoin(mission, 0);
     mission = collectCoin(mission, 1);
     expect(missionComplete(level, mission)).toBe(false);
-    expect(missionComplete(level, depositCoins(mission))).toBe(true);
+    expect(level.mission?.kind === 'delivery' && level.mission.oneAtATime).toBe(true);
+    mission = assemblePart(mission);
+    expect(mission).toMatchObject({ carried: 1, deposited: 1 });
+    expect(missionComplete(level, mission)).toBe(false);
+    mission = assemblePart(mission);
+    expect(missionComplete(level, mission)).toBe(true);
   });
   it('opens the parcel route after the anchor and the exit after rescue', () => {
     const start = level.entities[0];

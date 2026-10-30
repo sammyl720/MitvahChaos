@@ -326,7 +326,7 @@ export const LEVELS: Level[] = [LevelSchema.parse({
   number: 10,
   name: 'The Great Wagon Rescue',
   world: 2,
-  hint: 'Float the stalled wagon, make the tow anchor HEAVY, then give the wagon SLIPPERY to slide through the mud!',
+  hint: 'Float the stalled wagon, make the tow anchor HEAVY, and slide the wagon through the mud. Then unload both parcels for Shmuel!',
   entities: [
     { id: 'player', kind: 'bandit', label: 'YOU', x: 195, y: 521, stickers: [], behavior: 'idle' },
     { id: 'stalled-wagon', kind: 'wagon', label: 'STALLED WAGON', x: 73, y: 300, stickers: [], behavior: 'idle' },
@@ -359,9 +359,12 @@ export const LEVELS: Level[] = [LevelSchema.parse({
     kind: 'delivery',
     items: [{ x: 65, y: 436 }, { x: 260, y: 440 }],
     itemName: 'wagon parcels',
+    oneAtATime: true,
+    actionLabel: 'UNLOAD PARCEL',
+    progressLabel: 'Unloaded',
     stationLabel: 'FAMILY',
     station: { x: 309, y: 209 },
-    npc: { x: 350, y: 259, name: 'SHMUEL', greeting: 'Our delivery wagon is stuck in the mud. Can you rescue it and bring the parcels to the family?', thanks: 'The wagon is free and the parcels arrived. What a helpful team!' }
+    npc: { x: 350, y: 259, name: 'SHMUEL', greeting: 'Our delivery wagon is stuck in the mud. Can you rescue it and unload the parcels for us?', thanks: 'The wagon is free and both parcels are safely unloaded. What a helpful team!' }
   }
 }), LevelSchema.parse({
   number: 11,

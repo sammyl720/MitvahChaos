@@ -459,9 +459,11 @@ test('rescues the wagon from mud and delivers its parcels', async ({page}) => {
   await tapWorld(page, 260, 440);
   await expect(page.locator('.mission-strip')).toContainText('Bag: 2', {timeout:20000});
   await tapWorld(page, 265, 209);
-  await expect(page.getByRole('button', {name:'DELIVER ITEM'})).toBeEnabled({timeout:20000});
-  await page.getByRole('button', {name:'DELIVER ITEM'}).click();
-  await expect(page.locator('.mission-strip')).toContainText('Delivered: 2/2');
+  await expect(page.getByRole('button', {name:'UNLOAD PARCEL'})).toBeEnabled({timeout:20000});
+  await page.getByRole('button', {name:'UNLOAD PARCEL'}).click();
+  await expect(page.locator('.mission-strip')).toContainText('Bag: 1 · Unloaded: 1/2');
+  await page.getByRole('button', {name:'UNLOAD PARCEL'}).click();
+  await expect(page.locator('.mission-strip')).toContainText('Bag: 0 · Unloaded: 2/2');
   await tapWorld(page, 65, 551);
   await expect(page.getByText('🎁 ✓')).toBeVisible({timeout:20000});
   await tapWorld(page, 195, 70);

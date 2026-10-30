@@ -51,6 +51,7 @@
 - Made the three community-home windows in Snowy Shlichus light up as each recovered winter pack is delivered.
 - Made Ezra's desert supply packs unpack one at a time: water and blankets appear inside the welcome tent as each pack is opened.
 - Made Reizel receive parcels individually across the Floating Bridge; each parcel appears on her far-bank shelf.
+- Made Shmuel's rescued wagon delivery a two-step unload; each parcel appears on the family's platform as it arrives.
 - Deferred Phaser canvas creation until the next frame so React Strict Mode can cancel its throwaway mount; six enter/leave cycles passed in each browser profile.
 - Made Avi pass gathering supplies to Maya in Jungle Mitzvah Mission; both neighbors move toward the gathering and raise a welcome garland when they finish together. Completed neighbor handoffs now show the bundle as delivered.
 
