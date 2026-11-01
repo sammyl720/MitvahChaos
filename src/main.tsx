@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import Phaser from 'phaser';
-import { GameScene, type SceneStatus } from './game/GameScene';
+import type Phaser from 'phaser';
+import type { GameScene, SceneStatus } from './game/GameScene';
 import { playSound, setMusicPaused, setMusicVolume, startCelebrationMusic, startMusic, stopMusic } from './game/audio';
 import { ADVENTURE_WORDS } from './game/glossary';
 import { getLevel, LEVELS, WORLD_ICONS, WORLD_NAMES } from './game/levels';
@@ -87,40 +87,77 @@ function GameScreen({ number, onBack, onNext }: { number:number; onBack:()=>void
   const [result,setResult] = useState<{stars:number;gem:boolean}|null>(null);
   const [expandedBoard,setExpandedBoard] = useState(false);
   const [showMission,setShowMission] = useState(false);
+  const [gameReady,setGameReady] = useState(false);
+  const [loadError,setLoadError] = useState(false);
   const achievementsSeen = useRef(progress.achievements.length);
+  const latestSettings = useRef(progress.settings);
+  const latestExpandedBoard = useRef(expandedBoard);
+  const latestPaused = useRef(paused);
+  latestSettings.current = progress.settings;
+  latestExpandedBoard.current = expandedBoard;
+  latestPaused.current = paused;
   const host = useRef<HTMLDivElement>(null);
   const stage = useRef<HTMLElement>(null);
   const scene = useRef<GameScene|null>(null);
   useEffect(() => {
     if (!host.current) return;
     const canvasHost = host.current;
-    const gameScene = new GameScene(level, {
-      onStatus: setStatus,
-      onTransfer: (sticker,sourceKind,stickers) => recordTransfer(sticker,sourceKind,stickers),
-      onBounce: () => recordBounce(),
-      onComplete: (stars,gem,tiny) => { completeLevel(number,stars,gem,tiny); if (number === 20) startCelebrationMusic(progress.settings.musicVolume); setResult({stars,gem}); }
-    }, progress.settings, progress.selectedCosmetic, progress.selectedCharacter);
     let game: Phaser.Game | null = null;
-    const visibility = () => { if(document.hidden){gameScene.setPaused(true);setMusicPaused(true);setPaused(true);} };
+    let gameScene: GameScene | null = null;
+    let disposed = false;
+    let readyOnce = false;
+    const visibility = () => { if(document.hidden){if(readyOnce) gameScene?.setPaused(true);setMusicPaused(true);setPaused(true);} };
+    document.addEventListener('visibilitychange',visibility);
     // Strict Mode immediately cleans up its first effect run. Let that run
-    // cancel before Phaser creates a canvas or starts its render loop.
+    // cancel before loading Phaser or creating a canvas.
     const mountFrame = requestAnimationFrame(() => {
-      if (!canvasHost.isConnected) return;
-      startMusic(level.world, progress.settings.musicVolume);
-      scene.current = gameScene;
-      game = new Phaser.Game({
-        type: progress.settings.graphicsQuality === 'low' ? Phaser.CANVAS : Phaser.AUTO,
-        parent: canvasHost,
-        width:390,height:620,
-        backgroundColor:'#fff0c8',
-        scale:{ mode:Phaser.Scale.EXPAND, autoCenter:Phaser.Scale.NO_CENTER, width:390, height:620 },
-        physics:{ default:'arcade', arcade:{ debug:false, gravity:{x:0,y:0} } },
-        render:{ antialias:progress.settings.graphicsQuality !== 'low', pixelArt:false },
-        scene:[gameScene]
+      void Promise.all([import('phaser'),import('./game/GameScene')]).then(([{default: PhaserRuntime},{GameScene: GameSceneRuntime}]) => {
+        if (disposed || !canvasHost.isConnected) return;
+        const settings = latestSettings.current;
+        gameScene = new GameSceneRuntime(level, {
+          onStatus: (next) => {
+            setStatus(next);
+            if (!readyOnce) {
+              readyOnce = true;
+              gameScene?.updateSettings({...latestSettings.current,controlMode:latestExpandedBoard.current?'tap':latestSettings.current.controlMode});
+              if (latestPaused.current || document.hidden) {gameScene?.setPaused(true);setMusicPaused(true);}
+              setGameReady(true);
+              requestAnimationFrame(() => {
+                if (disposed) return;
+                const scale = scene.current?.game?.scale;
+                scale?.getParentBounds();
+                scale?.refresh();
+                if (latestExpandedBoard.current && stage.current) stage.current.scrollTop = stage.current.scrollHeight;
+                scale?.updateBounds();
+              });
+            }
+          },
+          onTransfer: (sticker,sourceKind,stickers) => recordTransfer(sticker,sourceKind,stickers),
+          onBounce: () => recordBounce(),
+          onComplete: (stars,gem,tiny) => { completeLevel(number,stars,gem,tiny); if (number === 20) startCelebrationMusic(latestSettings.current.musicVolume); setResult({stars,gem}); }
+        }, settings, progress.selectedCosmetic, progress.selectedCharacter);
+        startMusic(level.world, settings.musicVolume);
+        scene.current = gameScene;
+        game = new PhaserRuntime.Game({
+          type: settings.graphicsQuality === 'low' ? PhaserRuntime.CANVAS : PhaserRuntime.AUTO,
+          parent: canvasHost,
+          width:390,height:620,
+          backgroundColor:'#fff0c8',
+          scale:{ mode:PhaserRuntime.Scale.EXPAND, autoCenter:PhaserRuntime.Scale.NO_CENTER, width:390, height:620 },
+          physics:{ default:'arcade', arcade:{ debug:false, gravity:{x:0,y:0} } },
+          render:{ antialias:settings.graphicsQuality !== 'low', pixelArt:false },
+          scene:[gameScene]
+        });
+      }).catch(() => {
+        if (disposed) return;
+        if (scene.current === gameScene) scene.current = null;
+        game?.destroy(true);
+        canvasHost.replaceChildren();
+        stopMusic();
+        setLoadError(true);
       });
-      document.addEventListener('visibilitychange',visibility);
     });
-    return () => { cancelAnimationFrame(mountFrame); document.removeEventListener('visibilitychange',visibility); if (scene.current === gameScene) scene.current=null; stopMusic(); game?.destroy(true); canvasHost.replaceChildren(); };
+    return () => { disposed = true; cancelAnimationFrame(mountFrame); document.removeEventListener('visibilitychange',visibility); if (scene.current === gameScene) scene.current=null; stopMusic(); game?.destroy(true); canvasHost.replaceChildren(); };
     // A level's game is intentionally mounted once; settings can be changed from the menu.
   },[number]);
   useEffect(() => {
@@ -152,7 +189,7 @@ function GameScreen({ number, onBack, onNext }: { number:number; onBack:()=>void
   return <main className={`game-screen ${expandedBoard?'expanded-board':''}`}>
     <header className="game-top"><button className="icon-button" onClick={() => {setPaused(true);setMusicPaused(true);scene.current?.setPaused(true);}} aria-label="Pause">Ⅱ</button><div className="game-title"><small>{WORLD_NAMES[level.world-1]} · Level {number}</small><strong>{level.name}</strong></div><div className="game-progress"><span>🎁 {status.treasure?'✓':'0/1'}</span><span>💎 {status.gem?'✓':'0/1'}</span></div></header>
     <div className="stage-hint"><span className="stage-hint-text" role="status" aria-live="polite">{showMission?level.hint:status.message || level.hint}</span>{status.message && status.message !== level.hint && <button type="button" onClick={()=>setShowMission((value)=>!value)} aria-label={showMission?'Show latest status':'Show mission instructions'}>{showMission?'STATUS':'MISSION'}</button>}</div>
-    <section ref={stage} className={`stage-shell world-${level.world}`} aria-label={`${level.name} game area`} onScroll={()=>scene.current?.game?.scale.updateBounds()}><div ref={host} className="game-canvas"/></section>
+    <section ref={stage} className={`stage-shell world-${level.world}`} aria-label={`${level.name} game area`} onScroll={()=>scene.current?.game?.scale.updateBounds()}><div ref={host} className="game-canvas"/>{!gameReady && <div className="stage-loading" role="status">{loadError ? <><span>Couldn’t open this level.</span><button type="button" onClick={onBack}>BACK TO MAP</button></> : 'Getting the playfield ready…'}</div>}</section>
     <div className="game-bottom">{level.mission && <div className="mission-strip"><span><b className="coin-symbol">●</b> {level.mission.kind === 'neighbors' ? level.mission.handoff ? `Helped: ${status.deposited}/${status.required} · ${handoffProgress}` : `Neighbors helped: ${status.deposited}/${status.required}` : `Bag: ${status.carried} · ${level.mission.kind === 'delivery' && level.mission.assembly ? (level.mission.progressLabel ?? 'Assembled') : level.mission.kind === 'delivery' ? (level.mission.progressLabel ?? 'Delivered') : level.mission.kind === 'deliveries' ? 'Delivered' : 'Pushka'}: ${status.deposited}/${status.required}`}</span><button onClick={()=>scene.current?.deposit()} disabled={!status.nearStation || (level.mission.kind !== 'neighbors' && (!status.carried || (level.mission.kind === 'delivery' && level.mission.fragileZone && !status.deposited && status.carried < status.required)))}>{level.mission.kind === 'neighbors' ? 'HELP NEIGHBOR' : level.mission.kind === 'deliveries' ? 'DELIVER GIFT' : level.mission.kind === 'delivery' ? level.mission.assembly ? (level.mission.actionLabel ?? 'ASSEMBLE PIECE') : (level.mission.actionLabel ?? 'DELIVER ITEM') : 'DEPOSIT COINS'}</button></div>}<div className="tool-row"><button className="tool-button" onClick={() => scene.current?.undo()} disabled={!status.canUndo}>↶ <span>UNDO</span></button><button className="tool-button" onClick={restart}>↻ <span>RESTART</span></button><button className="tool-button view-toggle" onClick={()=>setExpandedBoard((value)=>!value)} aria-pressed={expandedBoard} aria-label={expandedBoard?'Fit playfield':'Enlarge playfield'} title={expandedBoard?'Fit the whole playfield':'Enlarge the playfield and move the view up or down'}>{expandedBoard?'⤡':'⤢'}<span>VIEW</span></button><div className="goal-count">⚡ {status.goals}/{status.totalGoals} switches</div></div>
       <div className="control-row">{expandedBoard?<div className="view-controls" aria-label="Move playfield view"><button onClick={()=>stage.current?.scrollBy({top:-170,behavior:'auto'})} aria-label="Move view up">↑ VIEW</button><button onClick={()=>stage.current?.scrollBy({top:170,behavior:'auto'})} aria-label="Move view down">↓ VIEW</button></div>:progress.settings.controlMode==='joystick'?<Joystick onMove={(x,y)=>scene.current?.setJoystick(x,y)}/>:<div className="tap-tip">👆 Tap the ground<br/>to move</div>}
       <div className="sticker-tray">{status.selected?<><span className="tray-title">{status.selected.kind.toUpperCase()} STICKERS</span><div className="tray-stickers">{status.selected.stickers.length?status.selected.stickers.map((sticker)=><button key={sticker} className={`sticker-pill ${status.armed===sticker?'armed':''}`} style={{'--sticker':STICKER_INFO[sticker].color} as React.CSSProperties} onClick={()=>scene.current?.selectSticker(sticker)}>{STICKER_INFO[sticker].icon} {sticker}</button>):<span className="tray-empty">Tap a stickered object</span>}</div></>:<><span className="tray-title">HOW TO PLAY</span><span className="tray-empty">Tap an object, choose a sticker, then tap a new home. Or drag a sticker!</span></>}</div></div>

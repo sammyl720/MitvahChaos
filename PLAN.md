@@ -54,6 +54,7 @@
 - Made Reizel receive parcels individually across the Floating Bridge; each parcel appears on her far-bank shelf.
 - Made Shmuel's rescued wagon delivery a two-step unload; each parcel appears on the family's platform as it arrives.
 - Deferred Phaser canvas creation until the next frame so React Strict Mode can cancel its throwaway mount; six enter/leave cycles passed in each browser profile.
+- Load the Phaser engine only after a level is selected, with a visible loading state and a return-to-map action if loading fails; the first-screen JavaScript is about 396 KB instead of 1.86 MB. Verified offline launch and kept browser test concurrency at two workers after a heavily contended run missed a timed pickup.
 - Made Avi pass gathering supplies to Maya in Jungle Mitzvah Mission; both neighbors move toward the gathering and raise a welcome garland when they finish together. Completed neighbor handoffs now show the bundle as delivered.
 
 ## Next milestones

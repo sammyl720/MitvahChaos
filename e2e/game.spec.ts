@@ -46,6 +46,32 @@ test('explains adventure words without crowding the sticker book on a small scre
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
 });
 
+test('loads the game engine only when a level opens', async ({page}) => {
+  const engineRequests: string[] = [];
+  page.on('request', (request) => {
+    const path = new URL(request.url()).pathname;
+    if (path.includes('GameScene') || path.includes('phaser')) engineRequests.push(path);
+  });
+  await page.goto('/', {waitUntil:'networkidle'});
+  await expect(page.locator('.logo')).toBeVisible();
+  expect(engineRequests).toEqual([]);
+  await page.getByRole('button', {name:/PLAY/}).first().click();
+  await page.getByRole('button', {name:/Level 1: The Runaway Pushka/}).click();
+  await expect(page.locator('canvas')).toBeVisible();
+  expect(engineRequests.some((path) => path.includes('GameScene'))).toBe(true);
+  expect(engineRequests.some((path) => path.includes('phaser'))).toBe(true);
+});
+
+test('offers a way back if the game engine cannot load', async ({page}) => {
+  await page.route('**/src/game/GameScene.ts*', (route) => route.abort());
+  await page.goto('/');
+  await page.getByRole('button', {name:/PLAY/}).first().click();
+  await page.getByRole('button', {name:/Level 1: The Runaway Pushka/}).click();
+  await expect(page.locator('.stage-loading')).toContainText('Couldn’t open this level.');
+  await page.getByRole('button', {name:'BACK TO MAP'}).click();
+  await expect(page.getByRole('heading', {name:'Pick a level!'})).toBeVisible();
+});
+
 test('mounts one canvas when entering and leaving levels repeatedly', async ({page}) => {
   const pageErrors: string[] = [];
   page.on('pageerror', (error) => pageErrors.push(error.message));
